@@ -35,6 +35,16 @@ export async function getEvaluations() {
   }
 }
 
+export async function getEvaluationVideos(evaluationId) {
+  try {
+    const response = await apiGet(`/evaluations/${evaluationId}/videos`)
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
+    return await response.json()
+  } catch {
+    return { videos: {}, source: 'empty' }
+  }
+}
+
 export async function getSummaryStats() {
   try {
     const response = await apiGet('/summary')
