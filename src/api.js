@@ -1,6 +1,7 @@
 import { evaluations, leaderboardRows, summaryStats } from './data/mockData.js'
 
-const API_BASE = import.meta.env.VITE_API_BASE || '/api'
+const API_BASE = import.meta.env.VITE_API_BASE
+  || (import.meta.env.DEV ? '/api' : 'https://34-208-253-34.sslip.io/api')
 
 export async function apiGet(path, init = {}) {
   return fetch(`${API_BASE}${path}`, init)
