@@ -31,14 +31,14 @@
 import { computed, onMounted, ref } from 'vue'
 import LeaderboardTable from '../components/LeaderboardTable.vue'
 import RobotSelector from '../components/RobotSelector.vue'
-import { getLeaderboard } from '../api.js'
-import { leaderboardRows as fallbackRows, robots } from '../data/mockData.js'
+import { getLeaderboard, getRobots } from '../api.js'
 
-const rows = ref(fallbackRows)
+const rows = ref([])
 const query = ref('')
 const minEvals = ref(0)
 const selectedRobotId = ref('yam')
-const leaderboardRobots = robots.filter((robot) => robot.id !== 'all')
+const robots = ref([])
+const leaderboardRobots = computed(() => robots.value.filter((robot) => robot.id !== 'all'))
 
 const filteredRows = computed(() => {
   const needle = query.value.trim().toLowerCase()
@@ -51,7 +51,8 @@ const filteredRows = computed(() => {
 })
 
 onMounted(async () => {
-  const data = await getLeaderboard()
-  rows.value = data.board || fallbackRows
+  const [robotData, leaderboardData] = await Promise.all([getRobots(), getLeaderboard()])
+  robots.value = robotData.robots || []
+  rows.value = leaderboardData.board || []
 })
 </script>

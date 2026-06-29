@@ -2,7 +2,10 @@
   <div class="page-stack overview-page">
     <section class="hero-copy overview-intro">
       <p class="eyebrow">BitRobot Arena</p>
-      <h1>Evaluate policies with simple A/B robot trials.</h1>
+      <h1>
+        Evaluate policies<br />
+        with simple A/B robot trials.
+      </h1>
       <p>
         Start with YAM evaluations now.
       </p>
@@ -32,19 +35,20 @@
 import { computed, onMounted, ref } from 'vue'
 import EvalCard from '../components/EvalCard.vue'
 import EvalVideoReview from '../components/EvalVideoReview.vue'
-import { getEvaluations } from '../api.js'
-import { evaluations as fallbackEvaluations, robots } from '../data/mockData.js'
+import { getEvaluations, getRobots } from '../api.js'
 
-const evaluations = ref(fallbackEvaluations)
+const evaluations = ref([])
+const robots = ref([])
 
 const latestEvaluation = computed(() => evaluations.value[0] || null)
 
 function robotName(robotId) {
-  return robots.find((robot) => robot.id === robotId)?.name || robotId
+  return robots.value.find((robot) => robot.id === robotId)?.name || robotId
 }
 
 onMounted(async () => {
-  const data = await getEvaluations()
-  evaluations.value = data.evaluations || fallbackEvaluations
+  const [robotData, evaluationData] = await Promise.all([getRobots(), getEvaluations()])
+  robots.value = robotData.robots || []
+  evaluations.value = evaluationData.evaluations || []
 })
 </script>

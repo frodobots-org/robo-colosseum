@@ -36,20 +36,20 @@ import { computed, onMounted, ref, watch } from 'vue'
 import EvalCard from '../components/EvalCard.vue'
 import EvalVideoReview from '../components/EvalVideoReview.vue'
 import RobotSelector from '../components/RobotSelector.vue'
-import { getEvaluations } from '../api.js'
-import { evaluations as fallbackEvaluations, robots } from '../data/mockData.js'
+import { getEvaluations, getRobots } from '../api.js'
 
-const evaluations = ref(fallbackEvaluations)
-const selected = ref(fallbackEvaluations[0])
+const evaluations = ref([])
+const selected = ref(null)
 const selectedRobotId = ref('yam')
-const concreteRobots = robots.filter((robot) => robot.id !== 'all')
+const robots = ref([])
+const concreteRobots = computed(() => robots.value.filter((robot) => robot.id !== 'all'))
 
 const filteredEvaluations = computed(() => {
   return evaluations.value.filter((evaluation) => evaluation.robotId === selectedRobotId.value)
 })
 
 function robotName(robotId) {
-  return robots.find((robot) => robot.id === robotId)?.name || robotId
+  return robots.value.find((robot) => robot.id === robotId)?.name || robotId
 }
 
 watch(filteredEvaluations, (items) => {
@@ -59,8 +59,9 @@ watch(filteredEvaluations, (items) => {
 })
 
 onMounted(async () => {
-  const data = await getEvaluations()
-  evaluations.value = data.evaluations || fallbackEvaluations
+  const [robotData, evaluationData] = await Promise.all([getRobots(), getEvaluations()])
+  robots.value = robotData.robots || []
+  evaluations.value = evaluationData.evaluations || []
   selected.value = filteredEvaluations.value[0]
 })
 </script>

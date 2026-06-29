@@ -1,10 +1,18 @@
-import { evaluations, leaderboardRows, summaryStats } from './data/mockData.js'
-
 const API_BASE = import.meta.env.VITE_API_BASE
   || (import.meta.env.DEV ? '/api' : 'https://34-208-253-34.sslip.io/api')
 
 export async function apiGet(path, init = {}) {
   return fetch(`${API_BASE}${path}`, init)
+}
+
+export async function getRobots() {
+  try {
+    const response = await apiGet('/robots')
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
+    return await response.json()
+  } catch {
+    return { robots: [], source: 'empty' }
+  }
 }
 
 export async function getLeaderboard() {
@@ -13,7 +21,7 @@ export async function getLeaderboard() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
     return await response.json()
   } catch {
-    return { board: leaderboardRows, source: 'mock' }
+    return { board: [], source: 'empty' }
   }
 }
 
@@ -23,7 +31,7 @@ export async function getEvaluations() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
     return await response.json()
   } catch {
-    return { evaluations, source: 'mock' }
+    return { evaluations: [], source: 'empty' }
   }
 }
 
@@ -33,6 +41,6 @@ export async function getSummaryStats() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
     return await response.json()
   } catch {
-    return { summary: summaryStats, source: 'mock' }
+    return { summary: { policies: 0, evaluations: 0, evaluators: 0, tasks: 0 }, source: 'empty' }
   }
 }

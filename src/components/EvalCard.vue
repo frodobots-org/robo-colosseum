@@ -31,7 +31,7 @@
       </div>
       <div class="eval-summary-row feedback-row">
         <span>Feedback</span>
-        <p>{{ evaluation.feedback || evaluation.notes || mockFeedback }}</p>
+        <p>{{ evaluation.feedback || evaluation.notes || 'No feedback yet.' }}</p>
       </div>
     </div>
   </article>
@@ -48,8 +48,6 @@ defineProps({
     default: '',
   },
 })
-
-const mockFeedback = 'Policy A reached the target region, while Policy B made contact but did not complete the final placement.'
 
 function prefLabel(evaluation) {
   const pref = evaluation.preference || evaluation.pref || evaluation.winner
