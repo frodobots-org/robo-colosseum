@@ -6,9 +6,8 @@
           <th>Rank</th>
           <th>Policy</th>
           <th>Status</th>
-          <th>RoboArena Score</th>
+          <th>Score</th>
           <th>SD</th>
-          <th>W-L-T</th>
           <th># A/B Evals</th>
         </tr>
       </thead>
@@ -28,7 +27,6 @@
             <strong>{{ formatNumber(row.score) }}</strong>
           </td>
           <td>{{ formatNumber(row.sd ?? row.std ?? row.ci) }}</td>
-          <td>{{ formatRecord(row) }}</td>
           <td>{{ formatCount(row.num_evals ?? row.evals) }}</td>
         </tr>
       </tbody>
@@ -67,7 +65,4 @@ function formatCount(value) {
   return number.toLocaleString()
 }
 
-function formatRecord(row) {
-  return `${formatCount(row.wins)}-${formatCount(row.losses)}-${formatCount(row.ties ?? 0)}`
-}
 </script>
