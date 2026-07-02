@@ -69,7 +69,10 @@ function prefLabel(evaluation) {
 
 function difficultyScore10(evaluation) {
   const score = Number(evaluation.difficultyScore)
-  if (Number.isFinite(score)) return `${Math.round(score * 10)}/10`
+  if (Number.isFinite(score)) {
+    const bucket = Math.min(10, Math.max(1, Math.ceil(score * 10)))
+    return `${bucket}/10`
+  }
   return evaluation.difficulty || 'Unscored'
 }
 </script>

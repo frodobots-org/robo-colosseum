@@ -47,7 +47,9 @@ const robots = ref([])
 const concreteRobots = computed(() => robots.value.filter((robot) => robot.id !== 'all'))
 
 const filteredEvaluations = computed(() => {
-  return evaluations.value.filter((evaluation) => evaluation.robotId === selectedRobotId.value)
+  return evaluations.value.filter((evaluation) => {
+    return evaluation.finalized && evaluation.robotId === selectedRobotId.value
+  })
 })
 
 function robotName(robotId) {

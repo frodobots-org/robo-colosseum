@@ -40,7 +40,8 @@ import { getEvaluations, getRobots } from '../api.js'
 const evaluations = ref([])
 const robots = ref([])
 
-const latestEvaluation = computed(() => evaluations.value[0] || null)
+const completedEvaluations = computed(() => evaluations.value.filter((evaluation) => evaluation.finalized))
+const latestEvaluation = computed(() => completedEvaluations.value[0] || null)
 
 function robotName(robotId) {
   return robots.value.find((robot) => robot.id === robotId)?.name || robotId
