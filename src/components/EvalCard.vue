@@ -3,9 +3,13 @@
     <div class="eval-summary-header">
       <div>
         <span>{{ evaluation.id }} · {{ robotName || evaluation.robotId }}</span>
-        <h2>{{ evaluation.instruction || evaluation.task }}</h2>
       </div>
       <time>{{ evaluation.evalTime || evaluation.date }}</time>
+    </div>
+
+    <div class="eval-instruction">
+      <span>Prompt</span>
+      <h2>{{ evaluation.instruction || evaluation.task }}</h2>
     </div>
 
     <div class="eval-summary-list">
@@ -14,8 +18,16 @@
         <strong>{{ prefLabel(evaluation) }}</strong>
       </div>
       <div class="eval-summary-row">
+        <span>Difficulty</span>
+        <strong>{{ difficultyScore10(evaluation) }}</strong>
+      </div>
+      <div class="eval-summary-row">
         <span>Evaluator</span>
         <strong>{{ evaluation.evaluator || 'eval-west-03' }}</strong>
+      </div>
+      <div class="eval-summary-row">
+        <span>Scene</span>
+        <strong>{{ evaluation.scene || 'Unspecified' }}</strong>
       </div>
       <div class="eval-summary-row policy-review-row">
         <span>Policy A</span>
@@ -53,5 +65,11 @@ function prefLabel(evaluation) {
   const pref = evaluation.preference || evaluation.pref || evaluation.winner
   if (pref === 'tie') return 'Tie'
   return pref === 'A' || pref === 'B' ? pref : ''
+}
+
+function difficultyScore10(evaluation) {
+  const score = Number(evaluation.difficultyScore)
+  if (Number.isFinite(score)) return `${Math.round(score * 10)}/10`
+  return evaluation.difficulty || 'Unscored'
 }
 </script>

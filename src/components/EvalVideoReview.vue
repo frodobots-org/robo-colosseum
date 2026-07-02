@@ -7,17 +7,17 @@
       </div>
       <div class="video-package-grid">
         <div class="review-camera review-camera-top">
-          <video v-if="videoSrc('a', 'top')" class="review-video" :src="videoSrc('a', 'top')" controls autoplay muted loop playsinline></video>
+          <video v-if="videoSrc('a', 'top')" class="review-video" :src="videoSrc('a', 'top')" autoplay muted loop playsinline></video>
           <div v-else class="review-video-placeholder">No video</div>
           <span class="video-caption">Top</span>
         </div>
         <div class="review-camera">
-          <video v-if="videoSrc('a', 'left_wrist')" class="review-video" :src="videoSrc('a', 'left_wrist')" controls autoplay muted loop playsinline></video>
+          <video v-if="videoSrc('a', 'left_wrist')" class="review-video" :src="videoSrc('a', 'left_wrist')" autoplay muted loop playsinline></video>
           <div v-else class="review-video-placeholder">No video</div>
           <span class="video-caption">Left wrist</span>
         </div>
         <div class="review-camera">
-          <video v-if="videoSrc('a', 'right_wrist')" class="review-video" :src="videoSrc('a', 'right_wrist')" controls autoplay muted loop playsinline></video>
+          <video v-if="videoSrc('a', 'right_wrist')" class="review-video" :src="videoSrc('a', 'right_wrist')" autoplay muted loop playsinline></video>
           <div v-else class="review-video-placeholder">No video</div>
           <span class="video-caption">Right wrist</span>
         </div>
@@ -31,17 +31,17 @@
       </div>
       <div class="video-package-grid">
         <div class="review-camera review-camera-top">
-          <video v-if="videoSrc('b', 'top')" class="review-video" :src="videoSrc('b', 'top')" controls autoplay muted loop playsinline></video>
+          <video v-if="videoSrc('b', 'top')" class="review-video" :src="videoSrc('b', 'top')" autoplay muted loop playsinline></video>
           <div v-else class="review-video-placeholder">No video</div>
           <span class="video-caption">Top</span>
         </div>
         <div class="review-camera">
-          <video v-if="videoSrc('b', 'left_wrist')" class="review-video" :src="videoSrc('b', 'left_wrist')" controls autoplay muted loop playsinline></video>
+          <video v-if="videoSrc('b', 'left_wrist')" class="review-video" :src="videoSrc('b', 'left_wrist')" autoplay muted loop playsinline></video>
           <div v-else class="review-video-placeholder">No video</div>
           <span class="video-caption">Left wrist</span>
         </div>
         <div class="review-camera">
-          <video v-if="videoSrc('b', 'right_wrist')" class="review-video" :src="videoSrc('b', 'right_wrist')" controls autoplay muted loop playsinline></video>
+          <video v-if="videoSrc('b', 'right_wrist')" class="review-video" :src="videoSrc('b', 'right_wrist')" autoplay muted loop playsinline></video>
           <div v-else class="review-video-placeholder">No video</div>
           <span class="video-caption">Right wrist</span>
         </div>

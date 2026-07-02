@@ -17,9 +17,11 @@
           type="button"
           @click="selected = item"
         >
-          <span>{{ item.id }}</span>
+          <span class="eval-list-meta">
+            <span>{{ item.id }}</span>
+            <time>{{ item.evalTime || item.date }}</time>
+          </span>
           <strong>{{ item.instruction || item.task }}</strong>
-          <small>{{ robotName(item.robotId) }} · {{ item.policyA }} vs {{ item.policyB }}</small>
         </button>
       </aside>
 
