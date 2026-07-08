@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE
-  || (import.meta.env.DEV ? '/api' : 'https://34-208-253-34.sslip.io/api')
+  || (import.meta.env.DEV ? '/api' : 'http://ec2-13-212-252-110.ap-southeast-1.compute.amazonaws.com:5051/api')
 
 export async function apiGet(path, init = {}) {
   return fetch(`${API_BASE}${path}`, init)
