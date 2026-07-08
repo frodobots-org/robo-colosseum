@@ -8,7 +8,7 @@
 
     <iframe
       class="submit-form-frame"
-      title="BitRobot Arena policy submission form"
+      title="ArenaVerse policy submission form"
       :src="GOOGLE_FORM_EMBED_URL"
       loading="lazy"
       allowfullscreen

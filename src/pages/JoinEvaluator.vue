@@ -9,7 +9,7 @@
     <section class="form-panel">
       <iframe
         class="submit-form-frame"
-        title="BitRobot Arena evaluator signup form"
+        title="ArenaVerse evaluator signup form"
         :src="GOOGLE_FORM_EMBED_URL"
       ></iframe>
     </section>

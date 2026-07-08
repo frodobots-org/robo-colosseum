@@ -1,7 +1,7 @@
 <template>
   <div class="page-stack overview-page">
     <section class="hero-copy overview-intro">
-      <p class="eyebrow">BitRobot Arena</p>
+      <p class="eyebrow">ArenaVerse</p>
       <h1>
         Evaluate policies<br />
         with simple A/B robot trials.

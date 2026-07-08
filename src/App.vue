@@ -1,10 +1,10 @@
 <template>
   <div class="app-shell">
     <header class="topbar">
-      <RouterLink class="brand" to="/" aria-label="BitRobot Arena home">
-        <span class="brand-mark">BA</span>
+      <RouterLink class="brand" to="/" aria-label="ArenaVerse home">
+        <span class="brand-mark">AV</span>
         <span>
-          <strong>BitRobot Arena</strong>
+          <strong>ArenaVerse</strong>
           <small>Real-world policy evaluation</small>
         </span>
       </RouterLink>
