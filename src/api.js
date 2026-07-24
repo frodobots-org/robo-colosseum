@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE
-  || (import.meta.env.DEV ? '/api' : 'https://rtcrobot.com/arena-api')
+  || (import.meta.env.DEV ? '/api' : 'https://cn.rtcrobot.com/api')
 
 export async function apiGet(path, init = {}) {
   return fetch(`${API_BASE}${path}`, init)
