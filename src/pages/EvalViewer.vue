@@ -1,14 +1,17 @@
 <template>
   <div class="page-stack">
     <section class="page-header">
-      <p class="eyebrow">A/B Evaluation Viewer</p>
-      <h1>Pairwise rollout review</h1>
-      <p>Inspect instructions, robot embodiment, policy matchups, evaluator feedback, and rollout metadata.</p>
+      <p class="eyebrow">Head-to-head comparison</p>
+      <h1>A/B Evaluation</h1>
+      <p>Compare Policy A and Policy B side by side on the same task, and explore evaluator feedback.</p>
     </section>
 
-    <RobotSelector v-model="selectedRobotId" :robots="concreteRobots" />
+    <ArenaControls />
+    <p class="micro">{{ robot.name }} · {{ track === 'open' ? 'Open Track' : 'Fine-tuning Track' }}</p>
+    <div v-if="loading" class="empty-state" role="status">Loading evaluations…</div>
+    <div v-else-if="!filteredEvaluations.length" class="empty-state"><h3>{{ unavailable ? 'Evaluations are temporarily unavailable' : 'No published evaluations for this selection' }}</h3><p>{{ track === 'fine-tuning' ? 'A/B comparisons belong to Open Track. Switch to Open Track to review paired rollouts.' : 'Completed A/B comparisons for this embodiment will appear here.' }}</p><button v-if="unavailable" class="button secondary" @click="loadEvaluations">Try again</button></div>
 
-    <section class="eval-layout">
+    <section v-if="filteredEvaluations.length" class="eval-layout">
       <aside class="eval-list">
         <button
           v-for="item in filteredEvaluations"
@@ -37,23 +40,23 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import EvalCard from '../components/EvalCard.vue'
 import EvalVideoReview from '../components/EvalVideoReview.vue'
-import RobotSelector from '../components/RobotSelector.vue'
-import { getEvaluations, getRobots } from '../api.js'
+import ArenaControls from '../components/ArenaControls.vue'
+import { useArena } from '../arena.js'
+import { getEvaluations } from '../api.js'
 
 const evaluations = ref([])
 const selected = ref(null)
-const selectedRobotId = ref('yam')
-const robots = ref([])
-const concreteRobots = computed(() => robots.value.filter((robot) => robot.id !== 'all'))
+const { robot, track } = useArena()
+const loading = ref(false), unavailable = ref(false)
 
 const filteredEvaluations = computed(() => {
   return evaluations.value.filter((evaluation) => {
-    return evaluation.finalized && evaluation.robotId === selectedRobotId.value
+    return track.value === 'open' && evaluation.finalized && evaluation.robotId === robot.value.id && (evaluation.track || 'open') === track.value
   })
 })
 
 function robotName(robotId) {
-  return robots.value.find((robot) => robot.id === robotId)?.name || robotId
+  return robot.value.id === robotId ? robot.value.name : robotId
 }
 
 watch(filteredEvaluations, (items) => {
@@ -62,10 +65,13 @@ watch(filteredEvaluations, (items) => {
   }
 })
 
-onMounted(async () => {
-  const [robotData, evaluationData] = await Promise.all([getRobots(), getEvaluations()])
-  robots.value = robotData.robots || []
-  evaluations.value = evaluationData.evaluations || []
-  selected.value = filteredEvaluations.value[0]
-})
+async function loadEvaluations() {
+  loading.value = true
+  try {
+    const data = await getEvaluations()
+    unavailable.value = data.source === 'empty'
+    evaluations.value = Array.isArray(data.evaluations) ? data.evaluations : []
+  } finally { loading.value = false }
+}
+onMounted(loadEvaluations)
 </script>

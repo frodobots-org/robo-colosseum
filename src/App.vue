@@ -1,25 +1,27 @@
 <template>
   <div class="app-shell">
-    <header class="topbar">
-      <RouterLink class="brand" to="/" aria-label="ArenaVerse home">
-        <span class="brand-mark">AV</span>
-        <span>
-          <strong>ArenaVerse</strong>
-          <small>Real-world policy evaluation</small>
-        </span>
-      </RouterLink>
-
-      <nav class="nav-links" aria-label="Primary navigation">
-        <RouterLink to="/">Overview</RouterLink>
-        <RouterLink to="/leaderboard">Leaderboard</RouterLink>
-        <RouterLink to="/evals">A/B Viewer</RouterLink>
-        <RouterLink to="/submit">Submit</RouterLink>
-        <RouterLink to="/join">Join</RouterLink>
+    <aside class="arena-sidebar">
+      <RouterLink class="brand" :to="link('/')" aria-label="RoboColosseum home"><span class="brand-mark">R<span>c</span></span><strong>RoboColosseum<small>THE REAL-WORLD ARENA</small></strong></RouterLink>
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="side-links" aria-label="Primary navigation">
+        <RouterLink :to="link('/')"><span>◫</span>Overview</RouterLink>
+        <RouterLink :to="link('/leaderboard')"><span>▤</span>Leaderboards</RouterLink>
+        <RouterLink :to="link('/evals')"><span>▷</span>A/B Evaluation</RouterLink>
+        <RouterLink :to="link('/tasks')"><span>▦</span>Task library</RouterLink>
       </nav>
-    </header>
-
-    <main>
-      <RouterView />
-    </main>
+      <div class="sidebar-bottom"><div class="contribute-card"><span class="eyebrow">BUILD THE BENCHMARK</span><h3>Bring your policy.<br />Meet the real world.</h3><RouterLink :to="link('/submit')">Submit a policy <span>↗</span></RouterLink></div><RouterLink class="join-link" :to="link('/join')">Become an evaluator ↗</RouterLink></div>
+    </aside>
+    <div class="arena-workspace">
+      <header class="workspace-header"><span>Workspace <span class="crumb-divider">/</span> <strong>{{ titles[route.path] || 'Overview' }}</strong></span><div><span class="edition-tag">RESEARCH PREVIEW</span><a href="https://github.com/frodobots-org" target="_blank" rel="noreferrer">GitHub ↗</a></div></header>
+      <main><RouterView /></main>
+      <footer class="workspace-footer"><span>Real robots. Shared tasks. Measurable progress.</span><span>RoboColosseum</span></footer>
+    </div>
   </div>
 </template>
+<script setup>
+import { useRoute } from 'vue-router'
+import { useArena } from './arena.js'
+const route = useRoute()
+const { link } = useArena()
+const titles = { '/': 'Overview', '/leaderboard': 'Leaderboards', '/tasks': 'Task library', '/evals': 'A/B Evaluation', '/submit': 'Submit a policy', '/join': 'Join the arena' }
+</script>

@@ -1,55 +1,13 @@
 <template>
-  <div class="page-stack overview-page">
-    <section class="hero-copy overview-intro">
-      <p class="eyebrow">ArenaVerse</p>
-      <h1>
-        Evaluate policies<br />
-        with simple A/B robot trials.
-      </h1>
-      <p>
-        Start with YAM evaluations now.
-      </p>
-      <div class="hero-actions">
-        <RouterLink class="button primary" to="/evals">Open A/B Viewer</RouterLink>
-        <RouterLink class="button secondary" to="/leaderboard">View Leaderboard</RouterLink>
-      </div>
-    </section>
-
-    <section class="section-block">
-      <div class="section-heading">
-        <span class="eyebrow">Latest Eval</span>
-        <RouterLink to="/evals">Review all</RouterLink>
-      </div>
-      <EvalCard
-        v-if="latestEvaluation"
-        :evaluation="latestEvaluation"
-        :robot-name="robotName(latestEvaluation.robotId)"
-      />
-      <EvalVideoReview v-if="latestEvaluation" :evaluation="latestEvaluation" />
-      <p v-else>No evaluations yet.</p>
-    </section>
+  <div class="page-stack arena-overview">
+    <section class="arena-hero"><div><p class="eyebrow"><span class="live-mark"></span> A BENCHMARK GROUNDED IN THE REAL WORLD</p><h1>Real-world robot<br /><em>policy evaluation.</em></h1><p>Explore how robot policies generalize, adapt, and perform.<br class="desktop-break" /> Five embodiments. Two tracks. One shared standard.</p><div class="hero-actions"><RouterLink class="button primary" :to="link('/leaderboard')">Explore leaderboards <span>↗</span></RouterLink><RouterLink class="text-link" :to="link('/tasks')">Discover the tasks →</RouterLink></div></div><div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="art-cross cross-one">+</div><div class="art-cross cross-two">+</div><RobotGlyph :kind="robot.glyph" /><span class="art-caption">{{ robot.name.toUpperCase() }} / EMBODIED INTELLIGENCE</span></div></section>
+    <ArenaControls />
+    <section class="overview-bottom"><div class="track-summary"><span class="eyebrow">{{ track === 'open' ? 'GENERALIZATION IN THE WILD' : 'ADAPTATION YOU CAN MEASURE' }}</span><h2>{{ track === 'open' ? 'Same scene. Two policies.' : 'One task. Repeated, reproducible trials.' }}</h2><p>{{ track === 'open' ? 'Compare pretrained policies on evaluator-created instructions. Run both on the same robot and scene, then review the rollouts blind.' : 'Adapt a policy with approximately 100 demonstrations per task, then evaluate on held-out configurations at the same deployment site.' }}</p><div class="method-chips"><span>{{ track === 'open' ? 'No fine-tuning' : '5 tasks / embodiment planned' }}</span><span>{{ track === 'open' ? 'Head-to-head ranking' : 'Success + milestone progress' }}</span></div><RouterLink class="text-link" :to="link('/leaderboard')">Explore {{ robot.name }} results →</RouterLink></div><div class="protocol-card"><span class="eyebrow">EVALUATION PRINCIPLES</span><div><span>01</span><p><strong>Compare within an embodiment</strong><small>Each robot has its own leaderboard.</small></p></div><div><span>02</span><p><strong>Separate capability from adaptation</strong><small>Open and fine-tuning results stay in distinct tracks.</small></p></div><div><span>03</span><p><strong>Make every result reviewable</strong><small>Task cards, rollout evidence, and explicit outcomes.</small></p></div></div></section>
   </div>
 </template>
-
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import EvalCard from '../components/EvalCard.vue'
-import EvalVideoReview from '../components/EvalVideoReview.vue'
-import { getEvaluations, getRobots } from '../api.js'
-
-const evaluations = ref([])
-const robots = ref([])
-
-const completedEvaluations = computed(() => evaluations.value.filter((evaluation) => evaluation.finalized))
-const latestEvaluation = computed(() => completedEvaluations.value[0] || null)
-
-function robotName(robotId) {
-  return robots.value.find((robot) => robot.id === robotId)?.name || robotId
-}
-
-onMounted(async () => {
-  const [robotData, evaluationData] = await Promise.all([getRobots(), getEvaluations()])
-  robots.value = robotData.robots || []
-  evaluations.value = evaluationData.evaluations || []
-})
+import ArenaControls from '../components/ArenaControls.vue'
+import RobotGlyph from '../components/RobotGlyph.vue'
+import { useArena } from '../arena.js'
+const { robot, track, link } = useArena()
 </script>
