@@ -46,3 +46,5 @@ button,a,input,select,summary{ -webkit-tap-highlight-color:transparent }button{c
 .embodiment .robot-glyph{height:108px;margin:12px 0 8px}
 .hero-art .robot-glyph{transform:none;height:230px}
 @media(max-width:640px){.embodiment .robot-glyph{height:94px}}
+
+.test-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; background: #fff0bf; color: #624900; font-size: 12px; }

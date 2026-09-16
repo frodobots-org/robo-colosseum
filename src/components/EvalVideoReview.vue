@@ -73,7 +73,8 @@ async function loadVideos() {
 }
 
 function videoSrc(policySide, camera) {
-  return videos.value[policySide]?.[camera] || ''
+  const aliases = { top: 'head_image', left_wrist: 'left_image', right_wrist: 'right_image' }
+  return videos.value[policySide]?.[camera] || videos.value[policySide]?.[aliases[camera]] || ''
 }
 
 function partialSuccessLabel(value) {

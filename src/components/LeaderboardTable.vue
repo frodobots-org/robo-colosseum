@@ -16,7 +16,7 @@
           <td>
             <span class="rank-pill">#{{ row.rank }}</span>
           </td>
-          <td class="policy-cell">{{ row.policy }}</td>
+          <td class="policy-cell">{{ policyName(row.policy) }}</td>
           <td>
             <span :class="['status-chip', statusClass(row)]">
               <span class="status-dot" aria-hidden="true"></span>
@@ -35,6 +35,7 @@
 </template>
 
 <script setup>
+import { policyName } from '../display.js'
 defineProps({
   rows: {
     type: Array,

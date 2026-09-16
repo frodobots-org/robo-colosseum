@@ -10,7 +10,7 @@ export const embodiments = [
 ]
 export function useArena() {
   const route = useRoute(), router = useRouter()
-  const robot = computed(() => embodiments.find(r => r.id === route.query.robot) || embodiments[0])
+  const robot = computed(() => embodiments.find(r => r.id === route.query.robot) || embodiments.find(r => r.id === 'franka'))
   const track = computed(() => route.query.track === 'fine-tuning' ? 'fine-tuning' : 'open')
   const source = computed(() => route.query.source === 'api' ? 'api' : 'preview')
   function select(values) { return router.replace({ query: { ...route.query, ...values } }) }

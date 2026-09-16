@@ -1,13 +1,18 @@
 <template>
   <div class="page-stack">
     <section class="page-header">
-      <p class="eyebrow">Head-to-head comparison</p>
-      <h1>A/B Evaluation</h1>
-      <p>Compare Policy A and Policy B side by side on the same task, and explore evaluator feedback.</p>
+      <p class="eyebrow">{{ track === 'open' ? 'Head-to-head comparison' : 'Predefined task trials' }}</p>
+      <h1>Evaluation Review</h1>
+      <p>{{ track === 'open' ? 'Compare Policy A and Policy B side by side on the same task, and explore evaluator feedback.' : 'Review task outcomes, partial success, and the footage behind each trial.' }}</p>
     </section>
 
     <ArenaControls />
     <p class="micro">{{ robot.name }} · {{ track === 'open' ? 'Open Track' : 'Fine-tuning Track' }}</p>
+    <FineTuneReview v-if="track === 'fine-tuning'" :robot-id="robot.id" :robot-name="robot.name" />
+    <template v-else>
+    <div class="review-actions">
+      <button class="button secondary" @click="loadEvaluations">Refresh</button>
+    </div>
     <div v-if="loading" class="empty-state" role="status">Loading evaluations…</div>
     <div v-else-if="!filteredEvaluations.length" class="empty-state"><h3>{{ unavailable ? 'Evaluations are temporarily unavailable' : 'No published evaluations for this selection' }}</h3><p>{{ track === 'fine-tuning' ? 'A/B comparisons belong to Open Track. Switch to Open Track to review paired rollouts.' : 'Completed A/B comparisons for this embodiment will appear here.' }}</p><button v-if="unavailable" class="button secondary" @click="loadEvaluations">Try again</button></div>
 
@@ -21,7 +26,7 @@
           @click="selected = item"
         >
           <span class="eval-list-meta">
-            <span>{{ item.id }}</span>
+            <strong v-if="item.test" class="test-badge">Test</strong>
             <time>{{ item.evalTime || item.date }}</time>
           </span>
           <strong>{{ item.instruction || item.task }}</strong>
@@ -33,11 +38,13 @@
         <EvalVideoReview :evaluation="selected" />
       </section>
     </section>
+    </template>
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import FineTuneReview from '../components/FineTuneReview.vue'
 import EvalCard from '../components/EvalCard.vue'
 import EvalVideoReview from '../components/EvalVideoReview.vue'
 import ArenaControls from '../components/ArenaControls.vue'

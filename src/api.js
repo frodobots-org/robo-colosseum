@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE
-  || (import.meta.env.DEV ? '/api' : 'https://cn.rtcrobot.com/api')
+  || (import.meta.env.DEV ? '/api' : 'https://191.222.219.43/api')
 
 export async function apiGet(path, init = {}) {
   return fetch(`${API_BASE}${path}`, init)
@@ -53,4 +53,31 @@ export async function getSummaryStats() {
   } catch {
     return { summary: { policies: 0, evaluations: 0, evaluators: 0, tasks: 0 }, source: 'empty' }
   }
+}
+
+// Remove tokens stored by the former private-review UI.
+try { sessionStorage.removeItem(`colosseum-review:${API_BASE}`) } catch {}
+
+export async function getFineTuningReviews(robotId, signal) {
+  const response = await apiGet(`/eval/review/fine-tuning?robot_id=${encodeURIComponent(robotId)}`, {
+    signal,
+  })
+  if (!response.ok) {
+    const error = new Error(`Unable to load trials (HTTP ${response.status}).`)
+    error.status = response.status
+    throw error
+  }
+  return response.json()
+}
+
+export async function getFineTuningVideoUrls(runId, signal) {
+  const response = await apiGet(`/eval/review/runs/${encodeURIComponent(runId)}/video-urls`, {
+    signal,
+  })
+  if (!response.ok) {
+    const error = new Error(`Unable to load videos (HTTP ${response.status}).`)
+    error.status = response.status
+    throw error
+  }
+  return response.json()
 }
