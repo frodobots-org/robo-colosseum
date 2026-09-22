@@ -6,8 +6,7 @@
       <nav class="side-links" aria-label="Primary navigation">
         <RouterLink :to="link('/')"><span>◫</span>Overview</RouterLink>
         <RouterLink :to="link('/leaderboard')"><span>▤</span>Leaderboards</RouterLink>
-        <RouterLink :to="link('/evals')"><span>▷</span>Evaluation Review</RouterLink>
-        <RouterLink :to="link('/tasks')"><span>▦</span>Task library</RouterLink>
+        <RouterLink :to="link('/evals')"><span>▷</span>Evaluation</RouterLink>
       </nav>
       <div class="sidebar-bottom"><div class="contribute-card"><span class="eyebrow">BUILD THE BENCHMARK</span><h3>Bring your policy.<br />Meet the real world.</h3><RouterLink :to="link('/submit')">Submit a policy <span>↗</span></RouterLink></div><RouterLink class="join-link" :to="link('/join')">Become an evaluator ↗</RouterLink></div>
     </aside>
@@ -23,5 +22,5 @@ import { useRoute } from 'vue-router'
 import { useArena } from './arena.js'
 const route = useRoute()
 const { link } = useArena()
-const titles = { '/': 'Overview', '/leaderboard': 'Leaderboards', '/tasks': 'Task library', '/evals': 'Evaluation Review', '/submit': 'Submit a policy', '/join': 'Join the arena' }
+const titles = { '/': 'Overview', '/leaderboard': 'Leaderboards', '/tasks': 'Task library', '/evals': 'Evaluation', '/submit': 'Submit a policy', '/join': 'Join the arena' }
 </script>

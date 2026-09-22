@@ -5,7 +5,7 @@
         <span>{{ robotName || evaluation.robotId }}</span>
       </div>
       <strong v-if="evaluation.test" class="test-badge">Test</strong>
-      <time>{{ evaluation.evalTime || evaluation.date }}</time>
+      <time>{{ dateLabel(evaluation.evalTime || evaluation.date) }}</time>
     </div>
 
     <div class="eval-instruction">
@@ -53,7 +53,7 @@
 </template>
 
 <script setup>
-import { policyName } from '../display.js'
+import { policyName, dateLabel } from '../display.js'
 defineProps({
   evaluation: {
     type: Object,

@@ -11,10 +11,10 @@
     <template v-else-if="!error">
       <div class="trial-filters">
         <label>Task<select v-model="taskFilter"><option value="">All tasks</option><option v-for="task in tasks" :key="task.id" :value="task.id">{{ task.label }}</option></select></label>
-        <label>Outcome<select v-model="outcomeFilter"><option value="">All outcomes</option><option value="success">Success</option><option value="failure">Failure</option><option value="aborted">Interrupted</option></select></label>
+        <label>Outcome<select v-model="outcomeFilter"><option value="">All outcomes</option><option value="success">Success</option><option value="failure">Failure</option></select></label>
         <span>{{ filtered.length }} trials · {{ robotName }}</span>
       </div>
-      <div v-if="!filtered.length" class="empty-state"><h3>No matching trials yet</h3><p>Completed or interrupted Fine-tuning trials for this robot will appear here.</p></div>
+      <div v-if="!filtered.length" class="empty-state"><h3>No matching trials yet</h3><p>Completed Fine-tuning trials for this robot will appear here.</p></div>
       <p v-if="trials.length >= limit" class="micro">Showing the {{ limit }} most recent trials for this robot.</p>
       <div v-if="filtered.length" class="eval-layout">
         <aside class="eval-list" aria-label="Fine-tuning trials">
@@ -53,7 +53,7 @@
 </template>
 
 <script setup>
-import { policyName } from '../display.js'
+import { policyName, dateLabel } from '../display.js'
 import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { getFineTuningReviews, getFineTuningVideoUrls } from '../api.js'
 const props = defineProps({ robotId: { type: String, required: true }, robotName: String })
@@ -64,7 +64,6 @@ let trialRequest, videoRequest
 const outcome = trial => trial.state === 'aborted' ? 'aborted' : trial.success ? 'success' : 'failure'
 const outcomeLabel = trial => ({ success: 'Success', failure: 'Failure', aborted: 'Interrupted' })[outcome(trial)]
 const percent = value => value === null || value === undefined ? 'Not scored' : `${Math.round(value * 100)}%`
-const dateLabel = value => new Date(value).toLocaleString()
 const cameraLabel = camera => ({ head_image: 'Head / overview', left_image: 'Left camera', right_image: 'Right camera' })[camera] || camera
 const tasks = computed(() => [...new Map(trials.value.map(t => [t.task_id, { id: t.task_id, label: t.task.instruction }])).values()])
 const filtered = computed(() => trials.value.filter(t => (!taskFilter.value || t.task_id === taskFilter.value) && (!outcomeFilter.value || outcome(t) === outcomeFilter.value)))
@@ -78,7 +77,7 @@ async function loadTrials() {
   try {
     const data = await getFineTuningReviews(props.robotId, request.signal)
     if (request.signal.aborted) return false
-    trials.value = data.trials || []; limit.value = data.limit || 500
+    trials.value = (data.trials || []).filter(trial => trial.state === 'completed'); limit.value = data.limit || 500
     return true
   } catch (err) {
     if (request.signal.aborted) return false

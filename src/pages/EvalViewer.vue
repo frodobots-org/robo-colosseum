@@ -1,9 +1,7 @@
 <template>
   <div class="page-stack">
     <section class="page-header">
-      <p class="eyebrow">{{ track === 'open' ? 'Head-to-head comparison' : 'Predefined task trials' }}</p>
-      <h1>Evaluation Review</h1>
-      <p>{{ track === 'open' ? 'Compare Policy A and Policy B side by side on the same task, and explore evaluator feedback.' : 'Review task outcomes, partial success, and the footage behind each trial.' }}</p>
+      <h1>Evaluation</h1>
     </section>
 
     <ArenaControls />
@@ -27,7 +25,7 @@
         >
           <span class="eval-list-meta">
             <strong v-if="item.test" class="test-badge">Test</strong>
-            <time>{{ item.evalTime || item.date }}</time>
+            <time>{{ dateLabel(item.evalTime || item.date) }}</time>
           </span>
           <strong>{{ item.instruction || item.task }}</strong>
         </button>
@@ -43,6 +41,7 @@
 </template>
 
 <script setup>
+import { dateLabel } from '../display.js'
 import { computed, onMounted, ref, watch } from 'vue'
 import FineTuneReview from '../components/FineTuneReview.vue'
 import EvalCard from '../components/EvalCard.vue'

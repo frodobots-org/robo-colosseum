@@ -45,18 +45,6 @@
       </g>
     </g>
 
-    <!-- Flexiv: slender continuous links, tall shoulder and contrasting joint rings. -->
-    <g v-else-if="kind === 'flexiv'" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M131 101V77L112 29Q106 16 98 30L71 69L49 60" stroke-width="13" />
-      <path d="M131 99V77L108 28Q106 25 103 30L71 69L49 60" stroke="var(--paper, #fafaf6)" stroke-width="8" />
-      <path d="M125 87H137M117 57L126 53M88 44L98 51M63 61L59 70" stroke="#84aaa3" stroke-width="3" />
-      <ellipse cx="106" cy="29" rx="7" ry="9" fill="var(--paper, #fafaf6)" stroke-width="2.5" />
-      <circle cx="106" cy="29" r="2" fill="currentColor" stroke="none" />
-      <path d="M47 54L43 64" stroke-width="7" />
-      <path d="M39 52L34 64M33 55L29 65" stroke-width="2" />
-      <path d="M121 101H141L145 107H117Z" fill="currentColor" stroke-width="2" />
-    </g>
-
     <!-- G1: compact humanoid proportions, dark visor, chest shell and articulated limbs. -->
     <g v-else-if="kind === 'g1'" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
       <rect x="80" y="7" width="20" height="21" rx="8" fill="currentColor" stroke-width="2" />
