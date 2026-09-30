@@ -27,4 +27,12 @@ const router = createRouter({
   },
 })
 
+// Retire old sample-data links while preserving robot, track, and other filters.
+router.beforeEach(to => {
+  if (!Object.prototype.hasOwnProperty.call(to.query, 'source')) return
+  const query = { ...to.query }
+  delete query.source
+  return { path: to.path, query, hash: to.hash, replace: true }
+})
+
 createApp(App).use(router).mount('#app')
