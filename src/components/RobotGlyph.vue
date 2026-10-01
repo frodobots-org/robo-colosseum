@@ -14,9 +14,9 @@
       <path d="M40 100H59L63 107H35Z" fill="currentColor" stroke-width="2" />
     </g>
 
-    <!-- SO-ARM101: two light open-frame arms with exposed rectangular servo housings. -->
+    <!-- SO-ARM101: one light open-frame arm with exposed rectangular servo housings. -->
     <g v-else-if="kind === 'so101'" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <g v-for="side in [0, 1]" :key="side" :transform="side ? 'translate(180 0) scale(-1 1)' : undefined">
+      <g transform="translate(30 -7) scale(1.15)">
         <path d="M29 102H54M39 98V83" stroke-width="5" />
         <path d="M33 80L45 78L35 46L23 49ZM29 43L66 36L67 45L32 53Z" fill="currentColor" fill-opacity=".09" stroke-width="2.5" />
         <path d="M38 74L31 54M39 45L59 41" stroke-width="2" opacity=".4" />

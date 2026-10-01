@@ -3,7 +3,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 export const embodiments = [
   { id: 'franka', name: 'Franka', detail: 'Panda / FR3', type: 'Single arm', glyph: 'franka' },
-  { id: 'so101', name: 'SO-ARM101', detail: 'Dual-arm manipulation', type: 'Bimanual', glyph: 'so101' },
+  { id: 'so101', name: 'SO-ARM101', detail: 'Single-arm manipulation', type: 'Single arm', glyph: 'so101' },
   { id: 'yam', name: 'Bimanual YAM', detail: 'Dual-arm manipulation', type: 'Bimanual', glyph: 'yam' },
   { id: 'g1', name: 'Unitree G1', detail: 'Humanoid manipulation', type: 'Humanoid', glyph: 'g1' },
 ]
