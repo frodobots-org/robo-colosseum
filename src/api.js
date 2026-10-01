@@ -15,12 +15,16 @@ export async function getRobots() {
   }
 }
 
-export async function getLeaderboard() {
+export async function getLeaderboard({ robot, track, signal } = {}) {
   try {
-    const response = await apiGet('/leaderboard')
+    const params = new URLSearchParams()
+    if (robot) params.set('robot', robot)
+    if (track) params.set('track', track)
+    const response = await apiGet(`/leaderboard${params.size ? `?${params}` : ''}`, { signal })
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
     return await response.json()
-  } catch {
+  } catch (error) {
+    if (error.name === 'AbortError') throw error
     return { board: [], source: 'empty' }
   }
 }
