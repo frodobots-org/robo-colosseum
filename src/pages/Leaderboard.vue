@@ -23,17 +23,15 @@
         <table class="leaderboard-table">
           <caption class="sr-only">{{ robot.name }} {{ track }} leaderboard</caption>
           <thead><tr>
-            <th scope="col">Rank</th><th v-if="track === 'fine-tuning'" scope="col">Task</th><th scope="col">Policy / checkpoint</th>
+            <th scope="col">Rank</th><th v-if="track === 'fine-tuning'" scope="col">Task</th><th scope="col">Policy</th>
             <template v-if="track === 'open'"><th scope="col">Rating ↓</th><th scope="col">Std. error</th><th scope="col">A/B comparisons</th></template>
             <template v-else><th scope="col">Success rate ↓</th><th scope="col">Milestone progress</th><th scope="col">Trials</th></template>
           </tr></thead>
           <tbody><tr v-for="row in filteredRows" :key="row.id">
             <td><span :class="['standing-rank', { first: row.rank === 1 }]">{{ row.rank == null ? '—' : String(row.rank).padStart(2, '0') }}</span></td>
             <td v-if="track === 'fine-tuning'" class="task-name">{{ taskName(row) }}</td>
-            <td class="checkpoint-cell">
+            <td>
               <strong class="policy-name">{{ policyName(row.policyId || row.policy) }}</strong>
-              <small v-if="row.modelUrl" class="policy-org checkpoint-name"><a v-if="modelLink(row.modelUrl)" :href="modelLink(row.modelUrl)" target="_blank" rel="noopener noreferrer">{{ modelName(row.modelUrl) }} ↗</a><span v-else>{{ row.modelUrl }}</span></small>
-              <small v-if="row.revision" class="policy-org checkpoint-name" :title="row.revision">{{ row.revision.slice(0, 8) }}<template v-if="row.subfolder"> · {{ row.subfolder }}</template></small>
               <small class="policy-org" :data-status="row.status">{{ row.status === 'pending' ? 'Pending evaluation' : 'Evaluated' }}</small>
             </td>
             <template v-if="track === 'open'">
@@ -73,8 +71,6 @@ let requestController
 function number(value) { return value != null && Number.isFinite(Number(value)) ? Number(value).toLocaleString('en-US', { maximumFractionDigits: 1 }) : '—' }
 function percent(value) { return value == null ? '—' : `${number(value)}%` }
 function taskName(row) { return String(row.task || row.taskId || '').replaceAll('_', ' ') }
-function modelName(url) { return url.replace(/^https:\/\/huggingface\.co\//, '') }
-function modelLink(url) { return /^https?:\/\//i.test(url) ? url : '' }
 function clearFilters() { query.value = ''; minEvals.value = 0; taskId.value = '' }
 const hasFilters = computed(() => Boolean(query.value || minEvals.value || taskId.value))
 const tasks = computed(() => Array.from(new Map(apiRows.value.map(row => [row.taskId, { id: row.taskId, name: taskName(row) }])).values()).sort((a, b) => a.name.localeCompare(b.name)))
@@ -108,8 +104,5 @@ watch([() => robot.value.id, track], () => { clearFilters(); fetchResults() }, {
 onBeforeUnmount(() => requestController?.abort())
 </script>
 <style scoped>
-.checkpoint-cell { min-width: 210px; max-width: 340px; }
-.checkpoint-name { overflow-wrap: anywhere; }
-.checkpoint-name a { text-decoration: underline; text-underline-offset: 3px; }
 .task-name { min-width: 110px; }
 </style>
