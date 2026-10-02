@@ -25,7 +25,7 @@
           <thead><tr>
             <th scope="col">Rank</th><th v-if="track === 'fine-tuning'" scope="col">Task</th><th scope="col">Policy</th>
             <template v-if="track === 'open'"><th scope="col">Rating ↓</th><th scope="col">Std. error</th><th scope="col">A/B comparisons</th></template>
-            <template v-else><th scope="col">Success rate ↓</th><th scope="col">Milestone progress</th><th scope="col">Trials</th></template>
+            <template v-else><th scope="col">Success rate ↓</th><th scope="col">Partial success</th><th scope="col">Trials</th></template>
           </tr></thead>
           <tbody><tr v-for="row in filteredRows" :key="row.id">
             <td><span :class="['standing-rank', { first: row.rank === 1 }]">{{ row.rank == null ? '—' : String(row.rank).padStart(2, '0') }}</span></td>
@@ -52,7 +52,7 @@
     <details class="method-details">
       <summary>How to read this leaderboard <span>+</span></summary>
       <p v-if="track === 'open'">Policies are ranked by head-to-head performance on the same robot. Higher ratings indicate stronger performance. Standard error shows rating uncertainty; a higher rank alone does not prove a meaningful difference. Registered policies without completed comparisons appear as pending, with no rating or rank.</p>
-      <p v-else>Each task and model checkpoint is scored separately using completed, non-test trials. Success rate is the percentage of successful trials. Milestone progress is the average partial completion. Registered checkpoints without completed trials appear as pending, with no score or rank.</p>
+      <p v-else>Each task and model checkpoint is scored separately using completed, non-test trials. Success rate is the percentage of successful trials. Partial success is the average partial success across those trials. Registered checkpoints without completed trials appear as pending, with no score or rank.</p>
     </details>
   </div>
 </template>
