@@ -20,33 +20,38 @@
         <aside class="eval-list" aria-label="Fine-tuning trials">
           <button v-for="trial in filtered" :key="trial.run_id" :class="['eval-list-item', selectedId === trial.run_id && 'active']" @click="selectedId = trial.run_id">
             <span class="eval-list-meta"><span :class="['outcome-tag', outcome(trial)]">{{ outcomeLabel(trial) }}</span><time>{{ dateLabel(trial.created) }}</time></span>
-            <strong>{{ taskLabel(trial.task.instruction) }} <span v-if="trial.test" class="test-badge">Test</span></strong><span class="micro">{{ policyName(trial.policy_id) }}</span><span class="micro">{{ percent(trial.partial_success) }} progress</span>
+            <strong>{{ taskLabel(trial.task.instruction) }} <span v-if="trial.test" class="test-badge">Test</span></strong><span class="micro">{{ policyName(trial.policy_id) }}</span><span class="micro">Partial success: {{ percent(trial.partial_success) }}</span>
           </button>
         </aside>
         <section v-if="selected" class="review-panel">
           <article class="trial-card">
             <div class="trial-title"><span class="eyebrow">Fine-tuning</span><span :class="['outcome-tag', outcome(selected)]">{{ outcomeLabel(selected) }}</span></div>
-            <h2>{{ taskLabel(selected.task.instruction) }}</h2><p v-if="selected.test" class="test-badge">Test</p>
-            <p class="micro">Model: {{ policyName(selected.policy_id) }} · {{ dateLabel(selected.created) }}</p>
-            <div class="trial-metrics"><div><span>Success</span><strong>{{ selected.success === null ? 'Not scored' : selected.success ? 'Yes' : 'No' }}</strong></div><div><span>Partial success</span><strong>{{ percent(selected.partial_success) }}</strong></div></div>
+            <div class="trial-overview">
+              <div class="trial-info">
+                <h2>{{ taskLabel(selected.task.instruction) }}</h2><p v-if="selected.test" class="test-badge">Test</p>
+                <p class="micro">Model: {{ policyName(selected.policy_id) }}</p>
+                <time class="micro">{{ dateLabel(selected.created) }}</time>
+              </div>
+              <div class="trial-metrics"><div><span>Success</span><strong>{{ selected.success === null ? 'Not scored' : selected.success ? 'Yes' : 'No' }}</strong></div><div><span>Partial success</span><strong>{{ percent(selected.partial_success) }}</strong></div></div>
+            </div>
             <template v-if="selected.inference_mode !== 'imported'">
               <dl><dt>Initial setup</dt><dd>{{ selected.task.setup }}</dd><dt>Success criteria</dt><dd>{{ selected.task.success_criteria }}</dd><dt>Progress criteria</dt><dd>{{ selected.task.partial_success_criteria }}</dd></dl>
               <p v-if="selected.feedback"><strong>Feedback:</strong> {{ selected.feedback }}</p>
             </template>
             <p v-if="selected.reason"><strong>Interruption:</strong> {{ selected.reason }}</p>
+            <section class="video-section" aria-label="Videos">
+              <h3>Videos</h3>
+              <p v-if="videosLoading" role="status">Loading videos…</p>
+              <p v-if="videoError" class="review-error" role="alert">{{ videoError }}</p>
+              <div class="trial-videos">
+                <figure v-for="camera in selected.task.cameras" :key="`${selected.run_id}-${camera}`">
+                  <video v-if="videos[camera]" :key="videos[camera]" :src="videos[camera]" controls playsinline preload="metadata" :style="{ aspectRatio: robotId === 'so101' ? '4 / 3' : '16 / 9' }" @error="videoError = 'Video could not be loaded. Refresh the page to try again.'"></video>
+                  <div v-else class="review-video-placeholder">{{ videosLoading ? 'Loading…' : 'No uploaded video' }}</div>
+                  <figcaption>{{ cameraLabel(camera) }}</figcaption>
+                </figure>
+              </div>
+            </section>
           </article>
-          <section class="trial-card">
-            <div class="trial-title"><h3>Trial footage</h3><button class="button secondary" :disabled="videosLoading" @click="loadVideos">Reload videos</button></div>
-            <p v-if="videosLoading" role="status">Loading videos…</p>
-            <p v-if="videoError" class="review-error" role="alert">{{ videoError }}</p>
-            <div class="trial-videos">
-              <figure v-for="camera in selected.task.cameras" :key="`${selected.run_id}-${camera}`">
-                <video v-if="videos[camera]" :key="videos[camera]" :src="videos[camera]" controls playsinline preload="metadata" @error="videoError = 'Video could not be loaded. Reload videos to refresh the playback links.'"></video>
-                <div v-else class="review-video-placeholder">{{ videosLoading ? 'Loading…' : 'No uploaded video' }}</div>
-                <figcaption>{{ cameraLabel(camera) }}</figcaption>
-              </figure>
-            </div>
-          </section>
         </section>
       </div>
     </template>
@@ -67,7 +72,7 @@ const outcome = trial => trial.state === 'aborted' ? 'aborted' : trial.success ?
 const outcomeLabel = trial => ({ success: 'Success', failure: 'Failure', aborted: 'Interrupted' })[outcome(trial)]
 const percent = value => value === null || value === undefined ? 'Not scored' : `${Math.round(value * 100)}%`
 const taskLabel = value => String(value || '').replaceAll('_', ' ')
-const cameraLabel = camera => ({ head_image: 'Head / overview', left_image: 'Left camera', right_image: 'Right camera' })[camera] || camera
+const cameraLabel = camera => (props.robotId === 'so101' ? { head_image: 'Front', left_image: 'Wrist' } : { head_image: 'Head / overview', left_image: 'Left camera', right_image: 'Right camera' })[camera] || camera
 const tasks = computed(() => [...new Map(trials.value.map(t => [t.task_id, { id: t.task_id, label: taskLabel(t.task.instruction) }])).values()])
 const filtered = computed(() => trials.value.filter(t => (!taskFilter.value || t.task_id === taskFilter.value) && (!outcomeFilter.value || outcome(t) === outcomeFilter.value)))
 const selected = computed(() => filtered.value.find(t => t.run_id === selectedId.value))
@@ -103,5 +108,41 @@ onBeforeUnmount(() => { trialRequest?.abort(); videoRequest?.abort() })
 </script>
 
 <style scoped>
-.fine-review{display:grid;gap:24px}.review-access,.review-actions,.trial-title{display:flex;align-items:center;justify-content:space-between;gap:14px}.review-access p{margin:6px 0 0;color:var(--muted)}.review-actions{justify-content:flex-end}.review-error{color:#a53832}.trial-filters{display:flex;align-items:end;gap:18px;flex-wrap:wrap}.trial-filters label{display:grid;gap:7px;font-size:14px;color:var(--muted)}select,input{font:inherit;padding:11px 13px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}.trial-filters span{padding-bottom:10px;color:var(--muted);font-size:14px}.trial-card{padding:26px;border:1px solid var(--line);border-radius:10px;background:#fff}.trial-card h2{font-size:26px;font-weight:500;margin:18px 0 8px}.trial-card h3{margin:0;font-size:19px}.trial-metrics{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:22px 0;border-bottom:1px solid var(--line)}.trial-metrics div{display:grid;gap:6px}.trial-metrics span,dt{color:var(--muted);font-size:14px}.trial-metrics strong{font-size:28px;font-weight:500}dt{margin:18px 0 6px;font-weight:600}dd{margin:0;font-size:16px;line-height:1.6}.outcome-tag{padding:4px 9px;border-radius:5px;font-size:13px;background:#eef0e9;color:#4c5841}.outcome-tag.success{background:#e7efd7;color:#365020}.outcome-tag.failure{background:#f8e9e4;color:#933b31}.outcome-tag.aborted{background:#f4ecd9;color:#705c28}.trial-videos{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}.trial-videos figure{margin:0;min-width:0}.trial-videos figure:first-child{grid-column:1/-1}.trial-videos video{width:100%;aspect-ratio:16/9;background:#182018;border-radius:8px}.trial-videos figcaption{margin-top:7px;font-size:14px;color:var(--muted)}details{margin-top:20px}details p{overflow-wrap:anywhere}@media(max-width:700px){.review-access{align-items:flex-start;flex-direction:column}.trial-card{padding:18px}.trial-title{flex-wrap:wrap}.trial-filters select{max-width:100%}.trial-videos{grid-template-columns:1fr}.trial-filters label{width:100%}.trial-metrics strong{font-size:24px}}
+.fine-review{display:grid;gap:20px}
+.review-access,.review-actions,.trial-title{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.review-access p{margin:6px 0 0;color:var(--muted)}
+.review-actions{justify-content:flex-end}
+.review-error{color:#a53832}
+.trial-filters{display:flex;align-items:end;gap:18px;flex-wrap:wrap}
+.trial-filters label{display:grid;gap:7px;font-size:14px;color:var(--muted)}
+select,input{font:inherit;padding:11px 13px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}
+.trial-filters span{padding-bottom:10px;color:var(--muted);font-size:14px}
+.eval-layout{grid-template-columns:290px minmax(0,1fr);gap:20px}
+.eval-list-item{gap:7px}
+.review-panel{padding:0;border:0;background:transparent;min-width:0}
+.trial-card{padding:22px;border:1px solid var(--line);border-radius:10px;background:#fff;min-width:0}
+.trial-overview{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:16px 0 20px}
+.trial-info{min-width:0}
+.trial-info p{margin:6px 0}
+.trial-info .micro{overflow-wrap:anywhere}
+.trial-card h2{font-size:23px;font-weight:500;margin:0 0 10px;overflow-wrap:anywhere}
+.trial-card h3{margin:0;font-size:16px;font-weight:550}
+.trial-metrics{display:flex;gap:24px;flex-shrink:0}
+.trial-metrics div{display:grid;gap:6px}
+.trial-metrics span,dt{color:var(--muted);font-size:13px}
+.trial-metrics strong{font-size:25px;font-weight:500}
+dt{margin:18px 0 6px;font-weight:600}
+dd{margin:0;font-size:16px;line-height:1.6}
+.outcome-tag{padding:4px 9px;border-radius:5px;font-size:13px;background:#eef0e9;color:#4c5841}
+.outcome-tag.success{background:#e7efd7;color:#365020}
+.outcome-tag.failure{background:#f8e9e4;color:#933b31}
+.outcome-tag.aborted{background:#f4ecd9;color:#705c28}
+.video-section{border-top:1px solid var(--line);padding-top:16px}
+.trial-videos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:12px;max-width:734px}
+.trial-videos figure{margin:0;min-width:0}
+.trial-videos video,.review-video-placeholder{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;background:#182018;border-radius:7px}
+.trial-videos figcaption{margin-top:7px;font-size:13px;color:var(--muted)}
+@media(max-width:1100px){.trial-overview{align-items:flex-start;flex-direction:column;gap:16px}.trial-metrics{gap:32px}}
+@media(max-width:980px){.eval-layout{grid-template-columns:1fr}.eval-list{position:static;max-height:280px}}
+@media(max-width:600px){.review-access{align-items:flex-start;flex-direction:column}.trial-card{padding:16px}.trial-title{flex-wrap:wrap}.trial-filters select{max-width:100%}.trial-videos{grid-template-columns:1fr;max-width:360px}.trial-filters label{flex:1;min-width:120px}.trial-metrics strong{font-size:23px}}
 </style>
