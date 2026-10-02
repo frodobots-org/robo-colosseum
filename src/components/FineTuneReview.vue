@@ -20,14 +20,14 @@
         <aside class="eval-list" aria-label="Fine-tuning trials">
           <button v-for="trial in filtered" :key="trial.run_id" :class="['eval-list-item', selectedId === trial.run_id && 'active']" @click="selectedId = trial.run_id">
             <span class="eval-list-meta"><span :class="['outcome-tag', outcome(trial)]">{{ outcomeLabel(trial) }}</span><time>{{ dateLabel(trial.created) }}</time></span>
-            <strong>{{ taskLabel(trial.task.instruction) }} <span v-if="trial.test" class="test-badge">Test</span></strong><span class="micro">{{ percent(trial.partial_success) }} progress</span>
+            <strong>{{ taskLabel(trial.task.instruction) }} <span v-if="trial.test" class="test-badge">Test</span></strong><span class="micro">{{ policyName(trial.policy_id) }}</span><span class="micro">{{ percent(trial.partial_success) }} progress</span>
           </button>
         </aside>
         <section v-if="selected" class="review-panel">
           <article class="trial-card">
             <div class="trial-title"><span class="eyebrow">Fine-tuning</span><span :class="['outcome-tag', outcome(selected)]">{{ outcomeLabel(selected) }}</span></div>
             <h2>{{ taskLabel(selected.task.instruction) }}</h2><p v-if="selected.test" class="test-badge">Test</p>
-            <p class="micro">{{ policyName(selected.policy_id) }} · {{ dateLabel(selected.created) }}</p>
+            <p class="micro">Model: {{ policyName(selected.policy_id) }} · {{ dateLabel(selected.created) }}</p>
             <div class="trial-metrics"><div><span>Success</span><strong>{{ selected.success === null ? 'Not scored' : selected.success ? 'Yes' : 'No' }}</strong></div><div><span>Partial success</span><strong>{{ percent(selected.partial_success) }}</strong></div></div>
             <template v-if="selected.inference_mode !== 'imported'">
               <dl><dt>Initial setup</dt><dd>{{ selected.task.setup }}</dd><dt>Success criteria</dt><dd>{{ selected.task.success_criteria }}</dd><dt>Progress criteria</dt><dd>{{ selected.task.partial_success_criteria }}</dd></dl>
