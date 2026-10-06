@@ -4,12 +4,14 @@
     <ArenaControls />
     <section class="results-panel">
       <div class="results-heading">
-        <div><p class="eyebrow">{{ robot.name }} / {{ track === 'open' ? 'OPEN TRACK' : 'FINE-TUNING TRACK' }}</p><h2>{{ track === 'open' ? 'Policy standings' : 'Task adaptation results' }}</h2></div>
+        <div><p class="eyebrow">{{ robot.name }} / {{ track === 'open' ? 'OPEN TRACK' : 'FINE-TUNING TRACK' }}</p><h2 v-if="track === 'open'">Policy standings</h2></div>
+      </div>
+      <div v-if="track === 'fine-tuning' && tasks.length" class="task-tabs" role="group" aria-label="Task">
+        <button v-for="task in tasks" :key="task.id" type="button" :class="{ active: taskId === task.id }" :aria-pressed="taskId === task.id" @click="taskId = task.id">{{ task.name }}</button>
       </div>
       <div class="results-toolbar">
         <label class="search-field"><span class="sr-only">Search policy</span><input v-model="query" type="search" placeholder="Search policies…" /></label>
         <label v-if="track === 'open'">Comparisons<select v-model.number="minEvals" aria-label="Comparisons"><option :value="0">All counts</option><option :value="50">50+</option><option :value="100">100+</option></select></label>
-        <label v-else>Task<select v-model="taskId" aria-label="Task"><option value="">All tasks</option><option v-for="task in tasks" :key="task.id" :value="task.id">{{ task.name }}</option></select></label>
         <span class="micro result-count">{{ filteredRows.length }} {{ track === 'open' ? 'policies' : 'task / policy entries' }}</span>
       </div>
       <div v-if="loading" class="empty-state" role="status">Loading results…</div>
@@ -25,7 +27,7 @@
           <thead><tr>
             <th scope="col">Rank</th><th v-if="track === 'fine-tuning'" scope="col">Task</th><th scope="col">Policy</th>
             <template v-if="track === 'open'"><th scope="col">Rating ↓</th><th scope="col">Std. error</th><th scope="col">A/B comparisons</th></template>
-            <template v-else><th scope="col">Success rate ↓</th><th scope="col">Partial success</th><th scope="col">Trials</th></template>
+            <template v-else><th scope="col">Success rate ↓</th><th scope="col">{{ robot.id === 'so101' ? 'Score (0–4)' : 'Partial success' }}</th><th scope="col">Trials</th></template>
           </tr></thead>
           <tbody><tr v-for="row in filteredRows" :key="row.id">
             <td><span :class="['standing-rank', { first: row.rank === 1 }]">{{ row.rank == null ? '—' : String(row.rank).padStart(2, '0') }}</span></td>
@@ -39,7 +41,7 @@
             </template>
             <template v-else>
               <td><div class="success-cell"><strong>{{ percent(row.successRate) }}</strong><span v-if="row.successRate != null" class="success-meter" aria-hidden="true"><span :style="{ width: `${Math.min(100, Math.max(0, row.successRate))}%` }"></span></span></div></td>
-              <td>{{ percent(row.progress) }}</td><td>{{ row.trials ?? '—' }}</td>
+              <td>{{ robot.id === 'so101' ? sourceScore(row.progress) : percent(row.progress) }}</td><td>{{ row.trials ?? '—' }}</td>
             </template>
           </tr></tbody>
         </table>
@@ -52,6 +54,7 @@
     <details class="method-details">
       <summary>How to read this leaderboard <span>+</span></summary>
       <p v-if="track === 'open'">Policies are ranked by head-to-head performance on the same robot. Higher ratings indicate stronger performance. Standard error shows rating uncertainty; a higher rank alone does not prove a meaningful difference. Registered policies without completed comparisons appear as pending, with no rating or rank.</p>
+      <p v-else-if="robot.id === 'so101'">Success rate is the percentage of trials with a score of 4. Score is the average trial score on the original 0–4 scale. Rankings are calculated within each task, ordered by success rate, then average score. Only completed, non-test trials are counted.</p>
       <p v-else>Each task and model checkpoint is scored separately using completed, non-test trials. Success rate is the percentage of successful trials. Partial success is the average partial success across those trials. Registered checkpoints without completed trials appear as pending, with no score or rank.</p>
     </details>
   </div>
@@ -70,15 +73,19 @@ let requestController
 
 function number(value) { return value != null && Number.isFinite(Number(value)) ? Number(value).toLocaleString('en-US', { maximumFractionDigits: 1 }) : '—' }
 function percent(value) { return value == null ? '—' : `${number(value)}%` }
+function sourceScore(value) { return value == null ? '—' : (Number(value) / 25).toLocaleString('en-US', { maximumFractionDigits: 2 }) }
 function taskName(row) { return String(row.task || row.taskId || '').replaceAll('_', ' ') }
-function clearFilters() { query.value = ''; minEvals.value = 0; taskId.value = '' }
-const hasFilters = computed(() => Boolean(query.value || minEvals.value || taskId.value))
+function clearFilters() { query.value = ''; minEvals.value = 0 }
+const hasFilters = computed(() => Boolean(query.value || minEvals.value))
 const tasks = computed(() => Array.from(new Map(apiRows.value.map(row => [row.taskId, { id: row.taskId, name: taskName(row) }])).values()).sort((a, b) => a.name.localeCompare(b.name)))
+watch(tasks, items => {
+  if (!items.some(task => task.id === taskId.value)) taskId.value = items[0]?.id || ''
+}, { flush: 'sync' })
 const filteredRows = computed(() => {
   const search = query.value.trim().toLowerCase()
   return apiRows.value.filter(row => row.robotId === robot.value.id && row.track === track.value
     && `${row.policy} ${row.modelUrl || ''}`.toLowerCase().includes(search)
-    && (track.value === 'open' ? Number(row.num_evals ?? row.evals ?? 0) >= minEvals.value : !taskId.value || row.taskId === taskId.value))
+    && (track.value === 'open' ? Number(row.num_evals ?? row.evals ?? 0) >= minEvals.value : row.taskId === taskId.value))
     .sort((a, b) => (track.value === 'fine-tuning' ? taskName(a).localeCompare(taskName(b)) || a.taskId.localeCompare(b.taskId) : 0)
       || (a.rank ?? Infinity) - (b.rank ?? Infinity) || a.policy.localeCompare(b.policy))
 })
@@ -105,4 +112,10 @@ onBeforeUnmount(() => requestController?.abort())
 </script>
 <style scoped>
 .task-name { min-width: 110px; }
+.task-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 24px 12px; border-bottom: 1px solid var(--line); }
+.task-tabs button { padding: 8px 12px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; }
+.task-tabs button:hover { background: #f1f5e8; }
+.task-tabs button.active { border-color: #c9d5b8; background: #edf3e4; color: #435b2f; font-weight: 600; }
+.task-tabs button:focus-visible { outline: 2px solid #60734b; outline-offset: 2px; }
+@media (max-width: 640px) { .task-tabs { padding-inline: 15px; } }
 </style>
