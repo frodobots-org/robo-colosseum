@@ -27,14 +27,14 @@
           <thead><tr>
             <th scope="col">Rank</th><th v-if="track === 'fine-tuning'" scope="col">Task</th><th scope="col">Policy</th>
             <template v-if="track === 'open'"><th scope="col">Rating ↓</th><th scope="col">Std. error</th><th scope="col">A/B comparisons</th></template>
-            <template v-else><th scope="col">Success rate ↓</th><th scope="col">{{ robot.id === 'so101' ? 'Score (0–4)' : 'Partial success' }}</th><th scope="col">Trials</th></template>
+            <template v-else><th scope="col">Success rate ↓</th><th scope="col">{{ robot.id === 'so101' ? 'Score (0–4)' : 'Partial success' }}</th><th scope="col">Evals</th></template>
           </tr></thead>
           <tbody><tr v-for="row in filteredRows" :key="row.id">
             <td><span :class="['standing-rank', { first: row.rank === 1 }]">{{ row.rank == null ? '—' : String(row.rank).padStart(2, '0') }}</span></td>
             <td v-if="track === 'fine-tuning'" class="task-name">{{ taskName(row) }}</td>
             <td>
               <strong class="policy-name">{{ policyName(row.policyId || row.policy) }}</strong>
-              <small class="policy-org" :data-status="row.status">{{ row.status === 'pending' ? 'Pending evaluation' : 'Evaluated' }}</small>
+              <small v-if="row.status === 'pending'" class="policy-org" data-status="pending">Pending evaluation</small>
             </td>
             <template v-if="track === 'open'">
               <td><strong class="score-number">{{ number(row.score) }}</strong></td><td class="muted">{{ number(row.std ?? row.sd) }}</td><td>{{ row.num_evals ?? row.evals ?? '—' }}</td>
@@ -48,14 +48,14 @@
       </div>
       <div class="table-footnote">
         <span>{{ track === 'open' ? 'Higher rating indicates stronger pairwise performance. Pending policies are unranked.' : 'Rankings are calculated within each task. Pending checkpoints are unranked.' }}</span>
-        <RouterLink :to="link('/evals')">{{ track === 'open' ? 'Review A/B evaluations ↗' : 'Review trials ↗' }}</RouterLink>
+        <RouterLink :to="link('/evals')">{{ track === 'open' ? 'Review A/B evaluations ↗' : 'Review evaluations ↗' }}</RouterLink>
       </div>
     </section>
     <details class="method-details">
       <summary>How to read this leaderboard <span>+</span></summary>
       <p v-if="track === 'open'">Policies are ranked by head-to-head performance on the same robot. Higher ratings indicate stronger performance. Standard error shows rating uncertainty; a higher rank alone does not prove a meaningful difference. Registered policies without completed comparisons appear as pending, with no rating or rank.</p>
-      <p v-else-if="robot.id === 'so101'">Success rate is the percentage of trials with a score of 4. Score is the average trial score on the original 0–4 scale. Rankings are calculated within each task, ordered by success rate, then average score. Only completed, non-test trials are counted.</p>
-      <p v-else>Each task and model checkpoint is scored separately using completed, non-test trials. Success rate is the percentage of successful trials. Partial success is the average partial success across those trials. Registered checkpoints without completed trials appear as pending, with no score or rank.</p>
+      <p v-else-if="robot.id === 'so101'">Success rate is the percentage of evaluations with a score of 4. Score is the average evaluation score on the original 0–4 scale. Rankings are calculated within each task, ordered by success rate, then average score. Only completed, non-test evaluations are counted.</p>
+      <p v-else>Each task and model checkpoint is scored separately using completed, non-test evaluations. Success rate is the percentage of successful evaluations. Partial success is the average partial success across those evaluations. Registered checkpoints without completed evaluations appear as pending, with no score or rank.</p>
     </details>
   </div>
 </template>
