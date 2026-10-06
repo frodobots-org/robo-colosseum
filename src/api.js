@@ -85,3 +85,26 @@ export async function getFineTuningVideoUrls(runId, signal) {
   }
   return response.json()
 }
+
+export async function getImportedDatasets(robotId, signal, offset = 0) {
+  return datasetRequest(`/datasets/published?robot_id=${encodeURIComponent(robotId)}&offset=${offset}`, signal)
+}
+
+export async function getImportedDataset(id, signal) {
+  return datasetRequest(`/datasets/published/${encodeURIComponent(id)}`, signal)
+}
+
+export async function getImportedEpisode(id, index, signal, frames = false) {
+  const result = await datasetRequest(`/datasets/published/${encodeURIComponent(id)}/episodes/${index}?include_frames=${frames}`, signal)
+  for (const video of Object.values(result.videos || {})) {
+    // API returns relative routes; resolve them against the configured API host.
+    video.url = `${API_BASE}${video.url.slice('/api'.length)}`
+  }
+  return result
+}
+
+async function datasetRequest(path, signal) {
+  const response = await apiGet(path, { signal })
+  if (!response.ok) { const error = new Error(`Dataset request failed (HTTP ${response.status}).`); error.status = response.status; throw error }
+  return response.json()
+}

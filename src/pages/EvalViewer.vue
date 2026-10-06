@@ -5,7 +5,6 @@
     </section>
 
     <ArenaControls />
-    <p class="micro">{{ robot.name }} · {{ track === 'open' ? 'Open Track' : 'Fine-tuning Track' }}</p>
     <FineTuneReview v-if="track === 'fine-tuning'" :robot-id="robot.id" :robot-name="robot.name" />
     <template v-else>
     <div class="review-actions">

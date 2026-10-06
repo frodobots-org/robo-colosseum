@@ -22,7 +22,10 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  scrollBehavior() {
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) return savedPosition
+    // Selection changes within a page should not move the viewer away from the controls.
+    if (to.path === from.path && to.query.robot === from.query.robot && to.query.track === from.query.track) return false
     return { top: 0 }
   },
 })

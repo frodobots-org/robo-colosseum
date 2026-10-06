@@ -1,38 +1,34 @@
 <template>
   <section class="fine-review">
-    <div class="review-access">
-      <div><span class="eyebrow">Trial review</span><p>Review recorded outcomes and footage for each predefined task.</p></div>
-      <div class="review-actions">
-        <button class="button secondary" @click="loadTrials">Refresh</button>
-      </div>
-    </div>
     <p v-if="error" class="review-error" role="alert">{{ error }}</p>
+    <p v-if="datasetError" class="review-error" role="alert">{{ datasetError }}</p>
     <div v-if="loading" class="empty-state" role="status">Loading trials…</div>
     <template v-else-if="!error">
-      <div class="trial-filters">
-        <label>Task<select v-model="taskFilter"><option value="">All tasks</option><option v-for="task in tasks" :key="task.id" :value="task.id">{{ task.label }}</option></select></label>
-        <label>Outcome<select v-model="outcomeFilter"><option value="">All outcomes</option><option value="success">Success</option><option value="failure">Failure</option></select></label>
-        <span>{{ filtered.length }} trials · {{ robotName }}</span>
-      </div>
-      <div v-if="!filtered.length" class="empty-state"><h3>No matching trials yet</h3><p>Completed Fine-tuning trials for this robot will appear here.</p></div>
-      <p v-if="trials.length >= limit" class="micro">Showing the {{ limit }} most recent trials for this robot.</p>
+      <div v-if="!filtered.length" class="empty-state"><h3>No matching evaluations yet</h3><p>Completed Fine-tuning trials and published datasets for this robot will appear here.</p></div>
       <div v-if="filtered.length" class="eval-layout">
-        <aside class="eval-list" aria-label="Fine-tuning trials">
-          <button v-for="trial in filtered" :key="trial.run_id" :class="['eval-list-item', selectedId === trial.run_id && 'active']" @click="selectedId = trial.run_id">
-            <span class="eval-list-meta"><span :class="['outcome-tag', outcome(trial)]">{{ outcomeLabel(trial) }}</span><time>{{ dateLabel(trial.created) }}</time></span>
-            <strong>{{ taskLabel(trial.task.instruction) }} <span v-if="trial.test" class="test-badge">Test</span></strong><span class="micro">{{ policyName(trial.policy_id) }}</span><span class="micro">Partial success: {{ percent(trial.partial_success) }}</span>
+        <aside class="eval-list" aria-label="Fine-tuning evaluations">
+          <button v-for="trial in filtered" :key="trial.entryId" :class="['eval-list-item', selectedId === trial.entryId && 'active']" :aria-pressed="selectedId === trial.entryId" @click="selectEntry(trial)">
+            <span class="eval-list-meta"><time :title="trial.kind === 'dataset' ? 'Import date' : 'Evaluation date'">{{ dateLabel(trial.created) }}</time><span class="micro">{{ trial.kind === 'dataset' ? trial.summary.episodes : 1 }} {{ trial.kind === 'dataset' && trial.summary.episodes !== 1 ? 'evals' : 'eval' }}</span></span>
+            <strong>{{ trial.kind === 'dataset' ? registeredModelName(trial) : policyName(trial.policy_id) }}</strong>
+            <span class="micro">{{ taskLabel(trial.task.instruction) }}</span>
           </button>
         </aside>
-        <section v-if="selected" class="review-panel">
+        <ImportedEvaluationFeed v-if="selectedEntry?.kind === 'dataset'" :key="selectedEntry.datasetId" :dataset-id="selectedEntry.datasetId" :model-name="registeredModelName(selectedEntry)" :robot-id="robotId" />
+        <section v-else-if="selected" class="review-panel">
           <article class="trial-card">
-            <div class="trial-title"><span class="eyebrow">Fine-tuning</span><span :class="['outcome-tag', outcome(selected)]">{{ outcomeLabel(selected) }}</span></div>
+            <div class="trial-title"><span class="eyebrow">{{ robotName }} · Fine-tuning</span></div>
             <div class="trial-overview">
               <div class="trial-info">
-                <h2>{{ taskLabel(selected.task.instruction) }}</h2><p v-if="selected.test" class="test-badge">Test</p>
-                <p class="micro">Model: {{ policyName(selected.policy_id) }}</p>
-                <time class="micro">{{ dateLabel(selected.created) }}</time>
+                <h2 class="model-name">{{ policyName(selected.policy_id) }}</h2><p v-if="selected.test" class="test-badge">Test</p>
               </div>
-              <div class="trial-metrics"><div><span>Success</span><strong>{{ selected.success === null ? 'Not scored' : selected.success ? 'Yes' : 'No' }}</strong></div><div><span>Partial success</span><strong>{{ percent(selected.partial_success) }}</strong></div></div>
+            </div>
+            <p class="task-label">{{ taskLabel(selected.task.instruction) }}</p>
+            <div class="episode-controls">
+              <label class="episode-select">Episode<select aria-label="Select episode"><option>Episode 1</option></select></label>
+            </div>
+            <div class="episode-summary" aria-label="Episode result">
+              <div class="episode-details"><span :class="['outcome-tag', outcome(selected)]">{{ outcomeLabel(selected) }}</span><time class="micro">{{ dateLabel(selected.created) }}</time></div>
+              <div class="episode-score"><span>{{ hasSourceScore ? 'Score' : 'Partial success' }}</span><strong>{{ hasSourceScore ? sourceScore + ' / 4' : percent(selected.partial_success) }}</strong></div>
             </div>
             <template v-if="selected.inference_mode !== 'imported'">
               <dl><dt>Initial setup</dt><dd>{{ selected.task.setup }}</dd><dt>Success criteria</dt><dd>{{ selected.task.success_criteria }}</dd><dt>Progress criteria</dt><dd>{{ selected.task.partial_success_criteria }}</dd></dl>
@@ -40,7 +36,7 @@
             </template>
             <p v-if="selected.reason"><strong>Interruption:</strong> {{ selected.reason }}</p>
             <section class="video-section" aria-label="Videos">
-              <h3>Videos</h3>
+              <h3>Review</h3>
               <p v-if="videosLoading" role="status">Loading videos…</p>
               <p v-if="videoError" class="review-error" role="alert">{{ videoError }}</p>
               <div class="trial-videos">
@@ -62,35 +58,78 @@
 <script setup>
 import { policyName, dateLabel } from '../display.js'
 import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
-import { getFineTuningReviews, getFineTuningVideoUrls } from '../api.js'
+import { useRoute, useRouter } from 'vue-router'
+import ImportedEvaluationFeed from './ImportedEvaluationFeed.vue'
+import { getFineTuningReviews, getFineTuningVideoUrls, getImportedDatasets, getImportedDataset } from '../api.js'
 const props = defineProps({ robotId: { type: String, required: true }, robotName: String })
 const loading = ref(false), error = ref(''), trials = ref([]), limit = ref(500)
+const importedEpisodes = ref([])
+const datasets = ref([]), datasetError = ref(''), datasetTotal = ref(0)
+const route = useRoute(), router = useRouter()
 const taskFilter = ref(''), outcomeFilter = ref(''), selectedId = ref('')
 const videos = ref({}), videosLoading = ref(false), videoError = ref('')
-let trialRequest, videoRequest
-const outcome = trial => trial.state === 'aborted' ? 'aborted' : trial.success ? 'success' : 'failure'
-const outcomeLabel = trial => ({ success: 'Success', failure: 'Failure', aborted: 'Interrupted' })[outcome(trial)]
+let trialRequest, videoRequest, moreRequest
+const outcome = trial => trial.state === 'aborted' ? 'aborted' : trial.success == null ? 'unscored' : trial.success ? 'success' : 'failure'
+const outcomeLabel = trial => ({ success: 'Success', failure: 'Failure', aborted: 'Interrupted', unscored: 'Not scored' })[outcome(trial)]
 const percent = value => value === null || value === undefined ? 'Not scored' : `${Math.round(value * 100)}%`
 const taskLabel = value => String(value || '').replaceAll('_', ' ')
 const cameraLabel = camera => (props.robotId === 'so101' ? { head_image: 'Front', left_image: 'Wrist' } : { head_image: 'Head / overview', left_image: 'Left camera', right_image: 'Right camera' })[camera] || camera
-const tasks = computed(() => [...new Map(trials.value.map(t => [t.task_id, { id: t.task_id, label: taskLabel(t.task.instruction) }])).values()])
-const filtered = computed(() => trials.value.filter(t => (!taskFilter.value || t.task_id === taskFilter.value) && (!outcomeFilter.value || outcome(t) === outcomeFilter.value)))
-const selected = computed(() => filtered.value.find(t => t.run_id === selectedId.value))
-watch(filtered, rows => { if (!rows.some(t => t.run_id === selectedId.value)) selectedId.value = rows[0]?.run_id || '' })
+function registeredModelName(dataset) {
+  return policyName(importedEpisodes.value.find(e => e.datasetId === dataset.id && e.evaluation_link)?.evaluation_link.policy_id || dataset.model.name)
+}
+const entries = computed(() => {
+  const linkedRuns = new Set(importedEpisodes.value.map(e => e.evaluation_link?.run_id).filter(Boolean))
+  const originals = trials.value.filter(t => !linkedRuns.has(t.run_id))
+  return [...datasets.value.map(d => ({ ...d, kind: 'dataset', datasetId: d.id, entryId: d.id })), ...originals.map(t => ({ ...t, kind: 'trial', entryId: t.run_id }))]
+    .sort((a, b) => b.created.localeCompare(a.created))
+})
+const filtered = computed(() => entries.value.slice(0, 20))
+async function expandDatasets(items, signal) {
+  const details = await Promise.all(items.map(d => getImportedDataset(d.id, signal)))
+  return details.flatMap(d => d.episodes.map(e => ({ ...e, kind: 'episode', entryId: `${d.id}:${e.episode_index}`,
+    datasetId: d.id, task_id: d.task_id, task: d.task, model: d.model, source: d.source,
+    created: d.created, recordedAt: e.source_result?.saved_at || '', state: 'completed' })))
+}
+const selectedEntry = computed(() => filtered.value.find(t => t.entryId === selectedId.value))
+const selected = computed(() => selectedEntry.value?.kind === 'trial' ? selectedEntry.value : null)
+const hasSourceScore = computed(() => props.robotId === 'so101' && selected.value?.inference_mode === 'imported')
+const sourceScore = computed(() => selected.value?.partial_success == null ? '—' : Math.round(selected.value.partial_success * 400) / 100)
+watch(filtered, rows => { if (!rows.some(t => t.entryId === selectedId.value)) selectedId.value = rows.find(t => route.query.dataset && t.datasetId === route.query.dataset)?.entryId || rows[0]?.entryId || '' })
+function selectEntry(entry) {
+  selectedId.value = entry.entryId
+  if (entry.kind === 'trial') { const query = { ...route.query }; delete query.dataset; delete query.episode; router.replace({ query }) }
+}
 watch(selected, loadVideos)
-watch(() => props.robotId, () => { trialRequest?.abort(); loading.value = false; taskFilter.value = ''; trials.value = []; loadTrials() })
+watch(() => props.robotId, () => { trialRequest?.abort(); moreRequest?.abort(); loading.value = false; taskFilter.value = ''; outcomeFilter.value = ''; trials.value = []; datasets.value = []; importedEpisodes.value = []; datasetTotal.value = 0; loadTrials() })
 async function loadTrials() {
+  const previousSelection = selectedId.value
   trialRequest?.abort(); const request = trialRequest = new AbortController()
-  loading.value = true; error.value = ''
+  loading.value = true; error.value = ''; datasetError.value = ''; moreRequest?.abort()
   try {
-    const data = await getFineTuningReviews(props.robotId, request.signal)
+    const [reviews, imports] = await Promise.allSettled([getFineTuningReviews(props.robotId, request.signal), getImportedDatasets(props.robotId, request.signal)])
     if (request.signal.aborted) return false
-    trials.value = (data.trials || []).filter(trial => trial.state === 'completed'); limit.value = data.limit || 500
+    if (reviews.status === 'fulfilled') { trials.value = (reviews.value.trials || []).filter(trial => trial.state === 'completed'); limit.value = reviews.value.limit || 500 }
+    else { trials.value = []; datasetError.value = reviews.reason.message }
+    if (imports.status === 'fulfilled') {
+      const episodes = await expandDatasets(imports.value.datasets, request.signal)
+      if (request.signal.aborted) return false
+      datasets.value = imports.value.datasets; datasetTotal.value = imports.value.total; importedEpisodes.value = episodes
+    }
+    else { datasets.value = []; importedEpisodes.value = []; datasetTotal.value = 0; if (imports.reason.status !== 404) datasetError.value = imports.reason.message }
+    if (!previousSelection) selectedId.value = entries.value.find(t => route.query.dataset && t.datasetId === route.query.dataset)?.entryId || entries.value[0]?.entryId || ''
     return true
   } catch (err) {
     if (request.signal.aborted) return false
     error.value = err.message; return false
   } finally { if (trialRequest === request) loading.value = false }
+}
+async function loadMoreDatasets() {
+  moreRequest?.abort(); const request = moreRequest = new AbortController()
+  try {
+    const data = await getImportedDatasets(props.robotId, request.signal, datasets.value.length)
+    const episodes = await expandDatasets(data.datasets, request.signal)
+    if (!request.signal.aborted) { datasets.value.push(...data.datasets); importedEpisodes.value.push(...episodes); datasetTotal.value = data.total }
+  } catch (err) { if (!request.signal.aborted) datasetError.value = err.message }
 }
 async function loadVideos() {
   videoRequest?.abort(); videos.value = {}; videoError.value = ''; videosLoading.value = false
@@ -104,10 +143,15 @@ async function loadVideos() {
   } finally { if (videoRequest === request) videosLoading.value = false }
 }
 onMounted(loadTrials)
-onBeforeUnmount(() => { trialRequest?.abort(); videoRequest?.abort() })
+onBeforeUnmount(() => { trialRequest?.abort(); videoRequest?.abort(); moreRequest?.abort() })
 </script>
 
 <style scoped>
+.episode-summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 0 18px}.episode-details{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.episode-score{display:grid;gap:4px;flex-shrink:0}.episode-score>span{font-size:13px;color:var(--muted)}.episode-score strong{font-size:24px;font-weight:500}.trial-overview{margin-bottom:8px!important}.episode-controls{border-bottom:0!important;padding-bottom:0!important;margin-bottom:18px!important}@media(max-width:600px){.episode-details{align-items:flex-start;flex-direction:column;gap:8px}}
+
+.model-name{text-align:left;overflow-wrap:anywhere}.task-label{margin:0 0 10px;color:var(--muted);font-size:14px}
+.episode-controls{display:flex;align-items:end;gap:12px;margin:0 0 16px;padding-bottom:18px;border-bottom:1px solid var(--line)}.episode-select{display:grid;gap:7px;flex:1;min-width:0;font-size:13px;color:var(--muted)}.episode-select select{width:100%;padding:9px 10px;border-radius:6px}.episode-select select:disabled{opacity:1;cursor:default;color:var(--ink);-webkit-text-fill-color:var(--ink)}
+
 .fine-review{display:grid;gap:20px}
 .review-access,.review-actions,.trial-title{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .review-access p{margin:6px 0 0;color:var(--muted)}
@@ -118,10 +162,10 @@ onBeforeUnmount(() => { trialRequest?.abort(); videoRequest?.abort() })
 select,input{font:inherit;padding:11px 13px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}
 .trial-filters span{padding-bottom:10px;color:var(--muted);font-size:14px}
 .eval-layout{grid-template-columns:290px minmax(0,1fr);gap:20px}
-.eval-list-item{gap:7px}
+.eval-list-item{gap:7px}.eval-list-item strong{overflow-wrap:anywhere}
 .review-panel{padding:0;border:0;background:transparent;min-width:0}
 .trial-card{padding:22px;border:1px solid var(--line);border-radius:10px;background:#fff;min-width:0}
-.trial-overview{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:16px 0 20px}
+.trial-overview{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin:16px 0 20px}
 .trial-info{min-width:0}
 .trial-info p{margin:6px 0}
 .trial-info .micro{overflow-wrap:anywhere}
