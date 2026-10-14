@@ -2,12 +2,16 @@
 
 Vue frontend for robot policy evaluation results and leaderboards.
 
-- Website: https://frodobots-org.github.io/robo-colosseum/
+- Netlify website: https://robocolosseum.netlify.app/
+- Custom domain: https://robocolosseum.ai/ (DNS cutover pending)
+- Previous website: https://frodobots-org.github.io/robo-colosseum/
 - Backend API: https://191.222.219.43/api
 - Backend repository: https://github.com/frodobots-org/colosseum-router
 
-The frontend is published independently on GitHub Pages. It calls the Router over
-HTTPS; no backend process or credentials are deployed with the static site.
+The frontend is hosted in the **FrodoBots Pro** Netlify team. Netlify proxies
+`/api/*` to the existing production Router over HTTPS; no backend process or
+credentials are deployed with the static site. The backend remains on the old
+production API until its separate Render migration is complete.
 
 ## Development
 
@@ -21,7 +25,45 @@ VITE_DEV_API_PROXY_TARGET=https://191.222.219.43 npm run dev
 Vite serves the site on port 5174 and proxies `/api` requests to the Router. For a
 local Router, omit the variable to use `http://127.0.0.1:8443`.
 
-## Deployment
+## Netlify deployment
+
+The `robocolosseum` project builds this repository's `main` branch. Its settings
+are versioned in `netlify.toml`:
+
+- Build command: `npm run build`; publish directory: `dist`; Node.js: 22.
+- `VITE_BASE_PATH=/` and `VITE_API_BASE=/api`.
+- `/api/*` is proxied to `https://191.222.219.43/api/:splat` before the app fallback.
+- Other application routes serve `index.html` with HTTP 200, so direct links and
+  refreshes work with Vue Router.
+
+The same-origin API route works on the Netlify URL, deployment previews, and the
+custom domain without adding each frontend origin to the Router's CORS settings.
+Robot clients continue connecting directly to the Router. Netlify proxies have a
+26-second timeout; this route is for frontend requests, not robot sessions or
+long-running uploads. When the backend cutover is approved, update the proxy
+destination in `netlify.toml` and verify the new deployment.
+
+To build the Netlify frontend locally:
+
+```bash
+VITE_BASE_PATH=/ VITE_API_BASE=/api npm run build
+```
+
+Deploy through the connected repository, or use `netlify deploy --prod` from a
+checkout linked to project `27e01154-2427-42ba-90b4-09ade672a65c`. The `.netlify`
+directory is local configuration and must not be committed.
+
+### Custom domain
+
+`robocolosseum.ai` is registered with GoDaddy. Keep DNS there and point the web
+records to Netlify: apex `A` record `@` to `75.2.60.5`, and `CNAME` record `www`
+to `robocolosseum.netlify.app`. Replace conflicting web records, preserving mail,
+verification, and other unrelated records. Complete DNS verification and HTTPS
+provisioning in Netlify before treating the domain as live.
+
+See [Netlify's external DNS instructions](https://docs.netlify.com/manage/domains/configure-domains/configure-external-dns/).
+
+## Previous GitHub Pages deployment
 
 Push to `main` to run `.github/workflows/deploy-pages.yml`. GitHub Actions builds
 with `/robo-colosseum/` as the base path and `https://191.222.219.43/api` as the API

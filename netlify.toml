@@ -1,0 +1,22 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  VITE_BASE_PATH = "/"
+  VITE_API_BASE = "/api"
+
+# Keep API requests on the frontend origin while using the existing production router.
+# Change this destination when the backend migration is ready.
+[[redirects]]
+  from = "/api/*"
+  to = "https://191.222.219.43/api/:splat"
+  status = 200
+  force = true
+
+# Vue Router handles direct visits to application routes.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
