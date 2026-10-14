@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE
-  || (import.meta.env.DEV ? '/api' : 'https://robocolosseum-api.onrender.com/api')
+  || (import.meta.env.DEV ? '/api' : 'https://191.222.219.43/api')
 
 export async function apiGet(path, init = {}) {
   return fetch(`${API_BASE}${path}`, init)
