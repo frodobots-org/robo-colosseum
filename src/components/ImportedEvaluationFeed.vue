@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getImportedDataset, getImportedEpisode } from '../api.js'
+import { policyName } from '../display.js'
 
 const props = defineProps({ robotId: { type: String, required: true }, datasetId: { type: String, required: true }, episodeIndex: { type: Number, default: null }, modelName: { type: String, default: '' } })
 const route = useRoute(), router = useRouter()
@@ -108,7 +109,7 @@ onBeforeUnmount(() => { datasetRequest?.abort(); replayRequest?.abort(); playbac
         <article v-if="selected" class="trial-card">
           <div class="trial-title"><span class="eyebrow">SO101 · Fine-tuning</span></div>
           <div class="trial-overview">
-            <div class="trial-info"><h2 class="model-name">{{ modelName || dataset.model.name }}</h2></div>
+            <div class="trial-info"><h2 class="model-name">{{ policyName(modelName || dataset.model.name) }}</h2></div>
           </div>
           <p class="task-label">{{ dataset.task.instruction.replaceAll('_', ' ') }}</p>
           <div class="episode-controls">

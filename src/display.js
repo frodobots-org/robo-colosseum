@@ -1,6 +1,6 @@
-// Keep the stored identity intact; omit pinned revision hashes in labels.
+// Keep the stored identity intact; omit @ suffixes in model labels.
 export function policyName(value) {
-  return String(value || '').replace(/@[a-f0-9]{40}$/i, '')
+  return String(value || '').split('@', 1)[0]
 }
 
 // Display evaluation times in the viewer's local timezone, to whole seconds.
