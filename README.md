@@ -65,7 +65,9 @@ See [Netlify's external DNS instructions](https://docs.netlify.com/manage/domain
 
 ## Previous GitHub Pages deployment
 
-Push to `main` to run `.github/workflows/deploy-pages.yml`. GitHub Actions builds
+The existing Pages site remains available as a fallback. Its workflow is now
+manual-only; pushes to `main` deploy through Netlify. Manually run
+`.github/workflows/deploy-pages.yml` if a Pages rebuild is needed. GitHub Actions builds
 with `/robo-colosseum/` as the base path and `https://191.222.219.43/api` as the API
 URL, then publishes the static assets to GitHub Pages. Repository Settings → Pages
 must use GitHub Actions as the publishing source.
