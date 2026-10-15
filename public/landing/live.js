@@ -58,10 +58,10 @@ export function loadReviews(robotId, onChange) {
 }
 
 export const board = (robotId, track) => store.boards[`${robotId}/${track}`] || []
-const rankedOpen = robotId => board(robotId, 'open')
+export const rankedOpen = robotId => board(robotId, 'open')
   .filter(row => row.status !== 'pending' && Number(row.evals) > 0 && Number.isFinite(row.score))
   .sort((a, b) => a.rank - b.rank)
-const fineRows = robotId => board(robotId, 'fine-tuning').filter(row => Number(row.trials) > 0)
+export const fineRows = robotId => board(robotId, 'fine-tuning').filter(row => Number(row.trials) > 0)
 export const hasData = robotId => rankedOpen(robotId).length > 0 || fineRows(robotId).length > 0
 
 export function totals() {
@@ -85,7 +85,7 @@ export const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':
 
 const FAMILIES = [
   ['groot-n17', 'GR00T N1.7'], ['gr00t-n17', 'GR00T N1.7'], ['pi05', 'π0.5'], ['g05', 'G0.5'],
-  ['molmoact2', 'MolmoAct2'], ['lingbot-vla', 'LingBot VLA'], ['lap-3b', 'LAP 3B'],
+  ['molmoact2', 'MolmoAct2'], ['lingbot-vla', 'LingBot VLA'], ['lingbot-molmoact2', 'LingBot-MolmoAct2'], ['lap-3b', 'LAP 3B'],
   ['claude-opus-5-5', 'Claude Opus 5.5'], ['gpt-6-astra', 'GPT-6 Astra'], ['grok-4.7', 'Grok 4.7'],
 ]
 export function policyLabel(policy) {
@@ -94,7 +94,7 @@ export function policyLabel(policy) {
   return family ? family[1] : id.replace(/-(so101|yam|droid|franka|g1)$/, '')
 }
 // Two revisions of one family on the same board get a short revision tag.
-function labelRows(rows, key) {
+export function labelRows(rows, key) {
   const counts = {}
   rows.forEach(row => { const label = policyLabel(row[key]); counts[label] = (counts[label] || 0) + 1 })
   return rows.map(row => {

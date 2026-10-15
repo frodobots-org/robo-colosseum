@@ -47,7 +47,7 @@
 <div style="min-width:0">
   <header style="background:var(--ink);color:#fff;min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px 28px;flex-wrap:wrap;padding:10px clamp(18px,3vw,36px)">
     <a href="#" style="font-weight:900;font-size:20px;letter-spacing:-.03em;text-transform:uppercase">Robo<span style="color:var(--orange)">Colosseum</span></a>
-    <nav class="mono" style="display:flex;gap:clamp(14px,2.5vw,28px);font-size:12px;color:oklch(0.8 0 0);flex-wrap:wrap"><a href="#benchmark">Benchmark</a><a href="#roster">Leaderboards</a><a data-app-link="/evals" href="/evals">Evaluations</a><a href="#tracks">Method</a></nav>
+    <nav class="mono" style="display:flex;gap:clamp(14px,2.5vw,28px);font-size:12px;color:oklch(0.8 0 0);flex-wrap:wrap"><a href="#benchmark">Benchmark</a><a href="#leaderboards">Leaderboards</a><a data-app-link="/evals" href="/evals">Evaluations</a><a href="#tracks">Method</a></nav>
     <a href="#join" style="background:var(--orange);color:var(--ink);font-weight:700;font-size:13px;padding:10px 16px">Submit a policy</a>
   </header>
 
@@ -86,6 +86,12 @@
   <section id="benchmark" style="padding:clamp(56px,7vw,100px) clamp(18px,3vw,36px)">
     <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px 40px;flex-wrap:wrap;margin-bottom:34px"><div><p class="mono" style="font-size:12px;color:var(--orange-deep);margin-bottom:18px">THE BENCHMARK · EVERY TRIAL, ON THE RECORD</p><h2 style="font-weight:800;font-size:clamp(40px,4.5vw,64px);line-height:.95;letter-spacing:-.05em">Pick a body.<br>Pick a track. See every trial.</h2></div><p class="mono" style="font-size:12px;line-height:1.8;color:var(--muted)">Each square is one scored trial.<br>Click a policy to isolate it.</p></div>
     <div id="explorer"></div>
+  </section>
+
+  <section id="leaderboards" style="background:oklch(0.97 0 0);border-top:2px solid var(--ink);padding:clamp(56px,7vw,100px) clamp(18px,3vw,36px)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px 40px;flex-wrap:wrap;margin-bottom:30px"><div><p class="mono" style="font-size:12px;color:var(--orange-deep);margin-bottom:18px">THE LEADERBOARDS · LIVE</p><h2 style="font-weight:800;font-size:clamp(40px,4.5vw,64px);line-height:.95;letter-spacing:-.05em">Every model.<br>On the record.</h2></div><a id="lb-full" href="/leaderboard" style="border:2px solid var(--ink);font-weight:700;font-size:14px;padding:12px 16px">Full leaderboard table →</a></div>
+    <div id="lb-controls" style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;margin-bottom:18px"></div>
+    <div id="lb-figure"></div>
   </section>
 
   <section id="roster" style="background:var(--orange);padding:clamp(48px,6vw,80px) clamp(18px,3vw,36px)">

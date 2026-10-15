@@ -1,6 +1,14 @@
 import { APP, ASSETS, ROBOTS, store, startLoading, loadReviews, explorer, hero, totals, summary, hasData, fmt, esc, appLink } from './live.js'
+import { figureModel, renderFigure, boardFromUrl, boardToUrl } from './leaderboard.js'
 
 const state = { robot: 'so101', track: 'fine', task: 'all', focus: null }
+const board = boardFromUrl()
+const figureTheme = {
+  card: 'background:#fff;border:2px solid oklch(0.15 0 0)', surface: '#fff',
+  ink: 'oklch(0.15 0 0)', secondary: 'oklch(0.38 0 0)', muted: 'oklch(0.5 0 0)', grid: 'oklch(0.92 0 0)', axis: 'oklch(0.7 0 0)', ring: 'oklch(0.72 0 0)',
+  sans: "'Schibsted Grotesk', sans-serif", mono: "'Geist Mono', monospace", titleWeight: 800, tipBg: 'oklch(0.15 0 0)', tipInk: '#fff',
+  brand: 'ROBO<span style="color:oklch(0.72 0.19 50)">COLOSSEUM</span>',
+}
 const $ = selector => document.querySelector(selector)
 const skeleton = width => `<span class="skeleton" style="min-width:${width}">&nbsp;</span>`
 const ink = 'oklch(0.15 0 0)', muted = 'oklch(0.45 0 0)'
@@ -125,8 +133,26 @@ $('#explorer').addEventListener('click', event => {
   renderExplorer()
 })
 
+function renderLeaderboard() {
+  $('#lb-controls').innerHTML = `<div style="display:flex;gap:4px;flex-wrap:wrap">${ROBOTS.map(r => square(r.id === board.robot, `data-lb-robot="${r.id}"`, r.name)).join('')}</div>
+    <div style="display:flex;gap:4px;margin-left:auto;flex-wrap:wrap">${[['open', 'A/B', 'Open track'], ['fine', '✓/4', 'Fine-tuning']].map(([id, label, name]) => square(board.track === id, `data-lb-track="${id}"`, `<span style="font-weight:900;letter-spacing:-.05em">${label}</span>${name}`)).join('')}</div>`
+  $('#lb-full').href = appLink('/leaderboard', { robot: board.robot, track: board.track === 'open' ? 'open' : 'fine-tuning' })
+  const target = $('#lb-figure')
+  if (!store.ready) { target.innerHTML = `<div style="${figureTheme.card};padding:40px;min-height:420px">${skeleton('22ch')}</div>`; return }
+  renderFigure(target, figureModel(board.robot, board.track), figureTheme)
+}
+
+$('#lb-controls').addEventListener('click', event => {
+  const target = event.target.closest('button')
+  if (!target) return
+  if (target.dataset.lbRobot) board.robot = target.dataset.lbRobot
+  if (target.dataset.lbTrack) board.track = target.dataset.lbTrack
+  boardToUrl(board)
+  renderLeaderboard()
+})
+
 function render() {
-  renderPanels(); renderStats(); renderExplorer(); renderRoster()
+  renderPanels(); renderStats(); renderExplorer(); renderLeaderboard(); renderRoster()
   if (store.ready) $('#data-note').textContent = `LIVE DATA FROM THE ROBOCOLOSSEUM API · ${new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }).toUpperCase()}`
 }
 

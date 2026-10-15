@@ -1,6 +1,14 @@
 import { APP, ASSETS, ROBOTS, store, startLoading, loadReviews, explorer, hero, totals, summary, hasData, fmt, esc, appLink } from './live.js'
+import { figureModel, renderFigure, boardFromUrl, boardToUrl } from './leaderboard.js'
 
 const state = { robot: 'so101', track: 'fine', task: 'all', focus: null }
+const board = boardFromUrl()
+const figureTheme = {
+  card: 'background:oklch(0.99 0.004 80);border:1px solid oklch(0.88 0.01 80)', surface: 'oklch(0.99 0.004 80)',
+  ink: 'oklch(0.2 0.01 80)', secondary: 'oklch(0.42 0.01 80)', muted: 'oklch(0.55 0.01 80)', grid: 'oklch(0.91 0.008 80)', axis: 'oklch(0.72 0.01 80)', ring: 'oklch(0.72 0.01 80)',
+  sans: "'Bricolage Grotesque', sans-serif", mono: "'Space Mono', monospace", titleWeight: 600, tipBg: 'oklch(0.2 0.01 80)', tipInk: '#fff',
+  brand: 'RoboColosseum<i style="display:inline-block;width:7px;height:7px;border-radius:50%;background:oklch(0.6 0.22 340);margin-left:6px;vertical-align:middle"></i>',
+}
 const $ = selector => document.querySelector(selector)
 const skeleton = width => `<span class="skeleton" style="min-width:${width}">&nbsp;</span>`
 const light = 'oklch(0.97 0.006 80)', dim = 'oklch(0.65 0.01 80)'
@@ -111,8 +119,28 @@ $('#explorer').addEventListener('click', event => {
   renderExplorer()
 })
 
+const lightPill = (active, attrs, inner) => `<button class="chip" ${attrs} style="font-weight:500;font-size:14px;padding:9px 16px;border:1px solid oklch(0.2 0.01 80/.3);border-radius:999px;background:${active ? 'var(--ink)' : 'transparent'};color:${active ? 'var(--paper)' : 'var(--ink)'}">${inner}</button>`
+
+function renderLeaderboard() {
+  $('#lb-controls').innerHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap">${ROBOTS.map(r => lightPill(r.id === board.robot, `data-lb-robot="${r.id}"`, r.name)).join('')}</div>
+    <div style="display:flex;gap:6px;margin-left:auto;flex-wrap:wrap">${[['open', 'A/B', 'Open track'], ['fine', '✓/4', 'Fine-tuning']].map(([id, label, name]) => lightPill(board.track === id, `data-lb-track="${id}"`, `<span class="mono" style="font-size:12px;margin-right:10px">${label}</span>${name}`)).join('')}</div>`
+  $('#lb-full').href = appLink('/leaderboard', { robot: board.robot, track: board.track === 'open' ? 'open' : 'fine-tuning' })
+  const target = $('#lb-figure')
+  if (!store.ready) { target.innerHTML = `<div style="${figureTheme.card};padding:40px;min-height:420px">${skeleton('22ch')}</div>`; return }
+  renderFigure(target, figureModel(board.robot, board.track), figureTheme)
+}
+
+$('#lb-controls').addEventListener('click', event => {
+  const target = event.target.closest('button')
+  if (!target) return
+  if (target.dataset.lbRobot) board.robot = target.dataset.lbRobot
+  if (target.dataset.lbTrack) board.track = target.dataset.lbTrack
+  boardToUrl(board)
+  renderLeaderboard()
+})
+
 function render() {
-  renderStrip(); renderHero(); renderStats(); renderExplorer(); renderCards()
+  renderStrip(); renderHero(); renderStats(); renderExplorer(); renderLeaderboard(); renderCards()
   if (store.ready) $('#data-note').textContent = `Live data from the RoboColosseum API · ${new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}`
 }
 
