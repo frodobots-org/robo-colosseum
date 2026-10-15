@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>RoboColosseum · The real world is the benchmark</title>
+<meta name="description" content="Robot policies evaluated outside the labs that built them. Live results from the RoboColosseum benchmark.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" href="../landing/live.js" as="script" crossorigin>
+<style>
+  :root { --ink: oklch(0.2 0.01 80); --paper: oklch(0.975 0.006 80); --accent: oklch(0.6 0.22 340); --accent-soft: oklch(0.78 0.18 340); --muted: oklch(0.45 0.01 80); --mono: 'Space Mono', monospace }
+  html { scroll-behavior: smooth }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Bricolage Grotesque', sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden }
+  a { color: inherit; text-decoration: none } a:hover { color: inherit }
+  h1, h2, h3, p { margin: 0 }
+  button { font: inherit }
+  .mono { font-family: var(--mono) }
+  .skeleton { display: inline-block; min-width: 3ch; color: transparent; background: oklch(0.88 0.01 80); border-radius: 4px; animation: pulse 1.4s ease-in-out infinite }
+  #benchmark .skeleton { background: oklch(1 0 0 / .12) }
+  @keyframes pulse { 50% { opacity: .45 } }
+  .ft-row { font: inherit; text-align: left; background: none; border: 0; border-top: 1px solid oklch(1 0 0/.15); padding: 16px 0; cursor: pointer; display: grid; grid-template-columns: 34px minmax(120px,170px) minmax(0,1fr) 150px; gap: 18px; align-items: center; color: inherit; width: 100%; transition: opacity .2s }
+  .ft-row:hover .ft-name { color: var(--accent-soft) }
+  .ft-blocks { display: flex; gap: 10px; flex-wrap: wrap; min-width: 0 }
+  .ft-block { display: grid; grid-template-columns: repeat(5,9px); gap: 2px }
+  .ft-block i { width: 9px; height: 9px; border-radius: 2px }
+  .c-success { background: oklch(0.72 0.2 340) } .c-partial { background: oklch(0.5 0.1 340) } .c-fail { background: oklch(0.32 0.01 80) } .c-empty { background: oklch(0.26 0.01 80) }
+  .c-unknown { box-shadow: inset 0 0 0 1px oklch(0.5 0.01 80) }
+  .op-row { border-top: 1px solid oklch(1 0 0/.15); padding: 18px 0; display: grid; grid-template-columns: 34px minmax(120px,190px) minmax(0,1fr) 150px; gap: 18px; align-items: center }
+  .op-axis { position: relative; height: 14px }
+  .op-axis::before { content: ''; position: absolute; left: 0; right: 0; top: 6px; height: 2px; background: repeating-linear-gradient(90deg,oklch(1 0 0/.2) 0 8px,transparent 8px 16px) }
+  .chip { font: inherit; cursor: pointer; transition: background .15s, color .15s }
+  @media (max-width: 720px) {
+    .ft-row { grid-template-columns: 28px minmax(0,1fr) auto; gap: 10px 12px }
+    .ft-blocks { grid-column: 2 / -1; grid-row: 2 }
+    .op-row { grid-template-columns: 28px minmax(0,1fr) auto; gap: 10px 12px }
+    .op-axis { grid-column: 2 / -1; grid-row: 2 }
+    .why-grid { grid-template-columns: minmax(0,1fr) !important }
+  }
+</style>
+</head>
+<body>
+<div style="min-width:0">
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:14px 30px;flex-wrap:wrap;padding:clamp(18px,2.5vw,26px) clamp(18px,3vw,40px)">
+    <a href="#" style="display:flex;align-items:center;gap:10px;font-weight:600;font-size:19px;letter-spacing:-.02em">RoboColosseum<i style="width:9px;height:9px;border-radius:50%;background:var(--accent)"></i></a>
+    <nav style="display:flex;gap:clamp(14px,2.5vw,30px);font-size:14px;flex-wrap:wrap"><a href="#benchmark">Benchmark</a><a href="#embodiments">Leaderboards</a><a data-app-link="/evals" href="/evals">Evaluations</a><a href="#tracks">Method</a></nav>
+    <a href="#join" class="mono" style="font-size:12px;border-bottom:1px solid currentColor;padding-bottom:2px">Submit a policy →</a>
+  </header>
+
+  <section style="padding:clamp(32px,4.5vw,60px) clamp(18px,3vw,40px) 0">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:28px 40px;flex-wrap:wrap">
+      <h1 style="flex:1 1 600px;font-weight:500;font-size:clamp(60px,9.2vw,132px);line-height:.9;letter-spacing:-.045em;font-variation-settings:'opsz' 96">The real world<br>is the <span style="color:var(--accent)">benchmark.</span></h1>
+      <p class="mono" style="flex:0 1 300px;min-width:240px;font-size:12px;line-height:1.8;color:var(--muted);padding-bottom:14px">Robot policies evaluated outside the labs that built them. Unfamiliar rooms, unfamiliar objects, a growing roster of robot bodies, independent evaluators.</p>
+    </div>
+    <div style="position:relative;height:clamp(360px,46vw,660px);margin-top:44px;background:oklch(0.9 0.01 80);overflow:hidden">
+      <div id="hero-media" style="position:absolute;inset:0"></div>
+      <div style="position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:flex-end;gap:16px 30px;flex-wrap:wrap;padding:26px 28px;background:linear-gradient(to top,oklch(0.2 0.01 80/.75),transparent);color:#fff;pointer-events:none">
+        <div><span id="hero-tag" class="mono" style="font-size:11px;letter-spacing:.06em"></span><p id="hero-quote" style="font-size:clamp(22px,2.5vw,36px);font-weight:500;letter-spacing:-.03em;margin-top:10px"><span class="skeleton" style="min-width:12ch">&nbsp;</span></p></div>
+        <div id="hero-verdict" class="mono" style="text-align:right;font-size:12px;line-height:1.8"></div>
+      </div>
+      <a data-app-link="/evals?robot=franka&amp;track=open" href="/evals" class="mono" style="position:absolute;right:28px;top:24px;font-size:11px;color:#fff;background:oklch(0.2 0.01 80/.6);padding:8px 12px">Inspect this A/B ↗</a>
+    </div>
+    <div id="robot-strip" style="display:flex;gap:20px 32px;flex-wrap:wrap;align-items:flex-end;padding:28px 0 36px;border-bottom:1px solid oklch(0.85 0.01 80)"></div>
+  </section>
+
+  <section style="display:flex;align-items:center;gap:24px clamp(28px,4vw,60px);flex-wrap:wrap;padding:30px clamp(18px,3vw,40px);border-bottom:1px solid oklch(0.85 0.01 80)">
+    <span class="mono" style="font-size:11px;color:oklch(0.5 0.01 80);width:140px;line-height:1.6">Co-organized by</span>
+    <a href="https://huggingface.co/" style="display:flex;align-items:center;gap:12px"><img src="../landing/assets/huggingface-logo.svg" alt="" style="width:34px;height:34px"><span style="font-size:24px;font-weight:600;letter-spacing:-.02em">Hugging Face</span></a>
+    <a href="https://bitrobot.ai/" style="display:flex;align-items:center"><img src="../landing/assets/bitrobot-logo.webp" alt="BitRobot — the world's open robotics lab" style="width:190px;height:48px;object-fit:contain"></a>
+    <a href="https://nrp.gov.sg/" style="display:flex;align-items:center;gap:12px"><strong style="font-size:34px;font-weight:700;letter-spacing:-.04em">EAIC</strong><span style="font-size:11px;line-height:1.4;color:var(--muted)">Embodied AI Centre<br>Singapore</span></a>
+  </section>
+
+  <section style="padding:clamp(60px,8vw,120px) clamp(18px,3vw,40px);display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:40px 60px" class="why-grid">
+    <p class="mono" style="font-size:12px;color:var(--accent)">Why RoboColosseum</p>
+    <div style="grid-column:1/-1;max-width:1000px;margin-left:auto;width:100%">
+      <p style="font-size:clamp(26px,3vw,44px);line-height:1.15;letter-spacing:-.03em;font-weight:400;text-wrap:pretty">Most robot policies are evaluated by the people who trained them, in the rooms where they were trained. RoboColosseum moves evaluation <em style="font-style:normal;font-weight:600">into the world</em>: unfamiliar scenes, different robot bodies, blind comparisons by independent evaluators. This has not been done at this scale.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:30px;margin-top:70px;border-top:1px solid var(--ink);padding-top:26px">
+        <div><strong data-stat="comparisons" style="display:block;font-size:clamp(48px,5vw,72px);font-weight:500;letter-spacing:-.05em;line-height:1"></strong><span class="mono" style="font-size:11px;color:oklch(0.5 0.01 80);display:block;margin-top:10px">completed A/B comparisons</span></div>
+        <div><strong data-stat="fineTrials" style="display:block;font-size:clamp(48px,5vw,72px);font-weight:500;letter-spacing:-.05em;line-height:1"></strong><span class="mono" style="font-size:11px;color:oklch(0.5 0.01 80);display:block;margin-top:10px">scored fine-tuning trials</span></div>
+        <div><strong data-stat="scenes" style="display:block;font-size:clamp(48px,5vw,72px);font-weight:500;letter-spacing:-.05em;line-height:1"></strong><span class="mono" style="font-size:11px;color:oklch(0.5 0.01 80);display:block;margin-top:10px">robot / scene combinations</span></div>
+        <div><strong style="display:block;font-size:clamp(48px,5vw,72px);font-weight:500;letter-spacing:-.05em;line-height:1"><span data-stat="embodiments"></span><span style="color:var(--accent)">+</span></strong><span class="mono" style="font-size:11px;color:oklch(0.5 0.01 80);display:block;margin-top:10px">embodiments · more joining</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="benchmark" style="background:var(--ink);color:oklch(0.97 0.006 80);padding:clamp(56px,6.5vw,90px) clamp(18px,3vw,40px)">
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:34px"><p class="mono" style="font-size:12px;color:var(--accent-soft)">The benchmark · every trial, on the record</p><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px 30px;flex-wrap:wrap"><h2 style="font-size:clamp(36px,4.2vw,60px);font-weight:500;letter-spacing:-.04em;line-height:1">Pick a body. Pick a track.<br>See every trial.</h2><span class="mono" style="font-size:11px;color:oklch(0.65 0.01 80);line-height:1.8">Each square is one scored trial.<br>Click a policy to isolate it.</span></div></div>
+    <div id="explorer"></div>
+  </section>
+
+  <section id="embodiments" style="padding:clamp(60px,7.5vw,110px) clamp(18px,3vw,40px) clamp(50px,6vw,90px)">
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:44px"><p class="mono" style="font-size:12px;color:var(--accent)">The embodiments</p><h2 style="font-size:clamp(36px,4.2vw,60px);font-weight:500;letter-spacing:-.04em;line-height:1">Different bodies.<br>The same need for evidence.</h2></div>
+    <div id="robot-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px"></div>
+  </section>
+
+  <section id="tracks" style="padding:clamp(40px,5vw,70px) clamp(18px,3vw,40px) clamp(60px,7.5vw,110px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:40px 60px;border-top:1px solid oklch(0.85 0.01 80)">
+    <div><p class="mono" style="font-size:12px;color:var(--accent);margin-bottom:18px">How it works</p><h2 style="font-size:clamp(32px,3.2vw,44px);font-weight:500;letter-spacing:-.035em;line-height:1.05">Two tracks, two questions.</h2></div>
+    <div><span style="font-size:80px;font-weight:300;letter-spacing:-.05em;line-height:1">A/B</span><h3 style="font-size:26px;font-weight:600;margin-top:20px">Open track</h3><p style="font-size:15px;color:var(--muted);margin-top:6px">Does the policy generalize?</p><ol style="margin:22px 0 0;padding-left:18px;font-size:14px;line-height:1.7;color:oklch(0.4 0.01 80)"><li>Two policies run the same task on the same robot, in the same room.</li><li>The evaluator records a blind preference and each rollout’s progress.</li><li>Ratings are fitted per embodiment, with uncertainty shown.</li></ol></div>
+    <div><span style="font-size:80px;font-weight:300;letter-spacing:-.05em;line-height:1">✓/4</span><h3 style="font-size:26px;font-weight:600;margin-top:20px">Fine-tuning</h3><p style="font-size:15px;color:var(--muted);margin-top:6px">Does the policy learn a task?</p><ol style="margin:22px 0 0;padding-left:18px;font-size:14px;line-height:1.7;color:oklch(0.4 0.01 80)"><li>A checkpoint is adapted to one defined task.</li><li>25 repeated trials are scored against written criteria.</li><li>Full success and partial progress are reported separately.</li></ol></div>
+  </section>
+
+  <section id="join" style="margin:0 clamp(18px,3vw,40px) 40px;background:var(--accent);color:#fff;padding:clamp(40px,5vw,70px) clamp(24px,4vw,56px);display:flex;justify-content:space-between;align-items:center;gap:32px 40px;flex-wrap:wrap">
+    <h2 style="font-size:clamp(44px,6vw,84px);font-weight:500;letter-spacing:-.045em;line-height:.95">Bring your policy.<br>Or bring your robot.</h2>
+    <div style="display:flex;flex-direction:column;gap:12px;flex:0 1 280px;min-width:240px"><a data-app-link="/submit" href="/submit" style="background:#fff;color:var(--ink);padding:18px 22px;font-size:15px;font-weight:600;display:flex;justify-content:space-between">Submit a policy <span>→</span></a><a data-app-link="/join" href="/join" style="border:1px solid #fff;padding:18px 22px;font-size:15px;font-weight:600;display:flex;justify-content:space-between">Join as an evaluator <span>→</span></a></div>
+  </section>
+  <footer class="mono" style="display:flex;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;padding:20px clamp(18px,3vw,40px) 30px;font-size:11px;color:oklch(0.5 0.01 80)"><span>RoboColosseum · Real-world robot policy evaluation</span><span id="data-note">Live data from the RoboColosseum API</span></footer>
+</div>
+<script type="module" src="../landing/pink.js"></script>
+</body>
+</html>

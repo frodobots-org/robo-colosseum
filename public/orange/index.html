@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>RoboColosseum · Every robot. Two tracks. One real world.</title>
+<meta name="description" content="The real-world robot policy benchmark. Live results from the RoboColosseum benchmark.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" href="../landing/live.js" as="script" crossorigin>
+<style>
+  :root { --ink: oklch(0.15 0 0); --orange: oklch(0.72 0.19 50); --orange-deep: oklch(0.55 0.19 50); --muted: oklch(0.45 0 0); --mono: 'Geist Mono', monospace }
+  html { scroll-behavior: smooth }
+  body { margin: 0; background: #fff; color: var(--ink); font-family: 'Schibsted Grotesk', sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden }
+  a { color: inherit; text-decoration: none } a:hover { color: inherit }
+  h1, h2, h3, p { margin: 0 }
+  button { font: inherit }
+  .mono { font-family: var(--mono) }
+  .skeleton { display: inline-block; min-width: 3ch; color: transparent; background: oklch(0.15 0 0 / .12); animation: pulse 1.4s ease-in-out infinite }
+  .on-dark .skeleton { background: oklch(1 0 0 / .18) }
+  @keyframes pulse { 50% { opacity: .45 } }
+  .ft-row { font: inherit; text-align: left; background: none; border: 0; border-top: 1px solid oklch(0.15 0 0/.2); padding: 16px 0; cursor: pointer; display: grid; grid-template-columns: 34px minmax(120px,170px) minmax(0,1fr) 150px; gap: 18px; align-items: center; color: inherit; width: 100%; transition: opacity .2s }
+  .ft-row:hover .ft-name { color: var(--orange-deep) }
+  .ft-blocks { display: flex; gap: 10px; flex-wrap: wrap; min-width: 0 }
+  .ft-block { display: grid; grid-template-columns: repeat(5,9px); gap: 2px }
+  .ft-block i { width: 9px; height: 9px }
+  .c-success { background: var(--ink) } .c-partial { background: var(--orange) } .c-fail { background: oklch(0.88 0 0) } .c-empty { background: oklch(0.96 0 0) }
+  .c-unknown { box-shadow: inset 0 0 0 1px oklch(0.6 0 0) }
+  .op-row { border-top: 1px solid oklch(0.15 0 0/.2); padding: 18px 0; display: grid; grid-template-columns: 34px minmax(120px,190px) minmax(0,1fr) 150px; gap: 18px; align-items: center }
+  .op-axis { position: relative; height: 14px }
+  .op-axis::before { content: ''; position: absolute; left: 0; right: 0; top: 6px; height: 2px; background: repeating-linear-gradient(90deg,oklch(0.15 0 0/.15) 0 8px,transparent 8px 16px) }
+  .chip { font: inherit; cursor: pointer; transition: background .15s, color .15s }
+  .panel video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }
+  @media (max-width: 720px) {
+    .ft-row { grid-template-columns: 28px minmax(0,1fr) auto; gap: 10px 12px }
+    .ft-blocks { grid-column: 2 / -1; grid-row: 2 }
+    .op-row { grid-template-columns: 28px minmax(0,1fr) auto; gap: 10px 12px }
+    .op-axis { grid-column: 2 / -1; grid-row: 2 }
+    .track-strip { grid-template-columns: minmax(0,1fr) !important }
+    .panel { height: 460px !important }
+  }
+</style>
+</head>
+<body>
+<div style="min-width:0">
+  <header style="background:var(--ink);color:#fff;min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px 28px;flex-wrap:wrap;padding:10px clamp(18px,3vw,36px)">
+    <a href="#" style="font-weight:900;font-size:20px;letter-spacing:-.03em;text-transform:uppercase">Robo<span style="color:var(--orange)">Colosseum</span></a>
+    <nav class="mono" style="display:flex;gap:clamp(14px,2.5vw,28px);font-size:12px;color:oklch(0.8 0 0);flex-wrap:wrap"><a href="#benchmark">Benchmark</a><a href="#roster">Leaderboards</a><a data-app-link="/evals" href="/evals">Evaluations</a><a href="#tracks">Method</a></nav>
+    <a href="#join" style="background:var(--orange);color:var(--ink);font-weight:700;font-size:13px;padding:10px 16px">Submit a policy</a>
+  </header>
+
+  <section style="background:var(--orange);padding:clamp(28px,4vw,48px) clamp(18px,3vw,36px) clamp(20px,3vw,36px)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:32px 40px;flex-wrap:wrap">
+      <div style="flex:1 1 560px;min-width:0"><p class="mono" style="font-size:12px;margin-bottom:20px">THE REAL-WORLD ROBOT POLICY BENCHMARK</p><h1 style="font-weight:800;font-size:clamp(56px,7.8vw,112px);line-height:.9;letter-spacing:-.05em;max-width:980px">Every robot.<br>Two tracks.<br>One real world.</h1></div>
+      <div style="flex:0 1 340px;min-width:260px;padding-bottom:8px"><p style="font-size:17px;line-height:1.5;font-weight:500">The same policies, evaluated on a growing roster of robot bodies, in rooms they have never seen, scored blind by independent evaluators.</p><div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap"><a href="#benchmark" style="background:var(--ink);color:#fff;font-weight:700;font-size:14px;padding:15px 20px;flex:1 1 180px;display:flex;justify-content:space-between">Explore results <span>→</span></a><a data-app-link="/evals?robot=franka&amp;track=open" href="/evals" style="border:2px solid var(--ink);font-weight:700;font-size:14px;padding:13px 18px;display:flex;align-items:center">Watch ↗</a></div></div>
+    </div>
+    <div id="hero-panels" class="on-dark" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;margin-top:40px"></div>
+    <div class="track-strip" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:8px;margin-top:8px">
+      <div class="on-dark" style="background:var(--ink);color:#fff;padding:18px 22px;display:flex;align-items:center;gap:20px;flex-wrap:wrap"><span style="font-weight:900;font-size:34px;letter-spacing:-.05em;line-height:1">A/B</span><span class="mono" style="flex:1 1 220px;font-size:12px;line-height:1.6;color:oklch(0.8 0 0)"><strong style="color:#fff;font-weight:600">Open track</strong> · does it generalize? Two policies, same task, same room, blind preference.</span><strong style="margin-left:auto;font-size:28px;font-weight:800;letter-spacing:-.04em;white-space:nowrap"><span data-stat="comparisons"></span> <span class="mono" style="font-size:11px;font-weight:400;color:var(--orange)">comparisons</span></strong></div>
+      <div style="background:#fff;color:var(--ink);padding:18px 22px;display:flex;align-items:center;gap:20px;flex-wrap:wrap"><span style="font-weight:900;font-size:34px;letter-spacing:-.05em;line-height:1">✓/4</span><span class="mono" style="flex:1 1 220px;font-size:12px;line-height:1.6;color:oklch(0.4 0 0)"><strong style="color:var(--ink);font-weight:600">Fine-tuning</strong> · does it learn the job? 25 scored trials per task, success and progress apart.</span><strong style="margin-left:auto;font-size:28px;font-weight:800;letter-spacing:-.04em;white-space:nowrap"><span data-stat="fineTrials"></span> <span class="mono" style="font-size:11px;font-weight:400;color:var(--orange-deep)">trials</span></strong></div>
+    </div>
+  </section>
+
+  <div class="mono on-dark" style="background:var(--ink);color:var(--orange);min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;padding:12px clamp(18px,3vw,36px);font-size:13px"><span><span data-stat="comparisons"></span> A/B comparisons</span><span><span data-stat="fineTrials"></span> fine-tuning trials</span><span><span data-stat="scenes"></span> robot/scene combinations</span><span>Franka · SO-ARM101 · YAM · G1 · more joining</span></div>
+
+  <section style="display:flex;align-items:center;gap:28px clamp(28px,4vw,56px);flex-wrap:wrap;padding:34px clamp(18px,3vw,36px);border-bottom:2px solid var(--ink)">
+    <span class="mono" style="font-size:11px;width:150px;line-height:1.6;color:var(--muted)">CO-ORGANIZED BY</span>
+    <a href="https://huggingface.co/" style="display:flex;align-items:center;gap:12px"><img src="../landing/assets/huggingface-logo.svg" alt="" style="width:36px;height:36px"><span style="font-size:26px;font-weight:800;letter-spacing:-.03em">Hugging Face</span></a>
+    <a href="https://bitrobot.ai/" style="display:flex;align-items:center"><img src="../landing/assets/bitrobot-logo.webp" alt="BitRobot — the world's open robotics lab" style="width:200px;height:50px;object-fit:contain"></a>
+    <a href="https://nrp.gov.sg/" style="display:flex;align-items:center;gap:12px"><strong style="font-size:38px;font-weight:900;letter-spacing:-.05em">EAIC</strong><span style="font-size:11px;line-height:1.4;color:var(--muted)">Embodied AI Centre<br>Singapore</span></a>
+  </section>
+
+  <section class="on-dark" style="background:var(--ink);color:#fff;padding:clamp(56px,7vw,100px) clamp(18px,3vw,36px)">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:60px;align-items:start">
+      <div><p class="mono" style="font-size:12px;color:var(--orange);margin-bottom:22px">WHY ROBOCOLOSSEUM</p><h2 style="font-weight:800;font-size:clamp(44px,5vw,72px);line-height:.95;letter-spacing:-.05em">Demos are easy.<br>The world isn’t.</h2><p style="font-size:17px;line-height:1.6;color:oklch(0.75 0 0);margin-top:28px;max-width:460px">The goal: one public, trustworthy answer to whether a robot policy works outside the lab that built it. Not a demo reel. A record.</p></div>
+      <div style="display:flex;flex-direction:column">
+        <article style="display:grid;grid-template-columns:clamp(56px,8vw,90px) 1fr;gap:20px;padding:30px 0;border-top:1px solid oklch(1 0 0/.25)"><span style="font-weight:900;font-size:40px;color:var(--orange);line-height:1">01</span><div><h3 style="font-size:32px;font-weight:700;letter-spacing:-.03em">In the wild</h3><p style="font-size:15px;line-height:1.65;color:oklch(0.75 0 0);margin-top:10px">Tasks are run in evaluators’ own kitchens, offices and labs. <span data-stat="scenes"></span> robot/scene combinations so far. No curated scenes, no favourable lighting.</p></div></article>
+        <article style="display:grid;grid-template-columns:clamp(56px,8vw,90px) 1fr;gap:20px;padding:30px 0;border-top:1px solid oklch(1 0 0/.25)"><span style="font-weight:900;font-size:40px;color:var(--orange);line-height:1">02</span><div><h3 style="font-size:32px;font-weight:700;letter-spacing:-.03em">Cross-embodiment</h3><p style="font-size:15px;line-height:1.65;color:oklch(0.75 0 0);margin-top:10px">The same policy families on Franka, SO-ARM101, Bimanual YAM, Unitree G1 and more bodies joining. Compared within each body, never pooled across them.</p></div></article>
+        <article style="display:grid;grid-template-columns:clamp(56px,8vw,90px) 1fr;gap:20px;padding:30px 0;border-top:1px solid oklch(1 0 0/.25);border-bottom:1px solid oklch(1 0 0/.25)"><span style="font-weight:900;font-size:40px;color:var(--orange);line-height:1">03</span><div><h3 style="font-size:32px;font-weight:700;letter-spacing:-.03em">Never done at this scale</h3><p style="font-size:15px;line-height:1.65;color:oklch(0.75 0 0);margin-top:10px"><span data-stat="comparisons"></span> blind comparisons and <span data-stat="fineTrials"></span> scored trials, with Hugging Face, BitRobot and EAIC behind it. Every result links to its recording.</p></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="benchmark" style="padding:clamp(56px,7vw,100px) clamp(18px,3vw,36px)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px 40px;flex-wrap:wrap;margin-bottom:34px"><div><p class="mono" style="font-size:12px;color:var(--orange-deep);margin-bottom:18px">THE BENCHMARK · EVERY TRIAL, ON THE RECORD</p><h2 style="font-weight:800;font-size:clamp(40px,4.5vw,64px);line-height:.95;letter-spacing:-.05em">Pick a body.<br>Pick a track. See every trial.</h2></div><p class="mono" style="font-size:12px;line-height:1.8;color:var(--muted)">Each square is one scored trial.<br>Click a policy to isolate it.</p></div>
+    <div id="explorer"></div>
+  </section>
+
+  <section id="roster" style="background:var(--orange);padding:clamp(48px,6vw,80px) clamp(18px,3vw,36px)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:34px"><h2 style="font-weight:800;font-size:clamp(40px,4.5vw,64px);line-height:.95;letter-spacing:-.05em">The roster.</h2><span class="mono" style="font-size:12px">One protocol · every body · growing</span></div>
+    <div id="roster-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px"></div>
+  </section>
+
+  <section id="tracks" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));border-bottom:2px solid var(--ink)">
+    <div style="padding:clamp(40px,5vw,70px) clamp(18px,3vw,36px);border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);margin-bottom:-2px"><span style="font-weight:900;font-size:clamp(80px,8vw,120px);line-height:.85;letter-spacing:-.06em">A/B</span><h3 style="font-size:34px;font-weight:800;letter-spacing:-.03em;margin-top:26px">Open track</h3><p class="mono" style="font-size:13px;color:var(--muted);margin-top:8px">DOES IT GENERALIZE?</p><p style="font-size:16px;line-height:1.6;margin-top:18px;max-width:520px">Two policies, same task, same robot, same room. The evaluator scores blind: preference plus progress. Ratings are fitted per embodiment with uncertainty attached.</p></div>
+    <div style="padding:clamp(40px,5vw,70px) clamp(18px,3vw,36px)"><span style="font-weight:900;font-size:clamp(80px,8vw,120px);line-height:.85;letter-spacing:-.06em">✓/4</span><h3 style="font-size:34px;font-weight:800;letter-spacing:-.03em;margin-top:26px">Fine-tuning</h3><p class="mono" style="font-size:13px;color:var(--muted);margin-top:8px">DOES IT LEARN THE JOB?</p><p style="font-size:16px;line-height:1.6;margin-top:18px;max-width:520px">One checkpoint adapted to one written task. 25 repeated trials. Full success and partial progress are reported separately so nobody can hide behind an average.</p></div>
+  </section>
+
+  <section id="join" style="background:var(--ink);color:#fff;padding:clamp(56px,7vw,90px) clamp(18px,3vw,36px);display:flex;justify-content:space-between;align-items:flex-end;gap:32px 40px;flex-wrap:wrap">
+    <h2 style="font-weight:800;font-size:clamp(56px,7.5vw,110px);line-height:.9;letter-spacing:-.055em">Enter the<br><span style="color:var(--orange)">Colosseum.</span></h2>
+    <div style="display:flex;flex-direction:column;gap:10px;flex:0 1 320px;min-width:260px"><a data-app-link="/submit" href="/submit" style="background:var(--orange);color:var(--ink);font-weight:800;font-size:15px;padding:18px 22px;display:flex;justify-content:space-between">Submit a policy <span>→</span></a><a data-app-link="/join" href="/join" style="border:2px solid #fff;font-weight:800;font-size:15px;padding:16px 20px;display:flex;justify-content:space-between">Bring your robot <span>→</span></a></div>
+  </section>
+  <footer class="mono" style="display:flex;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;padding:20px clamp(18px,3vw,36px);font-size:11px;color:var(--muted)"><span>ROBOCOLOSSEUM · REAL-WORLD ROBOT POLICY EVALUATION</span><span id="data-note">LIVE DATA FROM THE ROBOCOLOSSEUM API</span></footer>
+</div>
+<script type="module" src="../landing/orange.js"></script>
+</body>
+</html>
