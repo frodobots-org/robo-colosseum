@@ -22,16 +22,7 @@ export async function getLeaderboard({ robot, track, signal } = {}) {
     if (track) params.set('track', track)
     const response = await apiGet(`/leaderboard${params.size ? `?${params}` : ''}`, { signal })
     if (!response.ok) throw new Error(`HTTP ${response.status}`)
-    const data = await response.json()
-    // Retired YAM checkpoint: keep its evaluations, but omit it from public standings.
-    const hidden = (data.board || []).filter(row => row.robotId === 'yam' && row.track === 'open'
-      && row.policy === 'pi05-yam@ee17bb361e95eeba57853a2840480f5a1fc81a84')
-    data.board = (data.board || []).filter(row => !hidden.includes(row)).map(row => ({
-      ...row,
-      rank: row.rank == null ? row.rank : row.rank - hidden.filter(old =>
-        old.robotId === row.robotId && old.track === row.track && old.rank != null && old.rank < row.rank).length,
-    }))
-    return data
+    return await response.json()
   } catch (error) {
     if (error.name === 'AbortError') throw error
     return { board: [], source: 'empty' }

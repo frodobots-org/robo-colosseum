@@ -27,10 +27,7 @@ async function get(path) {
 export function startLoading(onChange) {
   const boards = ROBOTS.flatMap(robot => TRACKS.map(track =>
     get(`/leaderboard?robot=${robot.id}&track=${track}`)
-      .then(data => { store.boards[`${robot.id}/${track}`] = (data.board || []).filter(row => row.robotId === robot.id && row.track === track
-        // Retired checkpoint remains in historical evaluations, not public standings.
-        && !(row.robotId === 'yam' && row.track === 'open'
-          && row.policy === 'pi05-yam@ee17bb361e95eeba57853a2840480f5a1fc81a84')) })
+      .then(data => { store.boards[`${robot.id}/${track}`] = (data.board || []).filter(row => row.robotId === robot.id && row.track === track) })
       .catch(() => store.failed.add(`${robot.id}/${track}`))))
   Promise.all(boards).then(() => { store.ready = true; onChange() })
 
