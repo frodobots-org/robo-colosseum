@@ -6,20 +6,10 @@
         <strong>{{ partialSuccessLabel(evaluation.partialSuccessA ?? evaluation.partialSuccess) }} partial success</strong>
       </div>
       <div class="video-package-grid">
-        <div class="review-camera review-camera-top">
-          <video v-if="videoSrc('a', 'top')" class="review-video" :src="videoSrc('a', 'top')" autoplay muted loop playsinline></video>
+        <div v-for="(camera, index) in cameras" :key="camera" :class="['review-camera', { 'review-camera-top': index === 0 }]">
+          <video v-if="videoSrc('a', camera)" class="review-video" :src="videoSrc('a', camera)" autoplay muted loop playsinline></video>
           <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Top</span>
-        </div>
-        <div class="review-camera">
-          <video v-if="videoSrc('a', 'left_wrist')" class="review-video" :src="videoSrc('a', 'left_wrist')" autoplay muted loop playsinline></video>
-          <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Left wrist</span>
-        </div>
-        <div class="review-camera">
-          <video v-if="videoSrc('a', 'right_wrist')" class="review-video" :src="videoSrc('a', 'right_wrist')" autoplay muted loop playsinline></video>
-          <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Right wrist</span>
+          <span class="video-caption">{{ cameraLabel(camera) }}</span>
         </div>
       </div>
     </div>
@@ -30,20 +20,10 @@
         <strong>{{ partialSuccessLabel(evaluation.partialSuccessB ?? evaluation.partialSuccess) }} partial success</strong>
       </div>
       <div class="video-package-grid">
-        <div class="review-camera review-camera-top">
-          <video v-if="videoSrc('b', 'top')" class="review-video" :src="videoSrc('b', 'top')" autoplay muted loop playsinline></video>
+        <div v-for="(camera, index) in cameras" :key="camera" :class="['review-camera', { 'review-camera-top': index === 0 }]">
+          <video v-if="videoSrc('b', camera)" class="review-video" :src="videoSrc('b', camera)" autoplay muted loop playsinline></video>
           <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Top</span>
-        </div>
-        <div class="review-camera">
-          <video v-if="videoSrc('b', 'left_wrist')" class="review-video" :src="videoSrc('b', 'left_wrist')" autoplay muted loop playsinline></video>
-          <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Left wrist</span>
-        </div>
-        <div class="review-camera">
-          <video v-if="videoSrc('b', 'right_wrist')" class="review-video" :src="videoSrc('b', 'right_wrist')" autoplay muted loop playsinline></video>
-          <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Right wrist</span>
+          <span class="video-caption">{{ cameraLabel(camera) }}</span>
         </div>
       </div>
     </div>
@@ -51,7 +31,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { getEvaluationVideos } from '../api.js'
 
 const props = defineProps({
@@ -72,8 +52,23 @@ async function loadVideos() {
   videos.value = data.videos || {}
 }
 
+const aliases = { top: 'head_image', left_wrist: 'left_image', right_wrist: 'right_image' }
+const labels = { top: 'Top', left_wrist: 'Left wrist', right_wrist: 'Right wrist', front_image: 'Front', rear_image: 'Rear' }
+const armCameras = ['top', 'left_wrist', 'right_wrist']
+const roverCameras = ['front_image', 'rear_image']
+
+// Arms always show the three fixed slots; mobile rovers show the cameras they recorded.
+const cameras = computed(() => {
+  const available = new Set([...Object.keys(videos.value.a || {}), ...Object.keys(videos.value.b || {})])
+  const rover = roverCameras.filter(camera => available.has(camera))
+  return rover.length ? rover : armCameras
+})
+
+function cameraLabel(camera) {
+  return labels[camera] || camera
+}
+
 function videoSrc(policySide, camera) {
-  const aliases = { top: 'head_image', left_wrist: 'left_image', right_wrist: 'right_image' }
   return videos.value[policySide]?.[camera] || videos.value[policySide]?.[aliases[camera]] || ''
 }
 
