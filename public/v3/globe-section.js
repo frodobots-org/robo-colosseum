@@ -1,24 +1,24 @@
 // "Every evaluation": one dot per scored evaluation on a rotating globe, clustered by scene, coloured four ways.
 import { ROBOTS, store, loadReviews, hasData, fmt, esc, appLink, sentence } from '../landing/live.js'
 import { createGlobe, layout } from './sphere.js'
-import { prettyScene } from './hero.js'
+import { prettyScene } from './board.js'
 
 const robotName = id => ROBOTS.find(r => r.id === id)?.name || id
 const taskName = t => { const s = String(t?.task?.instruction || t?.task_id || '').replace(/^\w+-/, '').replace(/-v\d+$/, '').replace(/[_-]+/g, ' ').trim(); return s ? s[0].toUpperCase() + s.slice(1) : 'Task' }
 const OUTCOME = { A: 'Policy A preferred', B: 'Policy B preferred', tie: 'Tie', success: 'Full success', partial: 'Partial progress', fail: 'No progress' }
-const SLOT = ['--sph-c1', '--sph-c2', '--sph-c3', '--sph-c4', '--sph-c5', '--sph-c6', '--sph-c7', '--sph-c8']
+const SLOT = ['--c1', '--c2', '--c3', '--c4', '--c5', '--c6', '--c7', '--c8']
 
 export function globeSection(root) {
   let items = [], set = 'all', mode = 'bodies', highlight = null, globe = null, built = false, faced = false
   const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim()
 
   root.innerHTML = `<div class="sph">
-    <div class="seg sph-set" role="group" aria-label="Which evaluations"></div>
-    <div class="sph-total"><b class="skel">0,000</b><span>evaluations, each a dot. Near dots share a scene.</span></div>
+    <div class="switch sph-set" role="group" aria-label="Which evaluations"></div>
+    <div class="sph-total"><b class="skel">0,000</b><span>evaluations so far, each one a dot. Near dots share a room.</span></div>
     <div class="sph-modes-label"><div class="sph-modes" id="sph-modes"><p class="label">Colour by</p></div></div>
     <div class="sph-leg" id="sph-leg"></div>
-    <div class="sph-stage"><canvas class="sph-canvas" role="img" aria-label="Globe of evaluations" tabindex="0"></canvas><div class="sph-load" id="sph-load">Loading the evaluation list…</div>
-      <div class="sph-hint">${ICON_HAND} ${matchMedia('(pointer: coarse)').matches ? 'Drag to rotate · pinch to zoom · tap a dot' : 'Drag to rotate · ⌘ + scroll or + / − to zoom · click a dot'}</div>
+    <div class="sph-stage"><canvas class="sph-canvas" role="img" aria-label="Globe of evaluations" tabindex="0"></canvas><div class="sph-load" id="sph-load">Loading every evaluation…</div>
+      <div class="sph-hint">${matchMedia('(pointer: coarse)').matches ? 'Drag to turn it, tap a dot' : 'Drag to turn it, click a dot to open the viewer'}</div>
       <div class="sph-zoom"><button type="button" aria-label="Zoom in">+</button><button type="button" aria-label="Zoom out">−</button></div>
       <div class="sph-tip" id="sph-tip" hidden></div></div>
   </div>`
@@ -31,10 +31,10 @@ export function globeSection(root) {
     const count = fn => { const m = new Map(); for (const it of visible()) { const k = fn(it); m.set(k, (m.get(k) || 0) + 1) } return m }
     if (mode === 'bodies') return ROBOTS.filter(r => count(it => it.robot).has(r.id)).map((r, i) => ({ id: r.id, name: r.name, color: SLOT[i], test: it => it.robot === r.id }))
     if (mode === 'tracks') return [{ id: 'open', name: 'Open track · blind A/B', color: '--open', test: it => it.kind === 'open' }, { id: 'fine', name: 'Fine-tuning · scored trials', color: '--fine', test: it => it.kind === 'fine' }].filter(c => visible().some(c.test))
-    if (mode === 'outcomes') return [['A', SLOT[0]], ['B', SLOT[1]], ['tie', '--sph-none'], ['success', SLOT[2]], ['partial', SLOT[3]], ['fail', SLOT[7]]].map(([id, color]) => ({ id, name: OUTCOME[id], color, test: it => it.outcome === id })).filter(c => visible().some(c.test))
+    if (mode === 'outcomes') return [['A', SLOT[0]], ['B', SLOT[1]], ['tie', '--none'], ['success', SLOT[2]], ['partial', SLOT[3]], ['fail', SLOT[7]]].map(([id, color]) => ({ id, name: OUTCOME[id], color, test: it => it.outcome === id })).filter(c => visible().some(c.test))
     const scenes = [...count(it => it.scene).entries()].sort((a, b) => b[1] - a[1])
     const top = scenes.slice(0, 7).map(([s], i) => ({ id: s, name: s, color: SLOT[i], test: it => it.scene === s }))
-    if (scenes.length > 7) top.push({ id: '__other', name: `${scenes.length - 7} more scenes`, color: '--sph-none', test: it => !scenes.slice(0, 7).some(([s]) => s === it.scene) })
+    if (scenes.length > 7) top.push({ id: '__other', name: `${scenes.length - 7} more rooms`, color: '--none', test: it => !scenes.slice(0, 7).some(([s]) => s === it.scene) })
     return top
   }
   const visible = () => set === 'all' ? items : items.filter(it => it.kind === set)
@@ -45,15 +45,15 @@ export function globeSection(root) {
     setEl.innerHTML = [['all', 'All'], ['open', 'Open track'], ['fine', 'Fine-tuning']].map(([id, name]) => `<button class="${id === set ? 'on' : ''}" data-set="${id}" aria-pressed="${id === set}">${name}<small>${fmt(n[id])}</small></button>`).join('')
     total.classList.remove('skel'); total.textContent = fmt(visible().length)
     const cats = categories(), vis = visible()
-    modes.innerHTML = `<p class="label">Colour by</p>` + [['bodies', 'bodies'], ['scenes', 'scenes'], ['tracks', 'tracks'], ['outcomes', 'outcomes']].map(([id, name]) => {
+    modes.innerHTML = `<p class="label">Colour by</p>` + [['bodies', 'bodies'], ['scenes', 'rooms'], ['tracks', 'tracks'], ['outcomes', 'outcomes']].map(([id, name]) => {
       const save = mode; mode = id; const cs = categories(); mode = save
       return `<button class="sph-mode" data-mode="${id}" aria-pressed="${id === mode}"><b>${counts[id]()}</b><span>${name}</span><i>${cs.map(c => `<em style="width:${vis.filter(c.test).length / Math.max(1, vis.length) * 100}%;background:var(${c.color})"></em>`).join('')}</i></button>`
     }).join('')
     legend.innerHTML = cats.map(c => { const k = vis.filter(c.test).length; return `<button type="button" data-cat="${esc(c.id)}" class="${highlight === c.id ? 'on' : ''}"><span class="sw" style="background:var(${c.color})"></span><span class="nm">${esc(c.name)}</span><span class="ct">${fmt(k)}</span><span class="bar"><i style="--w:${k / Math.max(1, vis.length) * 100}%;--c:var(${c.color})"></i></span></button>` }).join('')
   }
   function colorFn() {
-    const cats = categories().map(c => ({ ...c, hex: css(c.color) || '#888' })), none = css('--sph-none')
-    return it => { const c = cats.find(c => c.test(it)); if (!c) return none; if (highlight && c.id !== highlight) return css('--sph-back'); return c.hex }
+    const cats = categories().map(c => ({ ...c, hex: css(c.color) || '#888' })), none = css('--none')
+    return it => { const c = cats.find(c => c.test(it)); if (!c) return none; if (highlight && c.id !== highlight) return css('--none'); return c.hex }
   }
   function rebuild() {
     const vis = visible(), groups = new Map()
@@ -72,7 +72,7 @@ export function globeSection(root) {
   function ensureGlobe() {
     if (globe) return
     globe = createGlobe(canvas, {
-      color: () => '#888', faint: css('--sph-back'), line: css('--line'), ink: css('--ink-2'), halo: css('--surface'),
+      color: () => '#888', faint: css('--none'), line: css('--line'), ink: css('--ink-2'), halo: css('--surface'),
       onHover(it, cluster, xy) {
         if (!it) { tip.hidden = true; return }
         tip.hidden = false
@@ -82,7 +82,6 @@ export function globeSection(root) {
       },
       onClick(it) { location.href = appLink('/evals', { robot: it.robot, track: it.kind === 'fine' ? 'fine-tuning' : 'open' }) },
     })
-    new MutationObserver(() => { if (items.length) { globe.setOptions({ color: colorFn(), faint: css('--sph-back'), line: css('--line'), ink: css('--ink-2'), halo: css('--surface') }) } }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
   }
   root.addEventListener('click', e => {
     const b = e.target.closest('button[data-set],button[data-mode],button[data-cat]'); if (!b) return

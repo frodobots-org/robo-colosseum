@@ -4,88 +4,87 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>RoboColosseum · The real-world exam for robot policies</title>
-<meta name="description" content="Robot policies evaluated blind, in rooms they have never seen, on bodies they were not built for. Live results from the RoboColosseum benchmark.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Cpath d='M8 22a8 8 0 0 1 16 0' stroke='%23f4f6f9' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='12' r='3' fill='%232491a8'/%3E%3Cpath d='M7 24h18' stroke='%23d6603a' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>RoboColosseum · The real world is the benchmark</title>
+<meta name="description" content="Robot policies evaluated outside the labs that built them: unfamiliar rooms, several robot bodies, blind comparisons by independent evaluators. Live results.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%231c231b'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='18' text-anchor='middle' fill='%23d5ed97'%3ER%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="./v3.css">
-<script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('rc-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="modulepreload" href="../landing/live.js">
 <script type="module" src="./v3.js"></script>
 </head>
 <body>
-<div id="nav"></div>
+<header class="top" id="top">
+  <a class="brand" href="#top"><span class="brand-mark">R<i></i></span><span><strong>RoboColosseum</strong><small>Real-world robot policy evaluation</small></span></a>
+  <nav class="top-links" aria-label="Sections"><a href="#leaderboards">Leaderboards</a><a href="#trials">Every trial</a><a href="#evaluations">Every evaluation</a><a href="#bodies">Bodies</a><a href="#tracks">Tracks</a><a class="ext" data-app="/evals" href="/evals">Viewer</a></nav>
+  <span class="live" id="live"><i></i>Live data</span>
+</header>
 <main>
 
-  <section class="hero-wall" id="top">
-    <div class="wall" id="wall" aria-hidden="true"></div>
-    <div class="wall-veil"></div>
-    <div class="wall-paper"></div>
-    <div class="hero-main">
-      <div class="hero-copy">
-        <p class="hero-q"><span>Robot policies pass every benchmark in the labs that trained them.</span> <em>What happens in a room they have never seen?</em></p>
-        <h1><span>Robo</span><span>Colosseum</span></h1>
-        <p class="summary">A blind, real-world exam for robot policies. Independent evaluators, unfamiliar scenes, a growing roster of robot bodies, every rollout recorded.</p>
-        <div class="hero-run" id="hero-run"></div>
-        <div class="cta">
-          <a class="btn primary" href="#leaderboard">See the leaderboard <span class="arr">→</span></a>
-          <a class="btn" data-app="/submit" href="/submit">Submit a policy</a>
-          <a class="btn" data-app="/evals" href="/evals">Watch a comparison</a>
-        </div>
-        <div class="home-search" id="home-search"></div>
+  <section class="hero" id="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">A benchmark grounded in the real world</p>
+      <h1>The real world is the benchmark.</h1>
+      <p class="lead">Robot policies evaluated outside the labs that built them. Unfamiliar rooms, unfamiliar objects, a growing roster of robot bodies, independent evaluators.</p>
+      <div class="actions"><a class="button primary" href="#leaderboards">Explore the leaderboards</a><a class="button" data-app="/evals" href="/evals">Open the viewer ↗</a></div>
+    </div>
+    <div class="pair" id="pair"></div>
+  </section>
+
+  <section class="band" id="thesis">
+    <div class="rail"><p class="eyebrow">Why this exists</p></div>
+    <div class="content">
+      <p class="thesis">Most robot policies are evaluated by the people who trained them, in the rooms where they were trained. RoboColosseum moves evaluation into the world: unfamiliar scenes, different robot bodies, blind comparisons by independent evaluators. <em>Not a demo reel. A record.</em></p>
+      <dl class="ledger" id="ledger"></dl>
+      <div class="partners" id="partners"></div>
+    </div>
+  </section>
+
+  <section class="band" id="leaderboards">
+    <div class="rail"><p class="eyebrow">Leaderboards</p><h2>Compare within an embodiment.</h2><p class="rail-note">Each robot body has its own board. Ratings are never pooled across bodies, and the open and fine-tuning tracks stay apart.</p><div class="switches" id="lb-switches"></div><p class="rail-note" id="lb-desc"></p><p class="rail-link" id="lb-note"></p></div>
+    <div class="content">
+      <div class="figure" id="lb-figure"></div>
+      <div class="rows" id="lb-rows"></div>
+    </div>
+  </section>
+
+  <section class="band" id="trials">
+    <div class="rail"><p class="eyebrow">Every trial</p><h2>One task. Repeated, reproducible trials.</h2><p class="rail-note">A checkpoint is adapted with about a hundred demonstrations per task, then scored on held-out configurations at the same deployment site. Each square is one scored trial: full success, partial progress, or none.</p><div class="legend" id="trials-legend"></div></div>
+    <div class="content" id="trials-content"></div>
+  </section>
+
+  <section class="band" id="evaluations">
+    <div class="rail"><p class="eyebrow">Every evaluation</p><h2>Same scene. Two policies.</h2><p class="rail-note">Every blind pair and every scored trial on a real robot, as one dot each. Turn the globe, colour it by body, room, track or outcome, and open any dot in the viewer.</p></div>
+    <div class="content"><div class="sphere" id="sphere"></div></div>
+  </section>
+
+  <section class="band" id="bodies">
+    <div class="rail"><p class="eyebrow">Bodies and rooms</p><h2>One benchmark. Every body.</h2><p class="rail-note">The same policy families on Franka, SO-ARM101, Bimanual YAM and Unitree G1, with more bodies joining. Tasks run in evaluators' own kitchens, offices and labs: no curated scenes, no favourable lighting.</p></div>
+    <div class="content" id="gallery"></div>
+  </section>
+
+  <section class="band" id="tracks">
+    <div class="rail"><p class="eyebrow">Two tracks</p><h2>Two questions.</h2><p class="rail-note">Capability and adaptation are measured separately, so nobody can hide behind an average.</p></div>
+    <div class="content">
+      <div class="tracks">
+        <article class="track open"><span class="glyph">A/B</span><h3>Open track</h3><p class="q">Does the policy generalize?</p><ol><li>Two policies run the same evaluator-written instruction on the same robot, in the same room.</li><li>The evaluator reviews both rollouts blind and records a preference and each rollout's progress.</li><li>Ratings are fitted per embodiment, with uncertainty shown.</li></ol></article>
+        <article class="track fine"><span class="glyph">✓/4</span><h3>Fine-tuning</h3><p class="q">Does the policy learn a task?</p><ol><li>A checkpoint is adapted to one defined task with about 100 demonstrations.</li><li>Up to 25 repeated trials are scored against written criteria on a 0–4 scale.</li><li>Full success and partial progress are reported separately.</li></ol></article>
       </div>
+      <ol class="principles">
+        <li><strong>Compare within an embodiment.</strong><span>Each robot has its own leaderboard.</span></li>
+        <li><strong>Separate capability from adaptation.</strong><span>Open and fine-tuning results stay in distinct tracks.</span></li>
+        <li><strong>Make every result reviewable.</strong><span>Task cards, rollout recordings and explicit outcomes for every row.</span></li>
+      </ol>
     </div>
-    <a class="scroll-cue" href="#statement" aria-label="Scroll down">↓</a>
   </section>
 
-  <section class="section numbers" id="statement">
-    <dl class="bignums reveal" id="bignums"></dl>
-    <p class="nums-line reveal" id="nums-line"></p>
-    <div class="partners reveal" id="partners"></div>
-  </section>
-
-  <section class="section" id="leaderboard">
-    <div class="head reveal"><h2>Leaderboard</h2><p>Every policy on a body is rated only against the others on that same body. Open-track ratings come from blind pairwise comparisons; fine-tuning results are full-success rates over repeated trials.</p></div>
-    <div class="lbh reveal" id="lbh"></div>
-    <p class="note reveal" id="bars-note"></p>
-  </section>
-
-  <section class="section" id="diversity">
-    <div class="head reveal"><h2>Every evaluation</h2><p>Each dot is one scored evaluation on a real robot. Dots sit near the others from the same scene; colour them by body, track, scene or outcome.</p></div>
-    <div class="sphere reveal" id="sphere"></div>
-  </section>
-
-  <section class="section" id="embodiments">
-    <div class="head reveal"><h2>The bodies and the rooms</h2><p>One protocol, several robot bodies, many unfamiliar rooms. A policy is never scored in the scene it was trained in.</p></div>
-    <div class="galleries reveal" id="gallery"></div>
-    <p class="budgets reveal" id="budgets"></p>
-  </section>
-
-  <section class="section" id="how">
-    <div class="head reveal"><h2>How a result is made</h2><p>From a policy server in a lab to a rated row on the board, the same path every time.</p></div>
-    <figure class="flowfig reveal" id="flowfig"></figure>
-    <div class="cways reveal" id="ways"></div>
-    <div class="trust reveal">
-      <p class="label">What keeps the scores honest</p>
-      <ul id="trust"></ul>
-    </div>
-    <p class="note reveal"><a data-app="/tasks" href="/tasks">The task catalogue and scoring criteria →</a></p>
-  </section>
-
-  <section class="section closing">
-    <div class="closing-inner reveal">
-      <h2>Bring your policy.<br>Or bring your robot.</h2>
-      <p>Policies join through a small server that speaks the router protocol. Robots join with the open client. Both end up on the same board, scored the same way.</p>
-      <div class="cta">
-        <a class="btn primary" data-app="/submit" href="/submit">Submit a policy <span class="arr">→</span></a>
-        <a class="btn" data-app="/join" href="/join">Join as an evaluator</a>
-      </div>
-    </div>
+  <section class="join" id="join">
+    <h2>Bring your policy.<br>Or bring your robot.</h2>
+    <div class="actions"><a class="button light" data-app="/submit" href="/submit">Submit a policy</a><a class="button ghost" data-app="/join" href="/join">Join as an evaluator</a></div>
   </section>
 
 </main>
-<div id="footer"></div>
+<footer class="foot" id="footer"></footer>
 </body>
 </html>

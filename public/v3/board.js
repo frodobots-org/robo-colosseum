@@ -2,8 +2,8 @@
 // and a click-to-expand breakdown (scenes for the open track, tasks for fine-tuning).
 import { ASSETS, ROBOTS, store, rankedOpen, fineRows, labelRows, wilson, fmt, esc, appLink } from '../landing/live.js'
 import { labFor } from '../landing/leaderboard.js'
-import { prettyScene } from './hero.js'
 
+export const prettyScene = s => { const t = String(s || '').replace(/\s+/g, ' ').trim().replace(/\.+$/, ''); return t ? t[0].toUpperCase() + t.slice(1) : '' }
 const robotOf = id => ROBOTS.find(r => r.id === id) || ROBOTS[0]
 const taskName = row => { const stem = String(row.taskId || '').replace(new RegExp(`^${row.robotId}-`), '').replace(/-v\d+$/, ''); const t = String(row.task || '').trim(); const s = (/\s/.test(t) ? t : stem || t).replace(/[_-]+/g, ' ').trim(); return s ? s[0].toUpperCase() + s.slice(1) : row.taskId }
 
@@ -87,9 +87,9 @@ function sceneMinis(robotId, policy) {
     .sort((a, b) => b.n - a.n).slice(0, 12)
 }
 
-const DESC = {
-  open: robot => `Two policies run the same instruction on ${robot.name}, in the same room, one after the other. The evaluator records a preference without knowing which policy is which. Ratings are fitted from those blind pairs and shown with ±1 standard error; they only compare policies on this body.`,
-  fine: robot => `Each checkpoint is adapted to one ${robot.name} task and runs up to 25 scored trials against written success criteria. Bars show the share of trials with full success; the lighter band is a Wilson 95% interval.`,
+export const DESC = {
+  open: robot => `Ratings on ${robot.name} are fitted from blind pairs and drawn with ±1 standard error. Policies are only ever compared with others on this same body.`,
+  fine: robot => `Each checkpoint is adapted to one ${robot.name} task and runs up to 25 scored trials. Bars show the share with full success; the band is a Wilson 95% interval.`,
 }
 
 export function homeBoard(root, note, state, onState) {
@@ -105,11 +105,7 @@ export function homeBoard(root, note, state, onState) {
     }
     const m = store.ready ? model() : null
     const trackName = state.track === 'open' ? 'Open track' : 'Fine-tuning'
-    let html = `<div class="lbh-top">
-      <div class="seg lb-set" role="group" aria-label="Robot body">${ROBOTS.map(r => `<button class="${r.id === state.robot ? 'on' : ''}" data-robot="${r.id}" aria-pressed="${r.id === state.robot}"${store.ready && !available(r) ? ' disabled' : ''}>${esc(r.name)}${store.ready && !available(r) ? '<small>soon</small>' : ''}</button>`).join('')}</div>
-      <div class="seg tracks" role="group" aria-label="Track">${[['open', 'A/B', 'Open track', rankedOpen(state.robot).length], ['fine', '✓/4', 'Fine-tuning', fineRows(state.robot).length]].map(([id, code, name, n]) => `<button class="${id === state.track ? 'on' : ''}" data-track="${id}" aria-pressed="${id === state.track}"${store.ready && !n ? ' disabled' : ''}><span class="mono" style="margin-right:8px;font-size:11px">${code}</span>${name}</button>`).join('')}</div>
-    </div>
-    <p class="lb-desc">${DESC[state.track](robot)}</p>`
+    let html = ''
     if (!store.ready) html += `<div class="lbh-empty"><span class="skel" style="min-width:22ch">&nbsp;</span></div>`
     else if (!m) html += `<div class="lbh-empty">${store.failed.has(`${state.robot}/${state.track === 'open' ? 'open' : 'fine-tuning'}`) ? `${robot.name} results are temporarily unavailable. Reload to try again.` : `No ${trackName.toLowerCase()} results for ${robot.name} yet.`}</div>`
     else {
@@ -123,22 +119,21 @@ export function homeBoard(root, note, state, onState) {
       html += `</div></div><p class="lbh-hint">Click a policy to see its ${state.track === 'open' ? 'scenes' : 'tasks'} one by one.</p><div class="lbh-detail" hidden></div>`
     }
     root.innerHTML = html
+    root.dataset.desc = DESC[state.track](robot)
     root.classList.toggle('picked', Boolean(picked && m?.rows.some(r => r.id === picked)))
     if (picked && m) { const row = root.querySelector(`.lbh-row[data-id="${CSS.escape(picked)}"]`); if (row) openDetail(row, m.rows.find(r => r.id === picked)) }
-    note.innerHTML = `<a href="${appLink('/leaderboard', { robot: state.robot, track: state.track === 'open' ? 'open' : 'fine-tuning' })}">Full leaderboard table, per policy →</a>`
+    if (note) note.innerHTML = `<a href="${appLink('/leaderboard', { robot: state.robot, track: state.track === 'open' ? 'open' : 'fine-tuning' })}">Full leaderboard table ↗</a>`
   }
   function openDetail(row, r) {
     const detail = root.querySelector('.lbh-detail')
     row.after(detail); detail.hidden = false; detail.classList.remove('in'); void detail.offsetWidth; detail.classList.add('in')
     const minis = state.track === 'open' ? sceneMinis(state.robot, r.policy) : r.minis
-    detail.innerHTML = `<div class="lbh-dh">${mark(r.policy, 30)}<b>${esc(r.label)}</b><span class="facts">${r.facts.map(f => `<span>${f}</span>`).join('')}</span><a class="btn small" href="${appLink('/leaderboard', { robot: state.robot, track: state.track === 'open' ? 'open' : 'fine-tuning' })}">On the full board <span class="arr">→</span></a></div>`
+    detail.innerHTML = `<div class="lbh-dh">${mark(r.policy, 30)}<b>${esc(r.label)}</b><span class="facts">${r.facts.map(f => `<span>${f}</span>`).join('')}</span><a class="link-btn" href="${appLink('/leaderboard', { robot: state.robot, track: state.track === 'open' ? 'open' : 'fine-tuning' })}">On the full board ↗</a></div>`
       + (minis === null ? `<p class="lbh-empty" style="padding:8px 0">Loading the evaluation list for the scene breakdown…</p>`
         : minis.length ? `<div class="lbh-minis">${minis.map(mn => `<div class="lbh-mini"><span class="nm" title="${esc(mn.name)}">${esc(mn.name)}${mn.n ? ` <span class="mono" style="color:var(--ink-3);font-size:11px">n=${mn.n}</span>` : ''}</span><span class="tr"><i style="--w:${mn.w}%"></i></span><span class="vl">${esc(mn.value)}</span></div>`).join('')}</div><p class="lbh-hint" style="margin-top:12px;text-align:left">${state.track === 'open' ? 'Bar: share of comparisons won, ties counted as half.' : 'Bar: share of trials with full success, per task.'}</p>`
         : `<p class="lbh-empty" style="padding:8px 0">No breakdown available.</p>`)
   }
   root.addEventListener('click', e => {
-    const seg = e.target.closest('button[data-robot],button[data-track]')
-    if (seg) { if (seg.disabled) return; if (seg.dataset.robot) state.robot = seg.dataset.robot; else state.track = seg.dataset.track; picked = null; render(); onState?.(state); return }
     const row = e.target.closest('.lbh-row'); if (!row) return
     picked = picked === row.dataset.id ? null : row.dataset.id
     render()

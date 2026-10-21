@@ -1,6 +1,6 @@
 // Poster frames of real, finalized open-track comparisons (left exterior camera where available),
 // extracted once from the recordings the API publishes. The ids are live evaluation ids; the clips are fetched from the API on demand.
-export const WALL = [
+export const FRAMES = [
   { id: "ev_6dbb398ff49dfec4ee39e66458c424e0", robot: "franka", scene: "Haichuan Chekerboard", instruction: "Pull out doll, drop to red brick spot", winner: "tie", w: 512, h: 288 },
   { id: "ev_a68aa856277d823f415725ce560e9426", robot: "franka", scene: "Haichuan Chekerboard", instruction: "Pull out doll, and put into white box", winner: "A", w: 512, h: 288 },
   { id: "ev_a6bdf0230718c43065d19bb16a880d5f", robot: "franka", scene: "Haichuan Chekerboard", instruction: "Pull out blue towel, and drp onto doll'slegs", winner: "B", w: 512, h: 288 },
