@@ -14,7 +14,7 @@ const LABS = {
   xai: { name: 'xAI', fit: 'contain', bg: '#fff' },
 }
 const FAMILY_LAB = [['pi05', 'pi'], ['g05', 'galaxea'], ['groot', 'nvidia'], ['gr00t', 'nvidia'], ['molmoact2', 'ai2'], ['lingbot', 'robbyant'], ['gpt-', 'openai'], ['claude-', 'anthropic'], ['grok-', 'xai']]
-function labFor(policy) {
+export function labFor(policy) {
   const id = String(policy || '').split('@')[0]
   const hit = FAMILY_LAB.find(([prefix]) => id.startsWith(prefix))
   return hit ? { id: hit[1], ...LABS[hit[1]] } : null
