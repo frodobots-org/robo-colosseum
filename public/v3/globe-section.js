@@ -5,6 +5,7 @@ import { prettyScene } from './board.js'
 
 const robotName = id => ROBOTS.find(r => r.id === id)?.name || id
 const taskName = t => { const s = String(t?.task?.instruction || t?.task_id || '').replace(/^\w+-/, '').replace(/-v\d+$/, '').replace(/[_-]+/g, ' ').trim(); return s ? s[0].toUpperCase() + s.slice(1) : 'Task' }
+const SITE = v => { const t = String(v || '').trim().toLowerCase(); if (!t) return 'Site not recorded'; if (t.startsWith('frodobots')) return 'FrodoBots'; if (t === 'nus') return 'NUS'; if (t.startsWith('droid')) return 'DROID rig'; return String(v).trim() }
 const OUTCOME = { A: 'Policy A preferred', B: 'Policy B preferred', tie: 'Tie', success: 'Full success', partial: 'Partial progress', fail: 'No progress' }
 const SLOT = ['--c1', '--c2', '--c3', '--c4', '--c5', '--c6', '--c7', '--c8']
 
@@ -30,6 +31,7 @@ export function globeSection(root) {
   function categories() {
     const count = fn => { const m = new Map(); for (const it of visible()) { const k = fn(it); m.set(k, (m.get(k) || 0) + 1) } return m }
     if (mode === 'bodies') return ROBOTS.filter(r => count(it => it.robot).has(r.id)).map((r, i) => ({ id: r.id, name: r.name, color: SLOT[i], test: it => it.robot === r.id }))
+    if (mode === 'sites') { const sites = [...count(it => it.site).entries()].sort((a, b) => b[1] - a[1]); return sites.map(([name], i) => ({ id: name, name, color: i < 7 ? SLOT[i] : '--none', test: it => it.site === name })) }
     if (mode === 'tracks') return [{ id: 'open', name: 'Open track · blind A/B', color: '--open', test: it => it.kind === 'open' }, { id: 'fine', name: 'Fine-tuning · scored trials', color: '--fine', test: it => it.kind === 'fine' }].filter(c => visible().some(c.test))
     if (mode === 'outcomes') return [['A', SLOT[0]], ['B', SLOT[1]], ['tie', '--none'], ['success', SLOT[2]], ['partial', SLOT[3]], ['fail', SLOT[7]]].map(([id, color]) => ({ id, name: OUTCOME[id], color, test: it => it.outcome === id })).filter(c => visible().some(c.test))
     const scenes = [...count(it => it.scene).entries()].sort((a, b) => b[1] - a[1])
@@ -38,14 +40,14 @@ export function globeSection(root) {
     return top
   }
   const visible = () => set === 'all' ? items : items.filter(it => it.kind === set)
-  const counts = { bodies: () => new Set(items.map(i => i.robot)).size, scenes: () => new Set(items.map(i => i.scene)).size, tracks: () => new Set(items.map(i => i.kind)).size, outcomes: () => new Set(items.map(i => i.outcome)).size }
+  const counts = { bodies: () => new Set(items.map(i => i.robot)).size, scenes: () => new Set(items.map(i => i.scene)).size, sites: () => new Set(items.map(i => i.site)).size, tracks: () => new Set(items.map(i => i.kind)).size, outcomes: () => new Set(items.map(i => i.outcome)).size }
 
   function renderControls() {
     const n = { all: items.length, open: items.filter(i => i.kind === 'open').length, fine: items.filter(i => i.kind === 'fine').length }
     setEl.innerHTML = [['all', 'All'], ['open', 'Open track'], ['fine', 'Fine-tuning']].map(([id, name]) => `<button class="${id === set ? 'on' : ''}" data-set="${id}" aria-pressed="${id === set}">${name}<small>${fmt(n[id])}</small></button>`).join('')
     total.classList.remove('skel'); total.textContent = fmt(visible().length)
     const cats = categories(), vis = visible()
-    modes.innerHTML = `<p class="label">Colour by</p>` + [['bodies', 'bodies'], ['scenes', 'rooms'], ['tracks', 'tracks'], ['outcomes', 'outcomes']].map(([id, name]) => {
+    modes.innerHTML = `<p class="label">Colour by</p>` + [['bodies', 'bodies'], ['scenes', 'rooms'], ['sites', 'sites'], ['outcomes', 'outcomes']].map(([id, name]) => {
       const save = mode; mode = id; const cs = categories(); mode = save
       return `<button class="sph-mode" data-mode="${id}" aria-pressed="${id === mode}"><b>${counts[id]()}</b><span>${name}</span><i>${cs.map(c => `<em style="width:${vis.filter(c.test).length / Math.max(1, vis.length) * 100}%;background:var(${c.color})"></em>`).join('')}</i></button>`
     }).join('')
@@ -76,7 +78,7 @@ export function globeSection(root) {
       onHover(it, cluster, xy) {
         if (!it) { tip.hidden = true; return }
         tip.hidden = false
-        tip.innerHTML = `<b>${esc(sentence(it.instruction) || cluster.label)}</b><small>${esc(robotName(it.robot))} · ${esc(it.scene)} · ${esc(OUTCOME[it.outcome] || it.outcome)}${it.kind === 'fine' ? ' · fine-tuning' : ''}</small>`
+        tip.innerHTML = `<b>${esc(sentence(it.instruction) || cluster.label)}</b><small>${esc(robotName(it.robot))} · ${esc(it.scene)} · ${esc(it.site)} · ${esc(OUTCOME[it.outcome] || it.outcome)}${it.kind === 'fine' ? ' · fine-tuning' : ''}</small>`
         const stage = canvas.parentElement.getBoundingClientRect(), w = 260
         tip.style.left = Math.min(stage.width - w - 4, Math.max(4, xy[0] + 14)) + 'px'; tip.style.top = Math.max(4, xy[1] - 10 - tip.offsetHeight) + 'px'
       },
@@ -96,10 +98,10 @@ export function globeSection(root) {
     const robots = ROBOTS.filter(r => hasData(r.id))
     if (robots.some(r => !Array.isArray(store.reviews[r.id]))) return false
     const seen = new Set()
-    items = store.evaluations.map(e => ({ kind: 'open', id: e.id, robot: e.robotId, scene: prettyScene(e.scene) || 'Unlabelled scene', instruction: e.instruction || e.task || '', outcome: e.winner === 'tie' ? 'tie' : e.winner }))
+    items = store.evaluations.map(e => ({ kind: 'open', id: e.id, robot: e.robotId, scene: prettyScene(e.scene) || 'Unlabelled scene', site: SITE(e.institution), instruction: e.instruction || e.task || '', outcome: e.winner === 'tie' ? 'tie' : e.winner }))
     for (const r of robots) for (const t of store.reviews[r.id]) {
       if (seen.has(t.id)) continue; seen.add(t.id)
-      items.push({ kind: 'fine', id: t.id, robot: t.robot_id, scene: taskName(t), instruction: t.task?.instruction && /\s/.test(t.task.instruction) ? t.task.instruction : taskName(t), outcome: t.success ? 'success' : Number(t.partial_success) > 0 ? 'partial' : 'fail' })
+      items.push({ kind: 'fine', id: t.id, robot: t.robot_id, scene: taskName(t), site: SITE(t.institution), instruction: t.task?.instruction && /\s/.test(t.task.instruction) ? t.task.instruction : taskName(t), outcome: t.success ? 'success' : Number(t.partial_success) > 0 ? 'partial' : 'fail' })
     }
     root.querySelector('#sph-load').remove()
     ensureGlobe(); renderControls(); rebuild(); built = true
