@@ -1,8 +1,9 @@
 // RoboColosseum v3. Every number, row, square, dot and clip is read from the live API through ../landing/live.js.
-import { API, ASSETS, ROBOTS, store, startLoading, totals, summary, hasData, rankedOpen, fineRows, policyLabel, fmt, esc, appLink } from '../landing/live.js'
+import { API, ASSETS, ROBOTS, store, totals, summary, hasData, rankedOpen, fineRows, policyLabel, fmt, esc, appLink } from '../landing/live.js'
 import { boardFromUrl, boardToUrl, figureModel, renderFigure } from '../landing/leaderboard.js'
 import { FRAMES } from './frames.js'
 import { heroPair } from './pair.js'
+import { load } from './loader.js'
 import { homeBoard, prettyScene, DESC } from './board.js'
 import { trialsSection } from './trials.js'
 import { globeSection } from './globe-section.js'
@@ -110,5 +111,5 @@ chrome(); footer(); ledger(); leaderboards(); gallery()
 pair = heroPair($('#pair'))
 trials = trialsSection($('#trials-content'), $('#trials-legend'))
 globe = globeSection($('#sphere'))
-startLoading(renderAll)
+load(renderAll)
 fetch(`${API}/summary`, { headers: { Accept: 'application/json' } }).then(r => r.ok ? r.json() : null).then(d => { live.summary = d?.summary || null; ledger() }).catch(() => {})
