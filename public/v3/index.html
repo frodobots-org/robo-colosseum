@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>RoboColosseum · The real-world exam for robot policies</title>
+<meta name="description" content="Robot policies evaluated blind, in rooms they have never seen, on bodies they were not built for. Live results from the RoboColosseum benchmark.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230f141a'/%3E%3Cpath d='M8 22a8 8 0 0 1 16 0' stroke='%23f4f6f9' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='12' r='3' fill='%232491a8'/%3E%3Cpath d='M7 24h18' stroke='%23d6603a' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="./v3.css">
+<script>try{var t=new URLSearchParams(location.search).get('theme')||localStorage.getItem('rc-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="modulepreload" href="../landing/live.js">
+<script type="module" src="./v3.js"></script>
+</head>
+<body>
+<div id="nav"></div>
+<main>
+
+  <section class="hero-wall" id="top">
+    <div class="wall" id="wall" aria-hidden="true"></div>
+    <div class="wall-veil"></div>
+    <div class="wall-paper"></div>
+    <div class="hero-main">
+      <div class="hero-copy">
+        <p class="hero-q"><span>Robot policies pass every benchmark in the labs that trained them.</span> <em>What happens in a room they have never seen?</em></p>
+        <h1><span>Robo</span><span>Colosseum</span></h1>
+        <p class="summary">A blind, real-world exam for robot policies. Independent evaluators, unfamiliar scenes, a growing roster of robot bodies, every rollout recorded.</p>
+        <div class="hero-run" id="hero-run"></div>
+        <div class="cta">
+          <a class="btn primary" href="#leaderboard">See the leaderboard <span class="arr">→</span></a>
+          <a class="btn" data-app="/submit" href="/submit">Submit a policy</a>
+          <a class="btn" data-app="/evals" href="/evals">Watch a comparison</a>
+        </div>
+        <div class="home-search" id="home-search"></div>
+      </div>
+    </div>
+    <a class="scroll-cue" href="#statement" aria-label="Scroll down">↓</a>
+  </section>
+
+  <section class="section numbers" id="statement">
+    <dl class="bignums reveal" id="bignums"></dl>
+    <p class="nums-line reveal" id="nums-line"></p>
+    <div class="partners reveal" id="partners"></div>
+  </section>
+
+  <section class="section" id="leaderboard">
+    <div class="head reveal"><h2>Leaderboard</h2><p>Every policy on a body is rated only against the others on that same body. Open-track ratings come from blind pairwise comparisons; fine-tuning results are full-success rates over repeated trials.</p></div>
+    <div class="lbh reveal" id="lbh"></div>
+    <p class="note reveal" id="bars-note"></p>
+  </section>
+
+  <section class="section" id="diversity">
+    <div class="head reveal"><h2>Every evaluation</h2><p>Each dot is one scored evaluation on a real robot. Dots sit near the others from the same scene; colour them by body, track, scene or outcome.</p></div>
+    <div class="sphere reveal" id="sphere"></div>
+  </section>
+
+  <section class="section" id="embodiments">
+    <div class="head reveal"><h2>The bodies and the rooms</h2><p>One protocol, several robot bodies, many unfamiliar rooms. A policy is never scored in the scene it was trained in.</p></div>
+    <div class="galleries reveal" id="gallery"></div>
+    <p class="budgets reveal" id="budgets"></p>
+  </section>
+
+  <section class="section" id="how">
+    <div class="head reveal"><h2>How a result is made</h2><p>From a policy server in a lab to a rated row on the board, the same path every time.</p></div>
+    <figure class="flowfig reveal" id="flowfig"></figure>
+    <div class="cways reveal" id="ways"></div>
+    <div class="trust reveal">
+      <p class="label">What keeps the scores honest</p>
+      <ul id="trust"></ul>
+    </div>
+    <p class="note reveal"><a data-app="/tasks" href="/tasks">The task catalogue and scoring criteria →</a></p>
+  </section>
+
+  <section class="section closing">
+    <div class="closing-inner reveal">
+      <h2>Bring your policy.<br>Or bring your robot.</h2>
+      <p>Policies join through a small server that speaks the router protocol. Robots join with the open client. Both end up on the same board, scored the same way.</p>
+      <div class="cta">
+        <a class="btn primary" data-app="/submit" href="/submit">Submit a policy <span class="arr">→</span></a>
+        <a class="btn" data-app="/join" href="/join">Join as an evaluator</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+<div id="footer"></div>
+</body>
+</html>
