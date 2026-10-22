@@ -1,9 +1,10 @@
 <template>
-  <div class="review-video-grid">
+  <div class="review-video-grid rv">
     <div class="policy-video-package">
       <div class="video-heading">
-        <span>Policy A</span>
-        <strong>{{ partialSuccessLabel(evaluation.partialSuccessA ?? evaluation.partialSuccess) }} partial success</strong>
+        <span class="side-chip">A</span>
+        <strong>{{ policyName(evaluation.policyA) }}</strong>
+        <em>{{ partialSuccessLabel(evaluation.partialSuccessA ?? evaluation.partialSuccess) }} progress</em>
       </div>
       <div class="video-package-grid">
         <div class="review-camera review-camera-top">
@@ -26,8 +27,9 @@
 
     <div class="policy-video-package">
       <div class="video-heading">
-        <span>Policy B</span>
-        <strong>{{ partialSuccessLabel(evaluation.partialSuccessB ?? evaluation.partialSuccess) }} partial success</strong>
+        <span class="side-chip">B</span>
+        <strong>{{ policyName(evaluation.policyB) }}</strong>
+        <em>{{ partialSuccessLabel(evaluation.partialSuccessB ?? evaluation.partialSuccess) }} progress</em>
       </div>
       <div class="video-package-grid">
         <div class="review-camera review-camera-top">
@@ -53,6 +55,7 @@
 <script setup>
 import { onBeforeUnmount, ref, watch } from 'vue'
 import EpisodeVideo from './EpisodeVideo.vue'
+import { policyName } from '../display.js'
 import { getEvaluationVideos } from '../api.js'
 
 const props = defineProps({
@@ -92,3 +95,14 @@ function partialSuccessLabel(value) {
 watch(() => props.evaluation.id, loadVideos, { immediate: true })
 onBeforeUnmount(() => { requestVersion++ })
 </script>
+
+<style scoped>
+.rv { gap: 12px; }
+.video-heading { display: flex; align-items: center; gap: 10px; padding: 0 2px 8px; }
+.video-heading .side-chip { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 6px; background: var(--field); font: 600 12px/1 var(--mono); color: var(--ink); }
+.video-heading strong { font: 600 13.5px/1.3 var(--sans); color: var(--ink); margin-right: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.video-heading em { font: 500 11.5px/1.4 var(--mono); font-style: normal; color: var(--muted); white-space: nowrap; }
+.review-camera { border-radius: 10px; overflow: hidden; }
+.video-caption { font: 500 10.5px/1.2 var(--mono); background: rgba(0, 0, 0, .62); }
+.review-video-placeholder { font: 500 12px/1.4 var(--mono); color: var(--ink-4); background: #000; }
+</style>

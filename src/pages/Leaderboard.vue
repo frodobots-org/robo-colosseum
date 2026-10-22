@@ -1,27 +1,15 @@
 <template>
   <div class="page-stack lb-page">
-    <section class="lb-head">
+    <section class="page-head">
       <div>
         <p class="eyebrow">Leaderboards</p>
-        <h1>{{ robot.name }}<span class="h1-track"> · {{ track === 'open' ? 'Open track' : 'Fine-tuning' }}</span></h1>
-        <p class="lb-lede">{{ track === 'open' ? 'Policies rated from blind A/B comparisons on this body, in rooms the policy has never seen. One rating per body; never pooled across bodies.' : 'Checkpoints adapted to a fixed task and scored over repeated trials. Full success and partial progress are reported separately.' }}</p>
+        <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Open track' : 'Fine-tuning' }}</span></h1>
+        <p class="lede">{{ track === 'open' ? 'Policies rated from blind A/B comparisons on this body, in rooms the policy has never seen. One rating per body; never pooled across bodies.' : 'Checkpoints adapted to a fixed task and scored over repeated trials. Full success and partial progress are reported separately.' }}</p>
       </div>
-      <span class="lb-live"><i></i>Live from the API</span>
+      <span class="live-tag"><i></i>Live from the API</span>
     </section>
 
-    <nav class="body-tabs" aria-label="Robot body">
-      <button v-for="item in embodiments" :key="item.id" type="button" :class="['body-tab', { on: robot.id === item.id }]" :aria-pressed="robot.id === item.id" @click="select({ robot: item.id })">
-        <RobotGlyph :kind="item.glyph" /><span><b>{{ item.name }}</b><small>{{ item.type }}</small></span>
-      </button>
-    </nav>
-
-    <div class="track-row">
-      <div class="track-switch" role="group" aria-label="Track">
-        <button type="button" :class="['track-btn open', { on: track === 'open' }]" :aria-pressed="track === 'open'" @click="select({ track: 'open' })"><Icon name="ab" /><span><b>Open track</b><small>Blind A/B rating</small></span></button>
-        <button type="button" :class="['track-btn fine', { on: track === 'fine-tuning' }]" :aria-pressed="track === 'fine-tuning'" @click="select({ track: 'fine-tuning' })"><Icon name="trials" /><span><b>Fine-tuning</b><small>Scored trials, 0–4</small></span></button>
-      </div>
-      <RouterLink class="text-link" :to="link('/evals')">Review the evaluations <Icon name="external" /></RouterLink>
-    </div>
+    <BoardControls><RouterLink class="text-link" :to="link('/evals')">Review the evaluations <Icon name="external" /></RouterLink></BoardControls>
 
     <section v-if="summary" class="summary" aria-label="Summary">
       <article v-for="card in summary" :key="card.label" :class="['sum-card', card.kind]">
@@ -116,7 +104,7 @@
     </section>
 
     <section v-if="!loading && !apiUnavailable && apiRows.length" class="figure-panel">
-      <div class="panel-head"><h2>{{ track === 'open' ? 'Rating against evidence' : 'Success against progress' }}</h2><p>{{ track === 'open' ? 'Every rated policy as a lab mark: rating on the vertical, comparisons on the horizontal (log). Whiskers are ±1 SE.' : 'Each checkpoint as a lab mark: full success against mean progress, with Wilson 95% intervals. The diagonal is success = progress.' }}</p></div>
+      <div><h2>{{ track === 'open' ? 'Rating against evidence' : 'Success against progress' }}</h2><p class="panel-note">{{ track === 'open' ? 'Every rated policy as a lab mark: rating on the vertical, comparisons on the horizontal (log). Whiskers are ±1 SE.' : 'Each checkpoint as a lab mark: full success against mean progress, with Wilson 95% intervals. The diagonal is success = progress.' }}</p></div>
       <div ref="figureEl" class="figure"></div>
     </section>
 
@@ -133,13 +121,13 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { policyName } from '../display.js'
-import RobotGlyph from '../components/RobotGlyph.vue'
+import BoardControls from '../components/BoardControls.vue'
 import Icon from '../components/Icon.vue'
-import { embodiments, useArena } from '../arena.js'
+import { useArena } from '../arena.js'
 import { getLeaderboard } from '../api.js'
 import { labFor, wilson, fmt, pct, taskName } from '../labs.js'
 
-const { robot, track, select, link } = useArena()
+const { robot, track, link } = useArena()
 const query = ref(''), minEvals = ref(0), showPending = ref(false), taskId = ref('')
 const sortKey = ref('rank'), sortDir = ref(1)
 const apiRows = ref([]), loading = ref(false), apiUnavailable = ref(false)
@@ -292,58 +280,12 @@ onBeforeUnmount(() => requestController?.abort())
 
 <style scoped>
 .lb-page { gap: 22px; }
-.lb-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
-.lb-head h1 { font: 800 clamp(34px, 4vw, 54px)/1 var(--sans); font-variation-settings: "wdth" 112; letter-spacing: -.035em; }
-.h1-track { color: var(--muted); font-weight: 600; }
-.lb-lede { margin: 12px 0 0; max-width: 64ch; color: var(--ink-2); font-size: 15.5px; }
-.lb-live { display: inline-flex; align-items: center; gap: 7px; font: 500 12px/1 var(--mono); color: var(--ink-2); white-space: nowrap; }
-.lb-live i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(255, 178, 36, .18); }
+.figure { margin-top: 6px; min-height: 240px; }
 
-.body-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.body-tab { display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); text-align: left; color: var(--ink-2); transition: border-color .15s, background .15s; }
-.body-tab:hover { background: var(--raised); }
-.body-tab.on { border-color: var(--accent-line); background: var(--raised); box-shadow: inset 0 0 0 1px var(--accent-line); color: var(--ink); }
-.body-tab :deep(.robot-glyph) { width: 64px; height: 44px; flex: none; color: var(--ink-4); }
-.body-tab.on :deep(.robot-glyph) { color: var(--accent); }
-.body-tab b { display: block; font: 600 15px/1.2 var(--sans); letter-spacing: -.01em; }
-.body-tab small { display: block; margin-top: 3px; font: 500 11px/1.4 var(--mono); color: var(--muted); }
 
-.track-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.track-switch { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
-.track-btn { display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px 8px 10px; border: 1px solid transparent; border-radius: 9px; background: transparent; color: var(--ink-2); text-align: left; }
-.track-btn .icon { font-size: 20px; color: var(--muted); }
-.track-btn b { display: block; font: 600 14px/1.2 var(--sans); }
-.track-btn small { display: block; font: 500 11px/1.4 var(--mono); color: var(--muted); }
-.track-btn.on { background: var(--field); color: var(--ink); border-color: var(--line-2); }
-.track-btn.open.on .icon { color: var(--open); } .track-btn.fine.on .icon { color: var(--fine); }
-.text-link { display: inline-flex; align-items: center; gap: 6px; }
 
-.summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-.sum-card { display: grid; gap: 8px; align-content: start; padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel) var(--dots) 0 0 / 14px 14px; min-width: 0; }
-.sum-label { display: inline-flex; align-items: center; gap: 7px; font: 500 12px/1.4 var(--mono); color: var(--muted); }
-.sum-label .icon { font-size: 15px; }
-.sum-card.lead .sum-label .icon { color: var(--accent); }
-.sum-main { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.sum-main b { font: 500 clamp(22px, 2.2vw, 30px)/1.1 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sum-card.lead .sum-main b { font-family: var(--sans); font-weight: 700; letter-spacing: -.02em; }
-.sum-card small { font-size: 12.5px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.lab-tile { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 8px; overflow: hidden; background: var(--field); font: 600 13px/1 var(--mono); color: var(--ink-2); }
-.lab-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.lab-tile.contain img { object-fit: contain; padding: 4px; }
 
-.board { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
-.board-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
-.search { display: inline-flex; align-items: center; gap: 8px; flex: 1 1 240px; max-width: 360px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--paper); color: var(--muted); }
-.search input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 9px 0; color: var(--ink); font: 400 14px/1.3 var(--sans); outline: none; }
-.chips { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
-.chips button { padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink-2); font: 500 12.5px/1 var(--sans); }
-.chips button small { color: var(--muted); font-size: 11px; }
-.chips button:hover { background: var(--raised); color: var(--ink); }
-.chips button.on { background: var(--field); border-color: var(--line-2); color: var(--ink); }
-.toggle { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; font: 500 12.5px/1 var(--sans); color: var(--ink-2); }
-.toggle input { accent-color: var(--accent); margin: 0; }
-.count { margin-left: auto; font: 500 12px/1.4 var(--mono); color: var(--muted); white-space: nowrap; }
 
 .rows { display: grid; }
 .row { display: grid; grid-template-columns: 44px minmax(220px, 1.4fr) minmax(200px, 1.6fr) minmax(150px, 1fr) minmax(120px, .7fr) 40px; gap: 14px; align-items: center; padding: 11px 18px; border-bottom: 1px solid var(--line); }
@@ -387,27 +329,9 @@ onBeforeUnmount(() => requestController?.abort())
 .row.faint .who, .row.faint .metric, .row.faint .record { opacity: .55; }
 .row.pending .who-text b { color: var(--ink-2); }
 .row.lead .who b { color: var(--ink); }
-.board-foot { padding: 12px 18px; border-top: 1px solid var(--line); font: 400 12.5px/1.6 var(--sans); color: var(--muted); }
-.state { padding: 40px 20px; text-align: center; color: var(--muted); }
-.state h3 { margin: 0 0 8px; font: 600 16px/1.3 var(--sans); color: var(--ink); }
-.state p { margin: 0 0 16px; font-size: 14px; }
-.skel { display: inline-block; min-width: 3ch; color: transparent !important; background: var(--field); border-radius: 3px; animation: skel 1.4s ease-in-out infinite; }
-@keyframes skel { 50% { opacity: .5; } }
 
-.figure-panel { border: 1px solid var(--line); border-radius: 12px; background: var(--panel) var(--dots) 0 0 / 14px 14px; padding: 18px 20px 8px; }
-.panel-head h2 { font: 700 20px/1.2 var(--sans); letter-spacing: -.02em; }
-.panel-head p { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-2); max-width: 70ch; }
 .figure { margin-top: 6px; min-height: 240px; }
-.definitions { display: grid; gap: 4px; }
-.definitions h2 { font: 700 18px/1.3 var(--sans); margin-bottom: 6px; }
-.definitions details { border-top: 1px solid var(--line); }
-.definitions summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; cursor: pointer; list-style: none; font: 600 14.5px/1.3 var(--sans); color: var(--ink); }
-.definitions summary::-webkit-details-marker { display: none; }
-.definitions summary .icon { color: var(--muted); transition: transform .15s; }
-.definitions details[open] summary .icon { transform: rotate(180deg); }
-.definitions p { margin: 0 0 14px; font-size: 14px; color: var(--ink-2); max-width: 78ch; }
 
-@media (max-width: 1100px) { .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .row { grid-template-columns: 40px minmax(180px, 1.4fr) minmax(160px, 1.6fr) minmax(130px, 1fr) minmax(90px, .7fr) 36px; gap: 10px; } }
-@media (max-width: 900px) { .body-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); } .row.head { position: static; } .row { grid-template-columns: 36px minmax(0, 1fr) 36px; grid-template-areas: "rank who actions" ". metric metric" ". record record" ". num num"; row-gap: 8px; } .row > .rank { grid-area: rank; } .row > .who { grid-area: who; } .row > .actions { grid-area: actions; } .row > .metric:nth-of-type(1) { grid-area: metric; } .row > .record, .row > .metric:nth-of-type(2) { grid-area: record; } .row > .num { grid-area: num; justify-items: start; text-align: left; } .row.head { display: none; } .lb-head { flex-direction: column; align-items: flex-start; } }
-@media (max-width: 600px) { .summary { grid-template-columns: minmax(0, 1fr); } .body-tabs { grid-template-columns: minmax(0, 1fr); } .track-switch { width: 100%; } .track-btn { flex: 1; } }
+@media (max-width: 1100px) { .row { grid-template-columns: 40px minmax(180px, 1.4fr) minmax(160px, 1.6fr) minmax(130px, 1fr) minmax(90px, .7fr) 36px; gap: 10px; } }
+@media (max-width: 900px) { .row.head { position: static; } .row { grid-template-columns: 36px minmax(0, 1fr) 36px; grid-template-areas: "rank who actions" ". metric metric" ". record record" ". num num"; row-gap: 8px; } .row > .rank { grid-area: rank; } .row > .who { grid-area: who; } .row > .actions { grid-area: actions; } .row > .metric:nth-of-type(1) { grid-area: metric; } .row > .record, .row > .metric:nth-of-type(2) { grid-area: record; } .row > .num { grid-area: num; justify-items: start; text-align: left; } .row.head { display: none; } }
 </style>
