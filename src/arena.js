@@ -6,6 +6,7 @@ export const embodiments = [
   { id: 'so101', name: 'SO-ARM101', detail: 'Single-arm manipulation', type: 'Single arm', glyph: 'so101' },
   { id: 'yam', name: 'Bimanual YAM', detail: 'Dual-arm manipulation', type: 'Bimanual', glyph: 'yam' },
   { id: 'g1', name: 'Unitree G1', detail: 'Humanoid manipulation', type: 'Humanoid', glyph: 'g1' },
+  { id: 'earth_rover_mini_plus', name: 'Earth Rover Mini+', detail: 'GPS and photo-goal navigation', type: 'Mobile rover', glyph: 'rover' },
 ]
 export function useArena() {
   const route = useRoute(), router = useRouter()

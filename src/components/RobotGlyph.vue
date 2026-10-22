@@ -60,6 +60,30 @@
       <circle cx="78" cy="87" r="3" fill="var(--paper, #fafaf6)" stroke-width="2" />
       <circle cx="102" cy="87" r="3" fill="var(--paper, #fafaf6)" stroke-width="2" />
     </g>
+
+    <!-- Earth Rover Mini+: low four-wheel chassis, front camera mast and a rear antenna. -->
+    <g v-else-if="kind === 'rover'" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M44 62H136L142 80H38Z" fill="currentColor" fill-opacity=".12" stroke-width="2.5" />
+      <path d="M52 62V50Q52 44 58 44H110Q116 44 116 50V62" fill="currentColor" fill-opacity=".06" stroke-width="2.5" />
+      <rect x="104" y="30" width="18" height="14" rx="3" fill="currentColor" />
+      <circle cx="113" cy="37" r="3" fill="var(--paper, #fafaf6)" stroke="none" />
+      <path d="M113 44V48" stroke-width="3" />
+      <path d="M60 44V26M56 26H64" stroke-width="2.5" />
+      <path d="M46 80V88M134 80V88" stroke-width="3" opacity=".5" />
+      <g fill="currentColor">
+        <circle cx="58" cy="88" r="13" /><circle cx="122" cy="88" r="13" />
+      </g>
+      <circle cx="58" cy="88" r="5" fill="var(--paper, #fafaf6)" stroke="none" />
+      <circle cx="122" cy="88" r="5" fill="var(--paper, #fafaf6)" stroke="none" />
+      <path d="M72 70H108" stroke-width="2" opacity=".45" />
+      <path d="M118 56Q126 48 136 54" stroke-width="1.5" opacity=".5" />
+    </g>
+
+    <!-- Unknown embodiment: a neutral outline so the card never renders empty. -->
+    <g v-else stroke="currentColor" stroke-linejoin="round">
+      <rect x="60" y="34" width="60" height="60" rx="12" fill="currentColor" fill-opacity=".1" stroke-width="2.5" />
+      <circle cx="90" cy="64" r="10" fill="currentColor" />
+    </g>
   </svg>
 </template>
 <script setup>
