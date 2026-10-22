@@ -19,7 +19,7 @@ const DATASET = { label: 'Get the 10,000-hour dataset', href: 'https://huggingfa
 // Bodies shown on the page: the API's robots plus the ones joining. Earth Rover has no results yet and no API entry.
 const BODIES = [
   ...ROBOTS.map(r => ({ id: r.id, name: r.name, kind: r.kind, img: `${ASSETS}${r.img}.webp`, mirror: r.mirror, portrait: true })),
-  { id: 'earth-rover', name: 'Earth Rover Mini+', kind: 'Sidewalk rover · outdoors', img: './bodies/earth-rover-mini-plus.webp', portrait: false, joining: 'Navigation to GPS goals, outdoors' },
+  { id: 'earth-rover', name: 'Earth Rover Mini+', kind: 'Sidewalk rover · outdoors', img: './bodies/earth-rover-mini-plus.webp', portrait: true, joining: 'Navigation to GPS goals, outdoors' },
 ]
 
 // The reel: real evaluations in different rooms and on different bodies. Replace entries with static footage (src/poster) when it is ready.

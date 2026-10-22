@@ -16,7 +16,7 @@ export const VIDEO = new URL('../video/', import.meta.url).href
 // Bodies on the page: the API's robots plus the one joining. Earth Rover has no results yet and no API entry.
 export const BODIES = [
   ...ROBOTS.map(r => ({ id: r.id, name: r.name, kind: r.kind, sub: r.sub, img: `${ASSETS}${r.img}.webp`, mirror: r.mirror, portrait: true })),
-  { id: 'earth-rover', name: 'Earth Rover Mini+', kind: 'Sidewalk rover', sub: 'Outdoors · GPS goals', img: new URL('../../v3/bodies/earth-rover-mini-plus.webp', import.meta.url).href, portrait: false, joining: 'Navigation to GPS goals, outdoors' },
+  { id: 'earth-rover', name: 'Earth Rover Mini+', kind: 'Sidewalk rover', sub: 'Outdoors · GPS goals', img: new URL('../../v3/bodies/earth-rover-mini-plus.webp', import.meta.url).href, portrait: true, joining: 'Navigation to GPS goals, outdoors' },
 ]
 export const robotName = id => ROBOTS.find(r => r.id === id)?.name || id
 
