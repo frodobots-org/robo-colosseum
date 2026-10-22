@@ -159,8 +159,10 @@ function labelled(items, key) {
 const scoped = computed(() => apiRows.value.filter(r => r.robotId === robot.value.id && r.track === track.value))
 
 const openRows = computed(() => {
+  // Rated policies with enough evidence come first; low-evidence ratings follow, still numbered, so a policy with
+  // two comparisons cannot top the board on a wide error bar.
   const rated = labelled(scoped.value.filter(r => r.status !== 'pending' && Number(r.evals) > 0 && Number.isFinite(r.score)), 'policy')
-    .sort((a, b) => b.score - a.score)
+    .sort((a, b) => (b.evals >= LOW) - (a.evals >= LOW) || b.score - a.score)
   const pending = labelled(scoped.value.filter(r => r.status === 'pending' || !(Number(r.evals) > 0)), 'policy')
   if (!rated.length && !pending.length) return []
   const lo = Math.min(...rated.map(r => r.score - (r.std || 0))), hi = Math.max(...rated.map(r => r.score + (r.std || 0)))
@@ -229,11 +231,11 @@ function sortIcon(key) { return sortKey.value !== key ? 'sort' : sortDir.value =
 const summary = computed(() => {
   const rows = baseRows.value.filter(r => !r.pending)
   if (!rows.length) return null
-  const lead = rows[0]
+  const lead = rows.find(r => !r.faint) || rows[0]
   const tile = r => r.lab ? { logo: r.lab.logo, logoFit: r.lab.fit, logoBg: r.lab.bg, logoAlt: r.lab.name } : { initial: r.initial }
   if (track.value === 'open') {
     const comparisons = Math.round(rows.reduce((n, r) => n + r.evals, 0) / 2)
-    const second = rows[1]
+    const second = rows.filter(r => !r.faint && r !== lead)[0] || rows.filter(r => r !== lead)[0]
     const gap = second ? lead.score - second.score : 0
     return [
       { icon: 'trophy', label: 'Leader', value: lead.label, sub: `${fmt(lead.score)} ±${fmt(lead.se)} · ${lead.lab?.name || 'Independent'}`, kind: 'lead', ...tile(lead) },
