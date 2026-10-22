@@ -3,9 +3,9 @@ import { boot, BODIES, bodyFacts, axes, num, partners, footerLinks, appLinks, la
 
 const $ = (s, el = document) => el.querySelector(s)
 const THEME = {
-  card: 'background:var(--surface);border:1px solid var(--line);border-radius:6px', surface: '#141b14',
-  ink: '#e9eddf', secondary: '#b8c0ad', muted: '#8a947f', grid: '#223022', axis: '#3a473a', ring: '#3a473a',
-  sans: "'Archivo', system-ui, sans-serif", mono: "'IBM Plex Mono', monospace", titleWeight: 600, tipBg: '#e9eddf', tipInk: '#0f140f',
+  card: 'background:var(--surface);border:1px solid var(--line);border-radius:6px', surface: '#15181c',
+  ink: '#eceef1', secondary: '#b5bac3', muted: '#848a95', grid: '#22262c', axis: '#3a4149', ring: '#3a4149',
+  sans: "'Archivo', system-ui, sans-serif", mono: "'IBM Plex Mono', monospace", titleWeight: 600, tipBg: '#eceef1', tipInk: '#101214',
   brand: 'RoboColosseum',
 }
 
