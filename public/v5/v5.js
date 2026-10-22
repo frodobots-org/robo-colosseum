@@ -3,6 +3,7 @@ import { boot, BODIES, bodyFacts, axes, num, partners, footerLinks, appLinks, la
 import { policyLabel } from '../landing/live.js'
 
 const $ = (s, el = document) => el.querySelector(s)
+const ROOT = window.RC_ROOT || '/'
 const THEME = {
   card: 'background:transparent;border:0;border-radius:0', surface: '#13161a',
   ink: '#e8eaed', secondary: '#b3b9c2', muted: '#8b929c', grid: '#23272d', axis: '#3a4149', ring: '#3a4149',
@@ -13,12 +14,14 @@ const THEME = {
 appLinks()
 $('#hero-actions').innerHTML = `<a class="button primary" href="${DATASET.href}">${DATASET.label}</a><a class="button" href="#leaderboards">See the leaderboards</a>`
 $('#partner-logos').innerHTML = partners()
-$('#footer').innerHTML = `<div><a class="brand" href="#top"><img src="../brand/rc-lockup-white.svg" alt="RoboColosseum" height="40"></a><p class="prov">Every figure on this page is read live from the RoboColosseum API when you open it. Co-organized by Hugging Face, BitRobot and the Embodied AI Centre, Singapore.</p></div>${footerLinks()}`
+$('#brand-mark').src = `${ROOT}brand/rc-mark-white.svg`
+$('#footer').innerHTML = `<div><a class="brand" href="#top"><img src="${ROOT}brand/rc-lockup-white.svg" alt="RoboColosseum" height="40"></a><p class="prov">Every figure on this page is read live from the RoboColosseum API when you open it. Co-organized by Hugging Face, BitRobot and the Embodied AI Centre, Singapore.</p></div>${footerLinks()}`
 
 // The film: the caption follows the cut list that ships with it.
 const film = $('#film'), caption = $('#caption'), progress = $('#progress')
+film.poster = `${ROOT}v4/video/mashup.jpg`; film.src = `${ROOT}v4/video/mashup.mp4`
 let cues = [], current = -1
-fetch('../v4/video/cues.json').then(r => r.ok ? r.json() : []).then(list => { cues = list; progress.innerHTML = cues.map(() => '<i></i>').join('') }).catch(() => {})
+fetch(`${ROOT}v4/video/cues.json`).then(r => r.ok ? r.json() : []).then(list => { cues = list; progress.innerHTML = cues.map(() => '<i></i>').join('') }).catch(() => {})
 film.addEventListener('timeupdate', () => {
   if (!cues.length) return
   const t = film.currentTime

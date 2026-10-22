@@ -20,7 +20,7 @@ The decisions behind the landing pages, as the user stated them. Read this befor
 ## Direction
 
 - References: Artificial Analysis (the benchmark publisher: white, serif one-liner, charts in cards, a changelog of evaluations) and XDOF (the instrument: dark panels on a dotted grid, mono labels, almost no copy).
-- Chosen (22 Oct 2026): **Index in night mode**, `/v5/`. The Index layout (claim + film window, index cards, a live feed of verdicts) on a dark page, with the control room's live ticker. Earlier explorations stay for comparison: `/v3/` (sage), `/v4/wall/`, `/v4/cinema/`, `/v4/poster/`.
+- Chosen (22 Oct 2026): **Index in night mode**, `/v5/`. **It is the default for the whole platform** (user decision, 22 Oct 2026): the site root serves `/v5/` on Netlify, and the app pages (leaderboards, evaluations, tasks, submit, join) use the same night tokens, the v5 top bar with the RC mark, Archivo + IBM Plex Mono and the amber accent. Tokens live in `src/styles/arena.css`; `src/styles/base.css` reads them. The Index layout (claim + film window, index cards, a live feed of verdicts) on a dark page, with the control room's live ticker. Earlier explorations stay for comparison: `/v3/` (sage), `/v4/wall/`, `/v4/cinema/`, `/v4/poster/`.
 
 ## Colour
 

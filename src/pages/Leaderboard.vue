@@ -114,8 +114,8 @@ onBeforeUnmount(() => requestController?.abort())
 .task-name { min-width: 110px; }
 .task-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 24px 12px; border-bottom: 1px solid var(--line); }
 .task-tabs button { padding: 8px 12px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; }
-.task-tabs button:hover { background: #f1f5e8; }
-.task-tabs button.active { border-color: #c9d5b8; background: #edf3e4; color: #435b2f; font-weight: 600; }
-.task-tabs button:focus-visible { outline: 2px solid #60734b; outline-offset: 2px; }
+.task-tabs button:hover { background: var(--raised); }
+.task-tabs button.active { border-color: var(--accent-line); background: var(--accent-tint); color: var(--accent); font-weight: 600; }
+.task-tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 640px) { .task-tabs { padding-inline: 15px; } }
 </style>
