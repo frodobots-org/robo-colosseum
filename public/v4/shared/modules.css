@@ -128,7 +128,7 @@
 .sph-hint { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 88%, transparent); font: 500 12px/1.2 var(--mono); color: var(--ink-2); white-space: nowrap; pointer-events: none; }
 .sph-zoom { position: absolute; right: 2px; bottom: 2px; display: flex; flex-direction: column; gap: 6px; }
 .sph-zoom button { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--line-2); background: var(--surface); font: 500 16px/1 var(--mono); }
-.sph-tip { position: absolute; z-index: 5; width: 260px; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); box-shadow: 0 10px 30px rgba(28, 35, 27, .12); font-size: 13px; line-height: 1.4; pointer-events: none; }
+.sph-tip { position: absolute; z-index: 5; width: 260px; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); box-shadow: 0 10px 30px rgba(0, 0, 0, .14); font-size: 13px; line-height: 1.4; pointer-events: none; }
 .sph-tip[hidden] { display: none; }
 .sph-tip b { display: block; font-weight: 600; }
 .sph-tip small { display: block; margin-top: 3px; font: 500 11px/1.5 var(--mono); color: var(--ink-3); }
@@ -233,7 +233,7 @@
 .pair-head .eyebrow::before { background: var(--fine-soft); border-color: var(--fine); }
 .pair-head small { font: 500 12px/1.4 var(--mono); color: var(--ink-3); }
 .screens { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; border-radius: 10px; overflow: hidden; background: var(--ink); }
-.screen { position: relative; aspect-ratio: 16 / 9; background: #263226; overflow: hidden; }
+.screen { position: relative; aspect-ratio: 16 / 9; background: #111316; overflow: hidden; }
 .screen video, .screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .8s ease; }
 .screen.ready video, .screen.ready img { opacity: 1; }
 .screen .side { position: absolute; left: 10px; top: 10px; z-index: 2; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; background: rgba(28, 35, 27, .78); color: #f5f9ec; font: 600 13px/1 var(--mono); }
