@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>RoboColosseum brand kit</title>
+<link rel="icon" href="./favicon.svg">
+<style>
+  body { margin: 0; background: #f2f2f0; color: #111; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 24px 64px; }
+  h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -.02em; }
+  p.lead { margin: 0 0 28px; color: #555; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  figure { margin: 0; border-radius: 10px; padding: 22px 16px 14px; display: grid; gap: 12px; justify-items: center; align-content: center; min-height: 190px; }
+  figure.light { background: #fff; border: 1px solid #e2e2de; } figure.dark { background: #0d0f12; color: #ddd; } figure.wide { grid-column: span 2; }
+  figure img { display: block; max-width: 100%; }
+  figcaption { font: 12px/1.4 ui-monospace, Menlo, monospace; display: flex; gap: 10px; align-items: center; }
+  figcaption a { color: inherit; }
+  h2 { font-size: 15px; margin: 36px 0 10px; color: #333; }
+  code { font: 12.5px ui-monospace, Menlo, monospace; background: #e8e8e4; padding: 2px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>RoboColosseum brand kit</h1>
+  <p class="lead">The RC monogram under the colosseum arcade, vectorised from the @RoboColosseum avatar. Every file is an SVG; the ones without a fixed colour use <code>currentColor</code>, so they take the text colour of wherever you put them.</p>
+  <div class="grid">
+    <figure class="light"><img src="./rc-mark-black.svg" style="height:140px" alt=""><figcaption>rc-mark-black.svg <a href="./rc-mark-black.svg" download>download</a></figcaption></figure>
+    <figure class="dark"><img src="./rc-mark-white.svg" style="height:140px" alt=""><figcaption>rc-mark-white.svg <a href="./rc-mark-white.svg" download>download</a></figcaption></figure>
+    <figure class="light"><img src="./rc-badge-dark.svg" style="height:140px" alt=""><figcaption>rc-badge-dark.svg <a href="./rc-badge-dark.svg" download>download</a></figcaption></figure>
+    <figure class="dark"><img src="./rc-badge-light.svg" style="height:140px" alt=""><figcaption>rc-badge-light.svg <a href="./rc-badge-light.svg" download>download</a></figcaption></figure>
+    <figure class="light wide"><img src="./rc-lockup-black.svg" style="height:96px" alt=""><figcaption>rc-lockup-black.svg <a href="./rc-lockup-black.svg" download>download</a></figcaption></figure>
+    <figure class="dark wide"><img src="./rc-lockup-white.svg" style="height:96px" alt=""><figcaption>rc-lockup-white.svg <a href="./rc-lockup-white.svg" download>download</a></figcaption></figure>
+    <figure class="light"><img src="./rc-tile-dark.svg" style="height:140px;border-radius:24px" alt=""><figcaption>rc-tile-dark.svg <a href="./rc-tile-dark.svg" download>download</a></figcaption></figure>
+    <figure class="light"><img src="./rc-badge-amber.svg" style="height:140px" alt=""><figcaption>rc-badge-amber.svg <a href="./rc-badge-amber.svg" download>download</a></figcaption></figure>
+    <figure class="light"><div style="display:flex;gap:18px;align-items:center"><img src="./favicon.svg" style="height:48px" alt=""><img src="./favicon.svg" style="height:32px" alt=""><img src="./favicon.svg" style="height:16px" alt=""></div><figcaption>favicon.svg (letters only, 48/32/16) <a href="./favicon.svg" download>download</a></figcaption></figure>
+    <figure class="light"><img src="./rc-letters.svg" style="height:90px" alt=""><figcaption>rc-letters.svg (no arcade, tiny sizes) <a href="./rc-letters.svg" download>download</a></figcaption></figure>
+    <figure class="light wide" style="color:#0b1d4d;background:#e8eef9;border-color:#c9d4ea"><img src="./rc-lockup.svg" style="height:80px" alt=""><figcaption>rc-lockup.svg · currentColor (shown in navy) <a href="./rc-lockup.svg" download>download</a></figcaption></figure>
+    <figure class="light wide"><img src="./rc-wordmark.svg" style="height:40px" alt=""><figcaption>rc-wordmark.svg · currentColor <a href="./rc-wordmark.svg" download>download</a></figcaption></figure>
+  </div>
+  <h2>Notes</h2>
+  <p>Source: the 400 px avatar on x.com/RoboColosseum (<a href="./source-x-avatar-400.jpg">source-x-avatar-400.jpg</a>), traced at 4× with VTracer and minified with SVGO. The wordmark is Archivo 800 at width 112, converted to outlines, so no font is needed. Minimum size for the full mark is about 40 px; below that use <code>rc-letters.svg</code> or the favicon.</p>
+</main>
+</body>
+</html>
