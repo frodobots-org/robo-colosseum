@@ -15,6 +15,13 @@
   status = 200
   force = true
 
+# The site root serves the /v5/ landing page (it resolves its own assets from the site root).
+[[redirects]]
+  from = "/"
+  to = "/v5/index.html"
+  status = 200
+  force = true
+
 # Vue Router handles direct visits to application routes.
 [[redirects]]
   from = "/*"
