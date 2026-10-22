@@ -7,7 +7,7 @@ The decisions behind the landing pages, as the user stated them. Read this befor
 - **What we build:** the independent, real-world benchmark for physical AI. Policies from every lab run on real robots in real rooms, judged blind by people, ranked per robot body.
 - **Main message:** *Evaluations made in the wild.* It is the headline and the first section. "Tested in the wild" was rejected: it names the method, not the thing.
 - **Second message:** cross-embodiment. One protocol, every body: Franka, SO-ARM101, Bimanual YAM, Unitree G1, Earth Rover Mini+ (joining).
-- **Order of the page** (huddle with Michael Cho, 21 Oct 2026): in the wild → every body → scale on several axes (bodies, sites, rooms, tasks, rollouts, evaluators, days) → partners as logos → then the benchmark detail (leaderboards, a real pair, every trial, the two tracks) → join.
+- **Order of the page** (huddle with Michael Cho, 21 Oct 2026): in the wild → every body → scale on several axes (bodies, sites, rooms, tasks, rollouts, evaluators, days) → then the benchmark detail (leaderboards, a real pair, every trial, the two tracks) → join. The co-organizer logos (Hugging Face, BitRobot, EAIC) sit as one quiet monochrome line directly under the hero, as a credibility strip, not a section (user decision, 22 Oct 2026); they appear once on the page plus the footer mention.
 - **Less text, more footage.** The hero carries real recordings (the in-the-wild mashup), not copy. Benchmark examples and evaluations sit below the fold.
 - **Day-one call to action:** the 10,000-hour dataset. Second: see the leaderboards.
 - **Voice:** plain, specific, in sentence case. Every number on the page is live from the API; never a static figure.
