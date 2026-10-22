@@ -39,3 +39,11 @@ The decisions behind the landing pages, as the user stated them. Read this befor
 
 - Everything is read from `/api` at load through `public/landing/live.js` and the v3 modules; `public/v3/loader.js` starts boards, the evaluation list and reviews in parallel. The router's public response cache (colosseum-router PR #4) adds edge caching when deployed.
 - The in-the-wild mashup (`public/v4/video/mashup.mp4` + `cues.json`) and the wall (`wall.mp4` + `wall.json`) are cut from the humanoid team's footage; captions say "Humanoid" and the room, never a model name that was not confirmed.
+
+## Leaderboards (22 Oct 2026)
+
+- Modelled on Artificial Analysis (summary cards naming the leaders with lab logos, dense table with logo cells, filters, key definitions) and Arena (dark rows with numbered rank chips, logo tiles, score bars inside the rows, category tabs with icons).
+- Page order: header (body · track) → body tabs with the robot glyphs → track switch with icons → four summary cards (leader with lab tile, comparisons or trials, policies, lead over #2 or median progress) → the ranking → the Robocurve figure → key definitions.
+- Ranking rows: rank chip (#1 amber, #2–3 raised), lab tile + policy + lab + Hugging Face link, a bar per metric (open: rating with ±1 SE whisker on a shared axis; fine-tuning: full success fill with the Wilson 95% band, progress fill), W·T·L stacked record, counts in mono, a play icon to the evaluations. Fewer than 20 comparisons (or 10 trials) is faded and marked low evidence; pending policies are hidden behind a toggle.
+- Sorting on the metric columns, text filter by policy or lab, minimum-comparisons chips (open) or task chips (fine-tuning: "All tasks" pools a checkpoint across tasks).
+- Lab logos come from `src/labs.js` (same mapping as `public/landing/leaderboard.js`); icons are the inline set in `src/components/Icon.vue`.
