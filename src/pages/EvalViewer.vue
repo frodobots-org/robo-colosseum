@@ -1,82 +1,132 @@
 <template>
-  <div class="page-stack">
-    <section class="page-header">
-      <h1>Evaluation</h1>
+  <div class="page-stack ev-page">
+    <section class="page-head">
+      <div>
+        <p class="eyebrow">Evaluations</p>
+        <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Blind pairs' : 'Scored trials' }}</span></h1>
+        <p class="lede">{{ track === 'open' ? 'Every finalized A/B comparison on this body: both rollouts, the instruction the evaluator wrote, their blind verdict and their note.' : 'Every scored trial of the fine-tuning checkpoints on this body, with the recording of each attempt.' }}</p>
+      </div>
+      <span class="live-tag"><i></i>Live from the API</span>
     </section>
 
-    <ArenaControls />
+    <BoardControls open-label="Pairs, judged blind" fine-label="Trials, scored 0–4"><RouterLink class="text-link" :to="link('/leaderboard')">See the leaderboard <Icon name="external" /></RouterLink></BoardControls>
+
     <FineTuneReview v-if="track === 'fine-tuning'" :robot-id="robot.id" :robot-name="robot.name" />
     <template v-else>
-    <div class="review-actions">
-      <button class="button secondary" @click="loadEvaluations">Refresh</button>
-    </div>
-    <div v-if="loading" class="empty-state" role="status">Loading evaluations…</div>
-    <div v-else-if="!filteredEvaluations.length" class="empty-state"><h3>{{ unavailable ? 'Evaluations are temporarily unavailable' : 'No published evaluations for this selection' }}</h3><p>{{ track === 'fine-tuning' ? 'A/B comparisons belong to Open Track. Switch to Open Track to review paired rollouts.' : 'Completed A/B comparisons for this embodiment will appear here.' }}</p><button v-if="unavailable" class="button secondary" @click="loadEvaluations">Try again</button></div>
-
-    <section v-if="filteredEvaluations.length" class="eval-layout">
-      <aside class="eval-list">
-        <button
-          v-for="item in filteredEvaluations"
-          :key="item.id"
-          :class="['eval-list-item', selected?.id === item.id && 'active']"
-          type="button"
-          @click="selected = item"
-        >
-          <span class="eval-list-meta">
-            <strong v-if="item.test" class="test-badge">Test</strong>
-            <time>{{ dateLabel(item.evalTime || item.date) }}</time>
-          </span>
-          <strong>{{ item.instruction || item.task }}</strong>
-        </button>
-      </aside>
-
-      <section v-if="selected" class="review-panel">
-        <EvalCard :evaluation="selected" :robot-name="robotName(selected.robotId)" />
-        <EvalVideoReview :evaluation="selected" />
+      <section v-if="summary" class="summary" aria-label="Summary">
+        <article class="sum-card"><span class="sum-label"><Icon name="ab" />Finalized pairs</span><div class="sum-main"><b>{{ fmt(summary.total) }}</b></div><small>on {{ robot.name }}, judged by people</small></article>
+        <article class="sum-card"><span class="sum-label"><Icon name="pulse" />Latest verdict</span><div class="sum-main"><b>{{ summary.latestAgo }}</b></div><small>{{ summary.latestScene }}</small></article>
+        <article class="sum-card"><span class="sum-label"><Icon name="trend-up" />Verdicts</span><div class="sum-main"><b>{{ pct(summary.decided) }}</b></div><span class="split" :title="`${summary.a} preferred A · ${summary.tie} ties · ${summary.b} preferred B`"><i style="background:var(--good)" :style="{ flexGrow: summary.a }"></i><i style="background:var(--line-2)" :style="{ flexGrow: summary.tie }"></i><i style="background:var(--fine)" :style="{ flexGrow: summary.b }"></i></span><small>{{ fmt(summary.a) }} A · {{ fmt(summary.tie) }} ties · {{ fmt(summary.b) }} B</small></article>
+        <article class="sum-card"><span class="sum-label"><Icon name="grid" />Rooms</span><div class="sum-main"><b>{{ fmt(summary.rooms) }}</b></div><small>{{ fmt(summary.evaluators) }} evaluators · {{ fmt(summary.policies) }} policies</small></article>
       </section>
-    </section>
+
+      <section class="board">
+        <div class="board-toolbar">
+          <label class="search"><Icon name="search" /><input v-model="query" type="search" placeholder="Filter by instruction, room, policy or evaluator" aria-label="Filter evaluations" /></label>
+          <div class="chips" role="group" aria-label="Verdict">
+            <button v-for="opt in verdictOptions" :key="opt.id" type="button" :class="{ on: verdictFilter === opt.id }" @click="verdictFilter = opt.id">{{ opt.label }}</button>
+            <button v-if="policyFilter" type="button" class="on" @click="clearPolicy">{{ policyFilter }} ×</button>
+          </div>
+          <span class="count">{{ filtered.length }} of {{ scoped.length }} pairs</span>
+          <button class="button secondary" type="button" @click="loadEvaluations"><Icon name="pulse" /> Refresh</button>
+        </div>
+
+        <div v-if="loading" class="state"><span class="skel" style="min-width:30ch">&nbsp;</span></div>
+        <div v-else-if="unavailable" class="state"><h3>Evaluations are temporarily unavailable</h3><p>The API did not answer. Try again in a moment.</p><button class="button secondary" type="button" @click="loadEvaluations">Try again</button></div>
+        <div v-else-if="!filtered.length" class="state"><h3>{{ hasFilters ? 'No pairs match' : 'No finalized pairs on this body yet' }}</h3><p>Pairs appear here as soon as an evaluator finalizes a verdict.</p><button v-if="hasFilters" class="button secondary" type="button" @click="clearFilters">Clear filters</button></div>
+
+        <div v-else class="ev-layout">
+          <ol class="feed" aria-label="Evaluations">
+            <li v-for="item in filtered" :key="item.id">
+              <button type="button" :class="['feed-item', { on: selected?.id === item.id }]" :aria-pressed="selected?.id === item.id" @click="selected = item">
+                <span class="feed-top"><time :datetime="item.evalTime || item.date">{{ ago(item.evalTime || item.date) }}</time><span :class="['verdict', verdictClass(item)]">{{ verdictLabel(item) }}</span></span>
+                <b>{{ item.instruction || item.task }}</b>
+                <small>{{ policyName(item.policyA) }} <i>vs</i> {{ policyName(item.policyB) }}{{ item.scene ? ` · ${item.scene}` : '' }}</small>
+              </button>
+            </li>
+          </ol>
+          <section v-if="selected" class="review" aria-live="polite">
+            <EvalCard :evaluation="selected" :robot-name="robot.name" />
+            <EvalVideoReview :evaluation="selected" />
+          </section>
+        </div>
+      </section>
     </template>
   </div>
 </template>
 
 <script setup>
-import { dateLabel } from '../display.js'
 import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import FineTuneReview from '../components/FineTuneReview.vue'
 import EvalCard from '../components/EvalCard.vue'
 import EvalVideoReview from '../components/EvalVideoReview.vue'
-import ArenaControls from '../components/ArenaControls.vue'
+import BoardControls from '../components/BoardControls.vue'
+import Icon from '../components/Icon.vue'
+import { policyName } from '../display.js'
 import { useArena } from '../arena.js'
 import { getEvaluations } from '../api.js'
+import { fmt, pct } from '../labs.js'
 
-const evaluations = ref([])
-const selected = ref(null)
-const { robot, track } = useArena()
-const loading = ref(false), unavailable = ref(false)
+const route = useRoute()
+const { robot, track, link } = useArena()
+const evaluations = ref([]), selected = ref(null), loading = ref(false), unavailable = ref(false)
+const query = ref(''), verdictFilter = ref('all')
+const policyFilter = computed(() => String(route.query.policy || ''))
+const verdictOptions = [{ id: 'all', label: 'All' }, { id: 'A', label: 'Preferred A' }, { id: 'B', label: 'Preferred B' }, { id: 'tie', label: 'Ties' }]
 
-const filteredEvaluations = computed(() => {
-  return evaluations.value.filter((evaluation) => {
-    return track.value === 'open' && evaluation.finalized && evaluation.robotId === robot.value.id && (evaluation.track || 'open') === track.value
-  })
+const verdictOf = e => { const p = e.preference || e.pref || e.winner; return p === 'A' || p === 'B' ? p : 'tie' }
+const verdictLabel = e => ({ A: 'Preferred A', B: 'Preferred B', tie: 'Tie' })[verdictOf(e)]
+const verdictClass = e => (e.test ? 'test' : verdictOf(e) === 'tie' ? '' : 'pref')
+const ago = iso => { if (!iso) return '—'; const m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 48 * 60 ? `${Math.round(m / 60)} h ago` : m < 60 * 24 * 30 ? `${Math.round(m / 1440)} d ago` : new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) }
+
+const scoped = computed(() => evaluations.value.filter(e => e.finalized && !e.test && e.robotId === robot.value.id && (e.track || 'open') === 'open')
+  .sort((a, b) => String(b.evalTime || b.date || '').localeCompare(String(a.evalTime || a.date || ''))))
+const filtered = computed(() => {
+  const q = query.value.trim().toLowerCase(), pf = policyFilter.value.toLowerCase()
+  return scoped.value.filter(e => (verdictFilter.value === 'all' || verdictOf(e) === verdictFilter.value)
+    && (!pf || policyName(e.policyA).toLowerCase() === pf || policyName(e.policyB).toLowerCase() === pf)
+    && (!q || `${e.instruction || ''} ${e.task || ''} ${e.scene || ''} ${e.evaluator || ''} ${e.policyA || ''} ${e.policyB || ''} ${e.institution || ''}`.toLowerCase().includes(q)))
+})
+const hasFilters = computed(() => Boolean(query.value || verdictFilter.value !== 'all' || policyFilter.value))
+function clearFilters() { query.value = ''; verdictFilter.value = 'all'; clearPolicy() }
+function clearPolicy() { if (policyFilter.value) history.replaceState(null, '', location.pathname + location.search.replace(/([?&])policy=[^&]*&?/, '$1').replace(/[?&]$/, '')); }
+
+const summary = computed(() => {
+  const rows = scoped.value
+  if (!rows.length) return null
+  const a = rows.filter(e => verdictOf(e) === 'A').length, b = rows.filter(e => verdictOf(e) === 'B').length, tie = rows.length - a - b
+  const latest = rows[0]
+  return { total: rows.length, a, b, tie, decided: (a + b) / rows.length * 100, latestAgo: ago(latest.evalTime || latest.date), latestScene: latest.scene || 'room not recorded',
+    rooms: new Set(rows.map(e => (e.scene || '').trim().toLowerCase()).filter(Boolean)).size, evaluators: new Set(rows.map(e => e.evaluator).filter(Boolean)).size,
+    policies: new Set(rows.flatMap(e => [policyName(e.policyA), policyName(e.policyB)]).filter(Boolean)).size }
 })
 
-function robotName(robotId) {
-  return robot.value.id === robotId ? robot.value.name : robotId
-}
-
-watch(filteredEvaluations, (items) => {
-  if (!items.some((item) => item.id === selected.value?.id)) {
-    selected.value = items[0] || null
-  }
-})
-
+watch(filtered, items => { if (!items.some(i => i.id === selected.value?.id)) selected.value = items[0] || null })
 async function loadEvaluations() {
   loading.value = true
   try {
     const data = await getEvaluations()
     unavailable.value = data.source === 'empty'
     evaluations.value = Array.isArray(data.evaluations) ? data.evaluations : []
-  } finally { loading.value = false }
+  } catch (error) { unavailable.value = true } finally { loading.value = false }
 }
 onMounted(loadEvaluations)
 </script>
+
+<style scoped>
+.ev-page { gap: 22px; }
+.board-toolbar .button { margin-left: 0; gap: 6px; min-height: 36px; padding: 6px 12px; font-size: 13px; }
+.ev-layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 0; align-items: start; }
+.feed { list-style: none; margin: 0; padding: 8px; display: grid; gap: 4px; max-height: calc(100vh - 140px); overflow-y: auto; border-right: 1px solid var(--line); position: sticky; top: 64px; }
+.feed-item { display: grid; gap: 6px; width: 100%; padding: 11px 12px; border: 1px solid transparent; border-radius: 9px; background: transparent; text-align: left; color: var(--ink); }
+.feed-item:hover { background: var(--raised); }
+.feed-item.on { background: var(--raised); border-color: var(--accent-line); box-shadow: inset 3px 0 0 var(--accent); }
+.feed-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.feed-top time { font: 500 11.5px/1.4 var(--mono); color: var(--muted); }
+.feed-item b { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font: 600 14px/1.35 var(--sans); }
+.feed-item small { font: 400 11.5px/1.4 var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.feed-item small i { font-style: normal; color: var(--ink-4); }
+.review { display: grid; gap: 16px; padding: 18px; min-width: 0; }
+@media (max-width: 980px) { .ev-layout { grid-template-columns: minmax(0, 1fr); } .feed { position: static; max-height: 300px; border-right: 0; border-bottom: 1px solid var(--line); } }
+</style>

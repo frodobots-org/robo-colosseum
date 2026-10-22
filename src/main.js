@@ -9,6 +9,7 @@ import SubmitPolicy from './pages/SubmitPolicy.vue'
 import JoinEvaluator from './pages/JoinEvaluator.vue'
 import './styles/base.css'
 import './styles/arena.css'
+import './styles/boards.css'
 
 const routes = [
   { path: '/', component: Home },
