@@ -15,7 +15,7 @@ appLinks()
 $('#hero-actions').innerHTML = `<a class="button primary" href="${DATASET.href}">${DATASET.label}</a><a class="button" href="#leaderboards">See the leaderboards</a>`
 $('#partner-logos').innerHTML = partners()
 $('#brand-mark').src = `${ROOT}brand/rc-mark-white.svg`
-$('#footer').innerHTML = `<div><a class="brand" href="#top"><img src="${ROOT}brand/rc-lockup-white.svg" alt="RoboColosseum" height="40"></a><p class="prov">Every figure on this page is read live from the RoboColosseum API when you open it. Co-organized by Hugging Face, BitRobot and the Embodied AI Centre, Singapore.</p></div>${footerLinks()}`
+$('#footer').innerHTML = `<div><a class="brand" href="#top"><img src="${ROOT}brand/rc-lockup-white.svg" alt="RoboColosseum" height="40"></a><p class="prov">Every figure on this page is read live from the RoboColosseum API when you open it. Co-organized by Hugging Face, BitRobot, the Embodied AI Centre (Singapore) and MAGIC Lab (NUS).</p></div>${footerLinks()}`
 
 // The film: the caption follows the cut list that ships with it.
 const film = $('#film'), caption = $('#caption'), progress = $('#progress')
