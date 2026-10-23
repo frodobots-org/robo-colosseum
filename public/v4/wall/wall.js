@@ -12,7 +12,7 @@ const THEME = {
 appLinks()
 $('#hero-actions').innerHTML = `<a class="button primary" href="${DATASET.href}">${DATASET.label}</a><a class="button" href="#leaderboards">See the leaderboards</a>`
 $('#partner-logos').innerHTML = partners()
-$('#footer').innerHTML = `<div><a class="brand" href="#top"><span class="brand-mark"><i></i><i></i><i></i><i></i></span><strong>RoboColosseum</strong></a><p class="prov">Every figure on this page is read live from the RoboColosseum API when you open it. Co-organized by Hugging Face, BitRobot and the Embodied AI Centre, Singapore.</p></div>${footerLinks()}`
+$('#footer').innerHTML = `<div><a class="brand" href="#top"><span class="brand-mark"><i></i><i></i><i></i><i></i></span><strong>RoboColosseum</strong></a><p class="prov">Every figure on this page is read live from the RoboColosseum API when you open it. Co-organized by Hugging Face, BitRobot, the Embodied AI Centre (Singapore) and MAGIC Lab (NUS).</p></div>${footerLinks()}`
 
 // Labels for the twelve tiles come with the video (../video/wall.json: [{body, place}] in reading order).
 fetch('../video/wall.json').then(r => r.ok ? r.json() : []).then(tiles => {

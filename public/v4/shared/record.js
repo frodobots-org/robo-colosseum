@@ -109,13 +109,14 @@ export function boot(roots, theme, onChange) {
   return parts
 }
 
-// Partner logos, the same three everywhere.
+// Partner logos, the same four everywhere.
 export const partners = () => `<a class="hf" href="https://huggingface.co/"><img src="${ASSETS}huggingface-logo.svg" alt=""><b>Hugging Face</b></a>
   <a class="br" href="https://bitrobot.ai/"><img src="${ASSETS}bitrobot-logo.webp" alt="BitRobot"></a>
-  <a class="eaic" href="https://nrp.gov.sg/"><b>EAIC</b><span>Embodied AI Centre<br>Singapore</span></a>`
+  <a class="eaic" href="https://nrp.gov.sg/"><b>EAIC</b><span>Embodied AI Centre<br>Singapore</span></a>
+  <a class="magic" href="https://magiclab-nus.github.io/"><img src="${ASSETS}magic-lab-logo.webp" alt="MAGIC Lab, NUS"></a>`
 
 export const footerLinks = () => `<div><h5>The benchmark</h5><ul><li><a href="#leaderboards">Leaderboards</a></li><li><a href="${appLink('/evals')}">Evaluation viewer</a></li><li><a href="${appLink('/tasks')}">Tasks and criteria</a></li><li><a href="${DATASET.href}">The dataset</a></li></ul></div>
   <div><h5>Take part</h5><ul><li><a href="${appLink('/submit')}">Submit a policy</a></li><li><a href="${appLink('/join')}">Join as an evaluator</a></li><li><a href="#bodies">Bring a robot</a></li></ul></div>
-  <div><h5>Partners</h5><ul><li><a href="https://huggingface.co/">Hugging Face</a></li><li><a href="https://bitrobot.ai/">BitRobot</a></li><li><a href="https://nrp.gov.sg/">Embodied AI Centre</a></li><li><a href="https://github.com/frodobots-org/robo-colosseum">GitHub</a></li></ul></div>`
+  <div><h5>Partners</h5><ul><li><a href="https://huggingface.co/">Hugging Face</a></li><li><a href="https://bitrobot.ai/">BitRobot</a></li><li><a href="https://nrp.gov.sg/">Embodied AI Centre</a></li><li><a href="https://magiclab-nus.github.io/">MAGIC Lab, NUS</a></li><li><a href="https://github.com/frodobots-org/robo-colosseum">GitHub</a></li></ul></div>`
 
 export function appLinks() { document.querySelectorAll('[data-app]').forEach(a => { a.href = appLink(a.dataset.app) }) }

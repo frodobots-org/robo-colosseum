@@ -12,7 +12,7 @@ const THEME = {
 appLinks()
 $('#hero-actions').innerHTML = `<a class="button primary" href="${DATASET.href}">${DATASET.label}</a><a class="button" href="#leaderboards">See the leaderboards</a>`
 $('#partner-logos').innerHTML = partners()
-$('#footer').innerHTML = `<div><a class="brand" href="#top">RoboColosseum</a><p class="prov">Every figure on this page is read live from the RoboColosseum API when you open it. Co-organized by Hugging Face, BitRobot and the Embodied AI Centre, Singapore.</p></div>${footerLinks()}`
+$('#footer').innerHTML = `<div><a class="brand" href="#top">RoboColosseum</a><p class="prov">Every figure on this page is read live from the RoboColosseum API when you open it. Co-organized by Hugging Face, BitRobot, the Embodied AI Centre (Singapore) and MAGIC Lab (NUS).</p></div>${footerLinks()}`
 
 // What is playing inside the letters right now (../video/cues.json: [{t, body, place, site, date}]).
 const film = $('#film'), now = $('#now')
