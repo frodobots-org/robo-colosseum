@@ -5,7 +5,7 @@ Vue frontend for robot policy evaluation results and leaderboards.
 - Netlify website: https://robocolosseum.netlify.app/
 - Custom domain: https://robocolosseum.ai/ (DNS cutover pending)
 - Previous website: https://frodobots-org.github.io/robo-colosseum/
-- Backend API: https://191.222.219.43/api
+- Backend API: https://robocolosseum-api.onrender.com/api
 - Backend repository: https://github.com/frodobots-org/colosseum-router
 
 The frontend is hosted in the **FrodoBots Pro** Netlify team. Netlify proxies
@@ -19,7 +19,7 @@ Requires Node.js 22 and npm.
 
 ```bash
 npm ci
-VITE_DEV_API_PROXY_TARGET=https://191.222.219.43 npm run dev
+VITE_DEV_API_PROXY_TARGET=https://robocolosseum-api.onrender.com npm run dev
 ```
 
 Vite serves the site on port 5174 and proxies `/api` requests to the Router. For a
@@ -32,7 +32,7 @@ are versioned in `netlify.toml`:
 
 - Build command: `npm run build`; publish directory: `dist`; Node.js: 22.
 - `VITE_BASE_PATH=/` and `VITE_API_BASE=/api`.
-- `/api/*` is proxied to `https://191.222.219.43/api/:splat` before the app fallback.
+- `/api/*` is proxied to `https://robocolosseum-api.onrender.com/api/:splat` before the app fallback.
 - Other application routes serve `index.html` with HTTP 200, so direct links and
   refreshes work with Vue Router.
 
