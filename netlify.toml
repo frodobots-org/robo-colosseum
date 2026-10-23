@@ -7,11 +7,10 @@
   VITE_BASE_PATH = "/"
   VITE_API_BASE = "/api"
 
-# Keep API requests on the frontend origin while using the existing production router.
-# Change this destination when the backend migration is ready.
+# Keep API requests on the frontend origin and forward them straight to the Router on Render.
 [[redirects]]
   from = "/api/*"
-  to = "https://191.222.219.43/api/:splat"
+  to = "https://robocolosseum-api.onrender.com/api/:splat"
   status = 200
   force = true
 
