@@ -91,7 +91,7 @@ const outcome = trial => trial.state === 'aborted' ? 'aborted' : trial.success =
 const outcomeLabel = trial => ({ success: 'Success', failure: 'Failure', aborted: 'Interrupted', unscored: 'Not scored' })[outcome(trial)]
 const percent = value => value === null || value === undefined ? 'Not scored' : `${Math.round(value * 100)}%`
 const taskLabel = value => String(value || '').replaceAll('_', ' ')
-const cameraLabel = camera => (props.robotId === 'so101' ? { head_image: 'Front', left_image: 'Wrist' } : { head_image: 'Head / overview', left_image: 'Left camera', right_image: 'Right camera' })[camera] || camera
+const cameraLabel = camera => (props.robotId === 'so101' ? { head_image: 'Front', left_image: 'Wrist' } : { head_image: 'Head / overview', left_image: 'Left camera', right_image: 'Right camera', front_image: 'Front', rear_image: 'Rear' })[camera] || camera
 function registeredModelName(dataset) {
   return policyName(importedEpisodes.value.find(e => e.datasetId === dataset.id && e.evaluation_link)?.evaluation_link.policy_id || dataset.model.name)
 }
