@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getImportedDataset, getImportedEpisode } from '../api.js'
 import { policyName } from '../display.js'
+import { embodiments } from '../arena.js'
 import Icon from './Icon.vue'
 import { labFor } from '../labs.js'
 
@@ -20,7 +21,7 @@ const episodes = computed(() => [...(dataset.value?.episodes || [])].sort((a, b)
 const selected = computed(() => episodes.value.find(e => e.episode_index === selectedIndex.value))
 const duration = computed(() => selected.value ? selected.value.length / dataset.value.summary.fps : 0)
 const playable = computed(() => !replayLoading.value && replay.value && Object.keys(replay.value.videos).length > 0 && Object.keys(replay.value.videos).every(c => ready.value[c]) && !replayError.value)
-const cameraLabels = computed(() => props.robotId === 'so101' ? { head_image: 'Front', left_image: 'Wrist', right_image: 'Right camera' } : { head_image: 'Head / overview', left_image: 'Left camera', right_image: 'Right camera' })
+const cameraLabels = computed(() => props.robotId === 'so101' ? { head_image: 'Front', left_image: 'Wrist', right_image: 'Right camera' } : { head_image: 'Head / overview', left_image: 'Left camera', right_image: 'Right camera', front_image: 'Front', rear_image: 'Rear' })
 const clock = v => `${Math.floor(v / 60)}:${String(Math.floor(v % 60)).padStart(2, '0')}`
 const epLabel = e => `Episode ${e.source_result?.run ?? e.episode_index + 1}`
 const modelLabel = computed(() => policyName(props.modelName || dataset.value?.model?.name))
@@ -112,7 +113,7 @@ onBeforeUnmount(() => { datasetRequest?.abort(); replayRequest?.abort(); playbac
     <p v-else-if="!dataset" class="state" role="status"><span class="skel" style="min-width:24ch">&nbsp;</span></p>
     <article v-else-if="selected" class="trial-card" aria-live="polite">
       <header class="tc-head">
-        <span class="tc-meta"><b>{{ robotId === 'so101' ? 'SO-ARM101' : robotId }}</b> · fine-tuning · imported dataset</span>
+        <span class="tc-meta"><b>{{ embodiments.find(e => e.id === robotId)?.name || robotId }}</b> · fine-tuning · imported dataset</span>
         <span class="tc-meta right"><time>{{ selected.source_result?.saved_at || 'Recording time unavailable' }}</time></span>
       </header>
       <div class="tc-who"><span class="lab-tile" :class="{ contain: lab.fit === 'contain' }" :style="{ background: lab.bg || '' }"><img v-if="lab.logo" :src="lab.logo" :alt="lab.name" @error="e => e.target.remove()"><template v-else>{{ lab.mono }}</template></span><div><h2>{{ modelLabel }}</h2><small>{{ lab.name }} · {{ episodes.length }} episodes</small></div></div>
