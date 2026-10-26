@@ -13,7 +13,7 @@
         <div class="chips" role="group" aria-label="Outcome">
           <button v-for="opt in outcomeOptions" :key="opt.id" type="button" :class="{ on: outcomeFilter === opt.id }" @click="outcomeFilter = opt.id">{{ opt.label }}</button>
         </div>
-        <span class="count">{{ filtered.length }} of {{ entries.length }} shown{{ limit && trials.length >= limit ? ` · latest ${limit}` : '' }}</span>
+        <span class="count">{{ filtered.length }} of {{ entries.length }} shown</span>
         <button class="button secondary" type="button" @click="loadTrials"><Icon name="pulse" /> Refresh</button>
       </div>
       <p v-if="error" class="state"><b>{{ error }}</b></p>
@@ -77,7 +77,7 @@ import Icon from './Icon.vue'
 import { labFor, fmt, pct } from '../labs.js'
 import { getFineTuningReviews, getFineTuningVideoUrls, getImportedDatasets, getImportedDataset } from '../api.js'
 const props = defineProps({ robotId: { type: String, required: true }, robotName: String })
-const loading = ref(false), error = ref(''), trials = ref([]), limit = ref(500)
+const loading = ref(false), error = ref(''), trials = ref([])
 const importedEpisodes = ref([])
 const datasets = ref([]), datasetError = ref(''), datasetTotal = ref(0)
 const route = useRoute(), router = useRouter()
@@ -139,7 +139,7 @@ async function loadTrials() {
   try {
     const [reviews, imports] = await Promise.allSettled([getFineTuningReviews(props.robotId, request.signal), getImportedDatasets(props.robotId, request.signal)])
     if (request.signal.aborted) return false
-    if (reviews.status === 'fulfilled') { trials.value = (reviews.value.trials || []).filter(trial => trial.state === 'completed'); limit.value = reviews.value.limit || 500 }
+    if (reviews.status === 'fulfilled') { trials.value = (reviews.value.trials || []).filter(trial => trial.state === 'completed') }
     else { trials.value = []; datasetError.value = reviews.reason.message }
     if (imports.status === 'fulfilled') {
       const episodes = await expandDatasets(imports.value.datasets, request.signal)
