@@ -7,20 +7,10 @@
         <em>{{ partialSuccessLabel(evaluation.partialSuccessA ?? evaluation.partialSuccess) }} progress</em>
       </div>
       <div class="video-package-grid">
-        <div class="review-camera review-camera-top">
-          <EpisodeVideo v-if="videoSrc('a', 'top')" :key="JSON.stringify(videoSrc('a', 'top'))" :source="videoSrc('a', 'top')" />
+        <div v-for="(camera, index) in cameras" :key="camera" :class="['review-camera', { 'review-camera-top': index === 0 }]">
+          <EpisodeVideo v-if="videoSrc('a', camera)" :key="JSON.stringify(videoSrc('a', camera))" :source="videoSrc('a', camera)" />
           <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Top</span>
-        </div>
-        <div class="review-camera">
-          <EpisodeVideo v-if="videoSrc('a', 'left_wrist')" :key="JSON.stringify(videoSrc('a', 'left_wrist'))" :source="videoSrc('a', 'left_wrist')" />
-          <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Left wrist</span>
-        </div>
-        <div class="review-camera">
-          <EpisodeVideo v-if="videoSrc('a', 'right_wrist')" :key="JSON.stringify(videoSrc('a', 'right_wrist'))" :source="videoSrc('a', 'right_wrist')" />
-          <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Right wrist</span>
+          <span class="video-caption">{{ cameraLabel(camera) }}</span>
         </div>
       </div>
     </div>
@@ -32,20 +22,10 @@
         <em>{{ partialSuccessLabel(evaluation.partialSuccessB ?? evaluation.partialSuccess) }} progress</em>
       </div>
       <div class="video-package-grid">
-        <div class="review-camera review-camera-top">
-          <EpisodeVideo v-if="videoSrc('b', 'top')" :key="JSON.stringify(videoSrc('b', 'top'))" :source="videoSrc('b', 'top')" />
+        <div v-for="(camera, index) in cameras" :key="camera" :class="['review-camera', { 'review-camera-top': index === 0 }]">
+          <EpisodeVideo v-if="videoSrc('b', camera)" :key="JSON.stringify(videoSrc('b', camera))" :source="videoSrc('b', camera)" />
           <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Top</span>
-        </div>
-        <div class="review-camera">
-          <EpisodeVideo v-if="videoSrc('b', 'left_wrist')" :key="JSON.stringify(videoSrc('b', 'left_wrist'))" :source="videoSrc('b', 'left_wrist')" />
-          <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Left wrist</span>
-        </div>
-        <div class="review-camera">
-          <EpisodeVideo v-if="videoSrc('b', 'right_wrist')" :key="JSON.stringify(videoSrc('b', 'right_wrist'))" :source="videoSrc('b', 'right_wrist')" />
-          <div v-else class="review-video-placeholder">No video</div>
-          <span class="video-caption">Right wrist</span>
+          <span class="video-caption">{{ cameraLabel(camera) }}</span>
         </div>
       </div>
     </div>
@@ -53,7 +33,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import EpisodeVideo from './EpisodeVideo.vue'
 import { policyName } from '../display.js'
 import { getEvaluationVideos } from '../api.js'
@@ -79,8 +59,23 @@ async function loadVideos() {
   if (version === requestVersion) videos.value = data.videos || {}
 }
 
+const aliases = { top: 'head_image', left_wrist: 'left_image', right_wrist: 'right_image' }
+const labels = { top: 'Top', left_wrist: 'Left wrist', right_wrist: 'Right wrist', front_image: 'Front', rear_image: 'Rear' }
+const armCameras = ['top', 'left_wrist', 'right_wrist']
+const roverCameras = ['front_image', 'rear_image']
+
+// Arms always show the three fixed slots; mobile rovers show the cameras they recorded.
+const cameras = computed(() => {
+  const available = new Set([...Object.keys(videos.value.a || {}), ...Object.keys(videos.value.b || {})])
+  const rover = roverCameras.filter(camera => available.has(camera))
+  return rover.length ? rover : armCameras
+})
+
+function cameraLabel(camera) {
+  return labels[camera] || camera
+}
+
 function videoSrc(policySide, camera) {
-  const aliases = { top: 'head_image', left_wrist: 'left_image', right_wrist: 'right_image' }
   return videos.value[policySide]?.[camera] || videos.value[policySide]?.[aliases[camera]] || ''
 }
 
