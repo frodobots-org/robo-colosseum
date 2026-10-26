@@ -112,7 +112,7 @@ function proof() {
   const ev = evaluations()
   if (!ev?.length) return
   const latest = ev.reduce((m, e) => (e.date > m ? e.date : m), '')
-  $('#proof').innerHTML = `Top five per robot. Rankings update as each evaluation is finished; the last one came in ${esc(ago(latest))}.`
+  $('#proof').innerHTML = `Who leads on each robot right now. Top five per robot, updated as each evaluation finishes; the last one came in ${esc(ago(latest))}.`
 }
 
 // Scale on several axes at once. A figure that cannot be counted yet stays a placeholder rather than showing a partial total.
