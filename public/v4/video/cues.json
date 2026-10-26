@@ -1,0 +1,140 @@
+[
+{
+"body": "Humanoid",
+"place": "A kitchen table",
+"date": "9 Oct 2026",
+"t": 0.0
+},
+{
+"body": "Humanoid",
+"place": "A bathroom",
+"date": "16 Oct 2026",
+"t": 2.4
+},
+{
+"body": "Humanoid",
+"place": "An entrance hall",
+"date": "28 Sep 2026",
+"t": 4.4
+},
+{
+"body": "Humanoid",
+"place": "A living room",
+"date": "10 Oct 2026",
+"t": 6.4
+},
+{
+"body": "Humanoid",
+"place": "A kitchen, pouring",
+"date": "2 Oct 2026",
+"t": 8.6
+},
+{
+"body": "Humanoid",
+"place": "A hallway, hanging laundry",
+"date": "9 Oct 2026",
+"t": 11.0
+},
+{
+"body": "Humanoid",
+"place": "A luggage corner",
+"date": "16 Oct 2026",
+"t": 13.2
+},
+{
+"body": "Humanoid",
+"place": "A kitchen island",
+"date": "19 Sep 2026",
+"t": 15.2
+},
+{
+"body": "Humanoid",
+"place": "A bedroom",
+"date": "8 Oct 2026",
+"t": 17.4
+},
+{
+"body": "Humanoid",
+"place": "Three rooms, three tasks",
+"date": "Oct 2026",
+"t": 19.4
+},
+{
+"body": "Humanoid",
+"place": "A clothes rack",
+"date": "16 Oct 2026",
+"t": 22.0
+},
+{
+"body": "Humanoid",
+"place": "A bedroom, sweeping",
+"date": "8 Oct 2026",
+"t": 24.0
+},
+{
+"body": "Humanoid",
+"place": "A sofa, laundry basket",
+"date": "16 Oct 2026",
+"t": 26.2
+},
+{
+"body": "Humanoid",
+"place": "An oven",
+"date": "19 Sep 2026",
+"t": 28.2
+},
+{
+"body": "Franka, Bimanual YAM, SO-ARM101, a humanoid",
+"place": "Four bodies, one protocol",
+"date": "Sep\u2013Oct 2026",
+"t": 30.4
+},
+{
+"body": "Humanoid",
+"place": "A sofa",
+"date": "28 Sep 2026",
+"t": 33.4
+},
+{
+"body": "Humanoid",
+"place": "A cluttered table",
+"date": "3 Oct 2026",
+"t": 35.4
+},
+{
+"body": "Humanoid",
+"place": "A table, spray bottles",
+"date": "9 Oct 2026",
+"t": 37.4
+},
+{
+"body": "Humanoid",
+"place": "By a window",
+"date": "28 Sep 2026",
+"t": 39.6
+},
+{
+"body": "Humanoid",
+"place": "A kitchen table",
+"date": "9 Oct 2026",
+"t": 41.6
+},
+{
+"body": "Humanoid",
+"place": "A kitchen table, wiping",
+"date": "19 Sep 2026",
+"t": 43.8
+},
+{
+"body": "Humanoid",
+"place": "A desk",
+"date": "16 Oct 2026",
+"t": 45.8
+},
+{
+"body": "Humanoid",
+"place": "A laundry basket",
+"date": "8 Oct 2026",
+"t": 47.8
+}
+]

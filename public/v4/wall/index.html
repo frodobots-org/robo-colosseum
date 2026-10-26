@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>RoboColosseum · The wall</title>
+<meta name="description" content="Robot policies tested in the wild: twelve real evaluations playing at once, every body, at scale. Live results.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23101214'/%3E%3Crect x='6' y='6' width='9' height='9' fill='%23ffb224'/%3E%3Crect x='17' y='6' width='9' height='9' fill='%23ffb224' opacity='.5'/%3E%3Crect x='6' y='17' width='9' height='9' fill='%23ffb224' opacity='.5'/%3E%3Crect x='17' y='17' width='9' height='9' fill='%23ffb224'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../shared/modules.css">
+<link rel="stylesheet" href="./wall.css">
+<link rel="modulepreload" href="../../landing/live.js">
+<script type="module" src="./wall.js"></script>
+</head>
+<body>
+<header class="top" id="top">
+  <a class="brand" href="#top"><span class="brand-mark"><i></i><i></i><i></i><i></i></span><strong>RoboColosseum</strong></a>
+  <nav class="top-links" aria-label="Sections"><a href="#wild">In the wild</a><a href="#bodies">Bodies</a><a href="#scale">Scale</a><a href="#leaderboards">Leaderboards</a><a href="#trials">Trials</a><a class="ext" data-app="/evals" href="/evals">Viewer</a></nav>
+  <span class="live" id="live"><i></i>Live data</span>
+</header>
+<main>
+
+  <section class="hero" id="wild" aria-label="Twelve evaluations, recorded in the wild">
+    <div class="wall">
+      <video id="wall-video" muted loop playsinline autoplay preload="metadata" poster="../video/wall.jpg"><source src="../video/wall.mp4" type="video/mp4"></video>
+      <div class="wall-labels" id="wall-labels"></div>
+    </div>
+    <div class="hero-text">
+      <h1>Tested in the wild.</h1>
+      <p>Real rooms. Real robots. Independent judges. Every verdict on this page is live.</p>
+      <div class="actions" id="hero-actions"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="bodies">
+    <div class="sec-head"><h2>Every body.</h2><p>One protocol on arms, bimanual rigs, a humanoid and a sidewalk rover. Compared within each body, never pooled across them.</p></div>
+    <div class="bodies" id="bodies-row"></div>
+  </section>
+
+  <section class="sec" id="scale">
+    <div class="sec-head"><h2>Not a demo reel. A record.</h2><p>Scale on every axis that matters, and where each evaluation happened.</p></div>
+    <dl class="axes" id="axes"></dl>
+    <div class="sphere" id="sphere"></div>
+  </section>
+
+  <section class="partners" id="partners"><span>Co-organized by</span><div id="partner-logos"></div></section>
+
+  <section class="sec board" id="leaderboards">
+    <div class="sec-head"><h2>Leaderboards.</h2><p id="lb-desc"></p><div class="switches" id="lb-switches"></div><p class="lb-note" id="lb-note"></p></div>
+    <div class="figure" id="lb-figure"></div>
+    <div class="rows" id="lb-rows"></div>
+  </section>
+
+  <section class="sec" id="pairs">
+    <div class="sec-head"><h2>Same scene. Two policies.</h2><p>Both rollouts, the instruction, the evaluator's blind verdict and their written note, straight from the record.</p></div>
+    <div class="pair" id="pair"></div>
+  </section>
+
+  <section class="sec" id="trials">
+    <div class="sec-head"><h2>Every trial.</h2><p>Each square is one scored trial of a checkpoint adapted to one task: full success, partial progress, or none.</p><div class="legend" id="trials-legend"></div></div>
+    <div id="trials-content"></div>
+  </section>
+
+  <section class="sec" id="tracks">
+    <div class="sec-head"><h2>Two tracks. Two questions.</h2><p>Capability and adaptation are measured separately, so nobody can hide behind an average.</p></div>
+    <div class="tracks">
+      <article class="track open"><span class="glyph">A/B</span><h3>Open track</h3><p class="q">Does the policy generalize?</p><ol><li>Two policies run the same evaluator-written instruction on the same robot, in the same room.</li><li>The evaluator reviews both rollouts blind and records a preference and each rollout's progress.</li><li>Ratings are fitted per embodiment, with uncertainty shown.</li></ol></article>
+      <article class="track fine"><span class="glyph">✓/4</span><h3>Fine-tuning</h3><p class="q">Does the policy learn a task?</p><ol><li>A checkpoint is adapted to one defined task with about 100 demonstrations.</li><li>Up to 25 repeated trials are scored against written criteria on a 0–4 scale.</li><li>Full success and partial progress are reported separately.</li></ol></article>
+    </div>
+  </section>
+
+  <section class="join" id="join">
+    <h2>Bring your policy.<br>Or bring your robot.</h2>
+    <div class="actions"><a class="button light" data-app="/submit" href="/submit">Submit a policy</a><a class="button ghost" data-app="/join" href="/join">Join as an evaluator</a></div>
+  </section>
+
+</main>
+<footer class="foot" id="footer"></footer>
+</body>
+</html>

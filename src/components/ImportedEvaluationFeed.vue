@@ -3,6 +3,8 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getImportedDataset, getImportedEpisode } from '../api.js'
 import { policyName } from '../display.js'
+import Icon from './Icon.vue'
+import { labFor } from '../labs.js'
 
 const props = defineProps({ robotId: { type: String, required: true }, datasetId: { type: String, required: true }, episodeIndex: { type: Number, default: null }, modelName: { type: String, default: '' } })
 const route = useRoute(), router = useRouter()
@@ -21,6 +23,10 @@ const playable = computed(() => !replayLoading.value && replay.value && Object.k
 const cameraLabels = computed(() => props.robotId === 'so101' ? { head_image: 'Front', left_image: 'Wrist', right_image: 'Right camera' } : { head_image: 'Head / overview', left_image: 'Left camera', right_image: 'Right camera' })
 const clock = v => `${Math.floor(v / 60)}:${String(Math.floor(v % 60)).padStart(2, '0')}`
 const epLabel = e => `Episode ${e.source_result?.run ?? e.episode_index + 1}`
+const modelLabel = computed(() => policyName(props.modelName || dataset.value?.model?.name))
+const lab = computed(() => labFor(modelLabel.value) || { name: 'Independent', mono: modelLabel.value.slice(0, 2).toUpperCase() })
+const outcomeClass = e => e.success == null ? '' : e.success ? 'success' : 'failure'
+const scorePct = e => e.score == null || !e.score_max ? 0 : Math.round(e.score / e.score_max * 100)
 function stop() { cancelAnimationFrame(animationFrame); for (const video of videos.values()) video.pause(); playing.value = false }
 function remember(camera, element) { if (element) videos.set(camera, element); else videos.delete(camera) }
 function seek(value) {
@@ -102,47 +108,74 @@ onBeforeUnmount(() => { datasetRequest?.abort(); replayRequest?.abort(); playbac
 
 <template>
   <section class="imported-review">
-    <p v-if="error" class="review-error" role="alert">{{ error }} <button @click="loadDataset">Try again</button></p>
-    <p v-else-if="!dataset" role="status">Loading evaluations…</p>
-    <template v-else>
-      <div class="review-detail">
-        <article v-if="selected" class="trial-card">
-          <div class="trial-title"><span class="eyebrow">SO101 · Fine-tuning</span></div>
-          <div class="trial-overview">
-            <div class="trial-info"><h2 class="model-name">{{ policyName(modelName || dataset.model.name) }}</h2></div>
-          </div>
-          <p class="task-label">{{ dataset.task.instruction.replaceAll('_', ' ') }}</p>
-          <div class="episode-controls">
-            <label class="episode-select">Episode<select v-model="selectedIndex" aria-label="Select episode"><option v-for="ep in episodes" :key="ep.episode_index" :value="ep.episode_index">{{ epLabel(ep) }}</option></select></label>
-          </div>
-          <div class="episode-summary" aria-label="Episode result">
-            <div class="episode-details"><span :class="['outcome-tag', selected.success == null ? 'unscored' : selected.success ? 'success' : 'failure']">{{ outcome(selected) }}</span><time class="micro">{{ selected.source_result?.saved_at || 'Recording time unavailable' }}</time></div>
-            <div class="episode-score"><span>Score</span><strong>{{ selected.score ?? '—' }} / {{ selected.score_max }}</strong></div>
-          </div>
-          <p v-if="selected.feedback" class="micro">{{ selected.feedback }}</p>
-          <section class="video-section" aria-label="Videos">
-            <h3>Review</h3><p class="video-status" role="status">{{ replayLoading ? 'Loading episode…' : ' ' }}</p>
-            <p v-if="replayError" class="review-error" role="alert">{{ replayError }} <button @click="loadReplay">Reload videos</button></p>
-            <template v-if="replay">
-              <div :class="['trial-videos', { 'is-loading': replayLoading }]" :aria-busy="replayLoading"><figure v-for="(segment, camera) in replay.videos" :key="`${datasetId}-${replay.episode_index}-${camera}`"><video :ref="el => remember(camera, el)" :src="segment.url" muted playsinline preload="auto" :aria-label="cameraLabels[camera] || camera" @loadedmetadata="loaded(camera, $event, segment)" @timeupdate="tick(camera)" @ended="stop" @error="!replayLoading && replay?.videos[camera] === segment && videos.get(camera) === $event.currentTarget && failed()"></video><figcaption>{{ cameraLabels[camera] || camera }}</figcaption></figure></div>
-              <div class="player-controls"><button class="play" :disabled="!playable" :aria-label="playing ? 'Pause playback' : 'Play playback'" @click="playing ? stop() : play()">{{ playing ? 'Ⅱ' : '▶' }}</button><span>{{ clock(position) }} <small>/ {{ clock(duration) }}</small></span><input type="range" min="0" :max="duration" step="0.01" :value="position" :disabled="!playable" aria-label="Playback time" @input="seek($event.target.value)"><select v-model="speed" aria-label="Playback speed"><option value="0.5">0.5×</option><option value="1">1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></div>
-              <p class="micro playback-note">{{ selected.length.toLocaleString() }} frames · {{ replay.fps }} fps · Front + Wrist</p>
-            </template>
-          </section>
-        </article>
+    <p v-if="error" class="tc-error" role="alert">{{ error }} <button class="button secondary" type="button" @click="loadDataset">Try again</button></p>
+    <p v-else-if="!dataset" class="state" role="status"><span class="skel" style="min-width:24ch">&nbsp;</span></p>
+    <article v-else-if="selected" class="trial-card" aria-live="polite">
+      <header class="tc-head">
+        <span class="tc-meta"><b>{{ robotId === 'so101' ? 'SO-ARM101' : robotId }}</b> · fine-tuning · imported dataset</span>
+        <span class="tc-meta right"><time>{{ selected.source_result?.saved_at || 'Recording time unavailable' }}</time></span>
+      </header>
+      <div class="tc-who"><span class="lab-tile" :class="{ contain: lab.fit === 'contain' }" :style="{ background: lab.bg || '' }"><img v-if="lab.logo" :src="lab.logo" :alt="lab.name" @error="e => e.target.remove()"><template v-else>{{ lab.mono }}</template></span><div><h2>{{ modelLabel }}</h2><small>{{ lab.name }} · {{ episodes.length }} episodes</small></div></div>
+      <blockquote class="tc-task">“{{ dataset.task.instruction.replaceAll('_', ' ') }}”</blockquote>
+      <div class="tc-result">
+        <div class="tc-outcome"><span :class="['verdict big', outcomeClass(selected)]">{{ outcome(selected) }}</span></div>
+        <div class="tc-score"><span>Score</span><b>{{ selected.score ?? '—' }} / {{ selected.score_max }}</b><span class="prog"><i :class="outcomeClass(selected)" :style="{ width: scorePct(selected) + '%' }"></i></span></div>
+        <label class="tc-episode"><span>Episode</span><select v-model="selectedIndex" aria-label="Select episode"><option v-for="ep in episodes" :key="ep.episode_index" :value="ep.episode_index">{{ epLabel(ep) }}</option></select></label>
       </div>
-    </template>
+      <div v-if="selected.feedback" class="tc-note"><span>Evaluator's note</span><p>{{ selected.feedback }}</p></div>
+      <section class="tc-videos" aria-label="Videos">
+        <p v-if="replayError" class="tc-error" role="alert">{{ replayError }} <button class="button secondary" type="button" @click="loadReplay">Reload videos</button></p>
+        <template v-if="replay">
+          <div :class="['trial-videos', { 'is-loading': replayLoading }]" :aria-busy="replayLoading"><figure v-for="(segment, camera) in replay.videos" :key="`${datasetId}-${replay.episode_index}-${camera}`" class="review-camera"><video :ref="el => remember(camera, el)" :src="segment.url" muted playsinline preload="auto" :aria-label="cameraLabels[camera] || camera" @loadedmetadata="loaded(camera, $event, segment)" @timeupdate="tick(camera)" @ended="stop" @error="!replayLoading && replay?.videos[camera] === segment && videos.get(camera) === $event.currentTarget && failed()"></video><figcaption class="video-caption">{{ cameraLabels[camera] || camera }}</figcaption></figure></div>
+          <div class="player-controls"><button class="play" type="button" :disabled="!playable" :aria-label="playing ? 'Pause playback' : 'Play playback'" @click="playing ? stop() : play()"><Icon :name="playing ? 'pause' : 'play'" /></button><span>{{ clock(position) }} <small>/ {{ clock(duration) }}</small></span><input type="range" min="0" :max="duration" step="0.01" :value="position" :disabled="!playable" aria-label="Playback time" @input="seek($event.target.value)"><select v-model="speed" aria-label="Playback speed"><option value="0.5">0.5×</option><option value="1">1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></div>
+          <p class="playback-note">{{ replayLoading ? 'Loading episode…' : `${selected.length.toLocaleString()} frames · ${replay.fps} fps · ${Object.keys(replay.videos).map(c => cameraLabels[c] || c).join(' + ')}` }}</p>
+        </template>
+        <p v-else-if="replayLoading" class="playback-note">Loading episode…</p>
+      </section>
+    </article>
   </section>
 </template>
 <style scoped>
-.video-status{min-height:20px;margin:8px 0 0;font-size:13px;color:var(--muted)}.trial-videos.is-loading{opacity:.45;pointer-events:none}
-.episode-summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 0 18px}.episode-details{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.episode-score{display:grid;gap:4px;flex-shrink:0}.episode-score>span{font-size:13px;color:var(--muted)}.episode-score strong{font-size:24px;font-weight:500}.trial-overview{margin-bottom:8px!important}.episode-controls{border-bottom:0!important;padding-bottom:0!important;margin-bottom:18px!important}@media(max-width:600px){.episode-details{align-items:flex-start;flex-direction:column;gap:8px}}
-
-.episode-select select:disabled{opacity:1;cursor:default;color:var(--ink);-webkit-text-fill-color:var(--ink)}.imported-review{min-width:0}.model-name{text-align:left;overflow-wrap:anywhere}.task-label{margin:0 0 10px;color:var(--muted);font-size:14px}.episode-controls{margin-top:0!important;padding-bottom:18px;border-bottom:1px solid var(--line)}
-.review-panel{padding:0;border:0;background:transparent;min-width:0}.trial-card{padding:22px;border:1px solid var(--line);border-radius:10px;background:#fff;min-width:0}.trial-title,.episode-heading{display:flex;align-items:center;justify-content:space-between;gap:14px}.trial-overview{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin:16px 0 20px}.trial-info{min-width:0}.trial-info p{margin:6px 0}.trial-info .micro{overflow-wrap:anywhere}.trial-card h2{font-size:23px;font-weight:500;margin:0 0 10px;overflow-wrap:anywhere}.trial-card h3{margin:0;font-size:16px;font-weight:550}.trial-metrics{display:flex;gap:24px;flex-shrink:0}.trial-metrics div{display:grid;gap:6px}.trial-metrics span,dt{color:var(--muted);font-size:13px}.trial-metrics strong{font-size:25px;font-weight:500}.outcome-tag{padding:4px 9px;border-radius:5px;font-size:13px;background:#eef0e9;color:#4c5841}.outcome-tag.success{background:#e7efd7;color:#365020}.outcome-tag.failure{background:#f8e9e4;color:#933b31}.outcome-tag.unscored{background:#f1f2ec;color:#737d67}.episode-section{border-top:1px solid var(--line);padding-top:18px}.episode-heading{flex-wrap:wrap}.episode-controls{display:flex;align-items:end;gap:12px;margin:16px 0}.episode-controls label{display:grid;gap:7px;font-size:13px;color:var(--muted);min-width:0}.episode-select{flex:1}.episode-controls select{width:100%}select{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}button:disabled,select:disabled{opacity:.4;cursor:default}.step-buttons{display:flex;gap:5px}.step-buttons button{width:36px;height:38px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer}.episode-result{display:flex;align-items:center;flex-wrap:wrap;gap:12px 18px;font-size:13px;padding:12px 0 16px}.episode-result>span:not(.outcome-tag){color:var(--muted)}.episode-result strong{font-weight:550}.video-section{border-top:1px solid var(--line);padding-top:16px}.trial-videos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:12px;max-width:734px}.trial-videos figure{margin:0;min-width:0}.trial-videos video{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;background:#182018;border-radius:7px}.trial-videos figcaption{margin-top:7px;font-size:13px;color:var(--muted)}.player-controls{display:flex;align-items:center;gap:12px;margin-top:16px;max-width:734px}.player-controls .play{width:36px;height:34px;border-radius:5px;border:0;background:#36492a;color:white;flex-shrink:0;cursor:pointer}.player-controls>span{font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}.player-controls small{color:var(--muted)}.player-controls input{flex:1 1 100px;width:auto;min-width:20px;height:4px;accent-color:#819e5d}.player-controls select{width:64px;flex:0 0 64px;font-size:12px;padding:6px}.playback-note{margin:10px 0 0;font-size:12px}.review-error{color:#a53832;font-size:14px}
-@media(max-width:1100px){.trial-overview{align-items:flex-start;flex-direction:column;gap:16px}.trial-metrics{gap:32px}}
-@media(max-width:600px){.trial-card{padding:16px}.trial-title{flex-wrap:wrap}.trial-metrics strong{font-size:23px}.episode-controls{flex-wrap:wrap}.episode-controls label{flex:1;min-width:110px}.episode-select{flex-basis:55%!important}.trial-videos{grid-template-columns:1fr;max-width:360px}.episode-heading .micro{font-size:12px}.player-controls{gap:7px}}
-
-.feed{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;align-items:start}.feed-list{display:grid;gap:8px;max-height:690px;overflow:auto;padding:2px}.feed-item{display:grid;gap:7px;text-align:left;border:1px solid var(--line);border-radius:8px;padding:14px;background:white;color:var(--ink);cursor:pointer}.feed-item.active{border-color:#617b43;background:#f0f4e9;box-shadow:inset 3px 0 #617b43}.feed-item>span:first-child{display:flex;justify-content:space-between}.feed-item time,.feed-item small{font-size:12px;color:var(--muted)}.review-count{margin:0 0 14px;color:var(--muted);font-size:13px}.trial-metrics{gap:20px}.feed-item:focus-visible{outline:2px solid #617b43;outline-offset:1px}
-@media(max-width:950px){.feed{grid-template-columns:1fr}.feed-list{display:flex;max-height:none;overflow-x:auto;padding-bottom:10px}.feed-item{min-width:220px}.trial-videos{max-width:none}}
+.imported-review { min-width: 0; }
+.verdict.success { background: var(--good-tint); color: var(--good); }
+.verdict.failure { background: var(--bad-tint); color: var(--bad); }
+.verdict.big { font-size: 13px; padding: 8px 12px; }
+.trial-card { display: grid; gap: 16px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel) var(--dots) 0 0 / 14px 14px; min-width: 0; }
+.tc-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.tc-meta { font: 500 12px/1.5 var(--mono); color: var(--muted); } .tc-meta b { color: var(--ink); font-weight: 600; }
+.tc-who { display: flex; align-items: center; gap: 12px; }
+.tc-who .lab-tile { width: 44px; height: 44px; border-radius: 10px; font-size: 15px; }
+.tc-who h2 { margin: 0; font: 700 22px/1.15 var(--sans); letter-spacing: -.02em; overflow-wrap: anywhere; }
+.tc-who small { display: block; margin-top: 2px; font: 500 11.5px/1.4 var(--mono); color: var(--muted); }
+.tc-task { margin: 0; font: 500 clamp(17px, 1.6vw, 21px)/1.35 var(--sans); letter-spacing: -.01em; color: var(--ink); text-wrap: pretty; }
+.tc-result { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(150px, auto); gap: 18px; align-items: center; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.tc-score { display: grid; gap: 4px; min-width: 0; }
+.tc-score > span, .tc-episode > span { font: 500 11px/1.4 var(--mono); color: var(--muted); }
+.tc-score b { font: 500 24px/1.1 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.tc-episode { display: grid; gap: 4px; }
+.tc-episode select { font: 600 13.5px/1.3 var(--sans); padding: 8px 10px; border: 1px solid var(--line-2); border-radius: 7px; background: var(--field); color: var(--ink); }
+.prog { display: block; height: 6px; border-radius: 3px; background: var(--field); overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--fine); border-radius: 3px; }
+.prog i.success { background: var(--good); } .prog i.failure { background: var(--ink-4); }
+.tc-note { display: grid; gap: 4px; }
+.tc-note span { font: 500 11px/1.4 var(--mono); color: var(--muted); }
+.tc-note p { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink); max-width: 80ch; }
+.tc-videos { padding-top: 14px; border-top: 1px solid var(--line); }
+.tc-error { margin: 0 0 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--bad); font-size: 13px; }
+.tc-error .button { min-height: 32px; padding: 4px 10px; font-size: 12.5px; }
+.trial-videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.trial-videos.is-loading { opacity: .45; pointer-events: none; }
+.trial-videos figure { margin: 0; min-width: 0; }
+.trial-videos video { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #000; }
+.review-camera { position: relative; border-radius: 10px; overflow: hidden; background: #000; }
+.video-caption { position: absolute; left: 10px; bottom: 10px; padding: 4px 7px; border-radius: 4px; font: 500 10.5px/1.2 var(--mono); color: #fff; background: rgba(0, 0, 0, .62); pointer-events: none; }
+.player-controls { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.player-controls .play { display: grid; place-items: center; width: 38px; height: 36px; border-radius: 8px; border: 0; background: var(--accent); color: var(--accent-ink); flex-shrink: 0; cursor: pointer; font-size: 18px; }
+.player-controls .play:disabled { opacity: .4; cursor: default; }
+.player-controls > span { font: 500 12px/1 var(--mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.player-controls small { color: var(--muted); }
+.player-controls input { flex: 1 1 100px; width: auto; min-width: 20px; height: 4px; accent-color: var(--accent); }
+.player-controls select { width: 68px; flex: 0 0 68px; font: 500 12px/1.3 var(--mono); padding: 7px 8px; border: 1px solid var(--line-2); border-radius: 7px; background: var(--field); color: var(--ink); }
+.playback-note { margin: 10px 0 0; font: 500 11.5px/1.4 var(--mono); color: var(--muted); }
+@media (max-width: 640px) { .tc-result { grid-template-columns: minmax(0, 1fr); } .trial-card { padding: 16px; } .player-controls { gap: 8px; } }
 </style>

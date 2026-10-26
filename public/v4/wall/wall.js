@@ -1,0 +1,40 @@
+// Direction: the wall. Twelve real evaluations play at once; everything else is the live record on a dark panel.
+import { boot, BODIES, bodyFacts, axes, num, partners, footerLinks, appLinks, latestAgo, DATASET, esc, store } from '../shared/record.js'
+
+const $ = (s, el = document) => el.querySelector(s)
+const THEME = {
+  card: 'background:var(--surface);border:1px solid var(--line);border-radius:6px', surface: '#15181c',
+  ink: '#eceef1', secondary: '#b5bac3', muted: '#848a95', grid: '#22262c', axis: '#3a4149', ring: '#3a4149',
+  sans: "'Archivo', system-ui, sans-serif", mono: "'IBM Plex Mono', monospace", titleWeight: 600, tipBg: '#eceef1', tipInk: '#101214',
+  brand: 'RoboColosseum',
+}
+
+appLinks()
+$('#hero-actions').innerHTML = `<a class="button primary" href="${DATASET.href}">${DATASET.label}</a><a class="button" href="#leaderboards">See the leaderboards</a>`
+$('#partner-logos').innerHTML = partners()
+$('#footer').innerHTML = `<div><a class="brand" href="#top"><span class="brand-mark"><i></i><i></i><i></i><i></i></span><strong>RoboColosseum</strong></a><p class="prov">Every figure on this page is read live from the RoboColosseum API when you open it. Co-organized by Hugging Face, BitRobot, the Embodied AI Centre (Singapore) and MAGIC Lab (NUS).</p></div>${footerLinks()}`
+
+// Labels for the twelve tiles come with the video (../video/wall.json: [{body, place}] in reading order).
+fetch('../video/wall.json').then(r => r.ok ? r.json() : []).then(tiles => {
+  $('#wall-labels').innerHTML = tiles.map(t => `<span><b>${esc(t.body)}</b>${t.place ? ` · ${esc(t.place)}` : ''}</span>`).join('')
+}).catch(() => {})
+const wall = $('#wall-video')
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) { wall.removeAttribute('autoplay'); wall.pause() }
+new IntersectionObserver(es => es.forEach(e => { if (wall.hasAttribute('autoplay')) e.isIntersecting ? wall.play().catch(() => {}) : wall.pause() })).observe(wall)
+
+function bodies() {
+  $('#bodies-row').innerHTML = BODIES.map(bodyFacts).map(b => `<a class="body" data-tag="${b.tag}" href="${b.href}">
+    <span class="portrait"><img class="${b.portrait ? 'portrait' : 'photo'}" src="${b.img}" alt="${esc(b.name)}" loading="lazy"${b.mirror ? ' style="transform:scaleX(-1)"' : ''}></span>
+    <b>${esc(b.name)}</b><span class="kind">${esc(b.kind)}</span>
+    <span class="facts">${b.tag ? `<i class="tag">${b.tag}</i>` : ''}${b.facts ? esc(b.facts) : '<span class="skel">0,000 comparisons</span>'}</span></a>`).join('')
+}
+function scale() {
+  $('#axes').innerHTML = axes().map(a => `<div><dt>${num(a.value)}</dt><dd>${a.label}${a.small ? `<small>${a.small}</small>` : ''}</dd></div>`).join('')
+}
+function liveMark() { const ago = latestAgo(); $('#live').innerHTML = `<i></i>${ago ? `Latest verdict ${ago}` : 'Live data'}` }
+
+bodies(); scale()
+boot({
+  leaderboards: { switches: $('#lb-switches'), desc: $('#lb-desc'), note: $('#lb-note'), figure: $('#lb-figure'), rows: $('#lb-rows') },
+  pair: $('#pair'), trialsContent: $('#trials-content'), trialsLegend: $('#trials-legend'), globe: $('#sphere'),
+}, THEME, () => { bodies(); scale(); liveMark() })

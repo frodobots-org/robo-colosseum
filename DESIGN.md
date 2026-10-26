@@ -1,0 +1,58 @@
+# RoboColosseum design language
+
+The decisions behind the landing pages, as the user stated them. Read this before touching any page under `public/`. When a decision changes, change it here first.
+
+## What we are and how we say it
+
+- **What we build:** the independent, real-world benchmark for physical AI. Policies from every lab run on real robots in real rooms, judged blind by people, ranked per robot body.
+- **Main message:** *Evaluations made in the wild.* It is the headline and the first section. "Tested in the wild" was rejected: it names the method, not the thing.
+- **Second message:** cross-embodiment. One protocol, every body: Franka, SO-ARM101, Bimanual YAM, Unitree G1, Earth Rover Mini+ (joining).
+- **Order of the page** (huddle with Michael Cho, 21 Oct 2026): in the wild → every body → scale on several axes (bodies, sites, rooms, tasks, rollouts, evaluators, days) → then the benchmark detail (leaderboards, a real pair, every trial, the two tracks) → join. The co-organizer logos (Hugging Face, BitRobot, EAIC, MAGIC Lab NUS: added after EAIC on 23 Oct 2026 at the user's request; its logo is the lab's own `magic-logo.png` with the white background removed, colours untouched) sit as one line directly under the hero, as a credibility strip, not a section (user decision, 22 Oct 2026); they appear once on the page plus the footer mention. **Always the official logos in their own colours**: never recolour, grey out or monochrome a partner logo (user correction, 22 Oct 2026).
+- **Less text, more footage.** The hero carries real recordings (the in-the-wild mashup), not copy. Benchmark examples and evaluations sit below the fold.
+- **Day-one call to action:** the 10,000-hour dataset. Second: see the leaderboards.
+- **Voice:** plain, specific, in sentence case. Every number on the page is live from the API; never a static figure.
+
+## Logo
+
+- The RC monogram under the colosseum arcade, from x.com/RoboColosseum. Kit in `public/brand/` (live at `/brand/`): `rc-mark.svg` (currentColor), black/white marks, dark/light/amber badges, `rc-letters.svg` and `favicon.svg` for 16–32 px, lockups and the wordmark (Archivo 800 outlines).
+- One colour at a time; minimum 40 px for the full mark; the letters-only mark below that; clear space of one arch on each side; the arcade may be used as a pattern, the letters may not be redrawn.
+
+## Direction
+
+- References: Artificial Analysis (the benchmark publisher: white, serif one-liner, charts in cards, a changelog of evaluations) and XDOF (the instrument: dark panels on a dotted grid, mono labels, almost no copy).
+- Chosen (22 Oct 2026): **Index in night mode**, `/v5/`. **It is the default for the whole platform** (user decision, 22 Oct 2026): the site root serves `/v5/` on Netlify, and the app pages (leaderboards, evaluations, tasks, submit, join) use the same night tokens, the v5 top bar with the RC mark, Archivo + IBM Plex Mono and the amber accent. Tokens live in `src/styles/arena.css`; `src/styles/base.css` reads them. The Index layout (claim + film window, index cards, a live feed of verdicts) on a dark page, with the control room's live ticker. Earlier explorations stay for comparison: `/v3/` (sage), `/v4/wall/`, `/v4/cinema/`, `/v4/poster/`.
+
+## Colour
+
+- Night mode: page `#0b0d10`, panel `#13161a`, raised `#181c21`, line `#23272d`, text `#e8eaed`, muted `#8b929c`, dim `#5e6670`.
+- Accent: amber `#ffb224` (the badge colour). Used for the live dot, the primary button, the selected state. Nothing else is amber.
+- Track pair, validated with the dataviz checker on the panel colour: open track `#c98500`, fine-tuning `#3987e5`.
+- Categorical (bodies, rooms, sites, outcomes on the globe): the validated dark set `#3987e5 #d95926 #199e70 #c98500 #d55181 #008300 #9085e9 #e66767`.
+- Do not default to the brand green/lime when exploring; the user flagged every early direction as "stuck to green/olive".
+
+## Type
+
+- Archivo (the wordmark's face) for claims and headings, wide (`wdth` 108–118) and heavy for claims; Archivo 400 for text; IBM Plex Mono for every measurement and label.
+- No uppercase labels except the mono eyebrow style; no number markers unless the content is a sequence.
+
+## Data and loading
+
+- Everything is read from `/api` at load through `public/landing/live.js` and the v3 modules; `public/v3/loader.js` starts boards, the evaluation list and reviews in parallel. The router's public response cache (colosseum-router PR #4) adds edge caching when deployed.
+- The in-the-wild mashup (`public/v4/video/mashup.mp4` + `cues.json`) and the wall (`wall.mp4` + `wall.json`) are cut from the humanoid team's footage; captions say "Humanoid" and the room, never a model name that was not confirmed.
+
+## Leaderboards (22 Oct 2026)
+
+- Modelled on Artificial Analysis (summary cards naming the leaders with lab logos, dense table with logo cells, filters, key definitions) and Arena (dark rows with numbered rank chips, logo tiles, score bars inside the rows, category tabs with icons).
+- Page order: header (body · track) → body tabs with the robot glyphs → track switch with icons → four summary cards (leader with lab tile, comparisons or trials, policies, lead over #2 or median progress) → the ranking → the Robocurve figure → key definitions.
+- Ranking rows: rank chip (#1 amber, #2–3 raised), lab tile + policy + lab + Hugging Face link, a bar per metric (open: rating with ±1 SE whisker on a shared axis; fine-tuning: full success fill with the Wilson 95% band, progress fill), W·T·L stacked record, counts in mono, a play icon to the evaluations. Fewer than 20 comparisons (or 10 trials) is faded and marked low evidence; pending policies are hidden behind a toggle.
+- Sorting on the metric columns, text filter by policy or lab, minimum-comparisons chips (open) or task chips (fine-tuning: "All tasks" pools a checkpoint across tasks).
+- Lab logos come from `src/labs.js` (same mapping as `public/landing/leaderboard.js`); icons are the inline set in `src/components/Icon.vue`.
+
+## App pages (22 Oct 2026)
+
+- Every app page (Leaderboards, Evaluations, Tasks, Submit a policy, Join) opens the same way: mono eyebrow → h1 "Body · Track" (the track in muted) → one-sentence lede → a live tag on the right; then the body tabs with the robot glyphs and the track switch with icons (`src/components/BoardControls.vue`); then four summary cards; then one `.board` panel with a toolbar (search, chips, count, refresh) and the content; then definitions as `<details>`. Shared rules live in `src/styles/boards.css`; page-specific rules stay scoped.
+- Evaluations, open track: the board is a two-column feed + review. Feed items carry time-ago, a verdict chip (amber when a side was preferred, plain for ties), the instruction and "A vs B · room". The review card quotes the instruction, shows both sides with progress bars (the preferred side outlined amber, verdict stamp between), the evaluator / site / difficulty (label · n/10) / confidence row, and the evaluator's note; below it the two camera packages with mono captions on the video.
+- Evaluations, fine-tuning: same feed and card for scored trials (outcome chips green / red / amber, score with a bar, episode, criteria, note, cameras) and for imported datasets (episode select in the result row, the synchronized player with play/pause icon, scrubber and speed).
+- Tasks: the open track explains how an instruction is written on the spot; the fine-tuning suite lists the draft Franka cards in a grid (id, category icon, site, milestones, demos) with a detail panel (predicate quoted on an amber rule, ordered milestones as numbered steps). Other bodies show an empty state until their cards exist.
+- Submit and Join: header, four "what you get / what you do" cards, two panels (numbered steps, key/value requirements, buttons) and the embedded form once a real Google Form id replaces the `REPLACE_WITH_…` placeholder; until then a note points to GitHub.
+- Numbers: `fmt` and `pct` from `src/labs.js`; time-ago in mono; never a bare percentage in a sentence.

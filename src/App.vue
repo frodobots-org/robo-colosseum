@@ -1,26 +1,31 @@
 <template>
   <div class="app-shell">
-    <aside class="arena-sidebar">
-      <RouterLink class="brand" :to="link('/')" aria-label="RoboColosseum home"><span class="brand-mark">R<span>c</span></span><strong>RoboColosseum<small>THE REAL-WORLD ARENA</small></strong></RouterLink>
-      <p class="nav-label">WORKSPACE</p>
-      <nav class="side-links" aria-label="Primary navigation">
-        <RouterLink :to="link('/')"><span>◫</span>Overview</RouterLink>
-        <RouterLink :to="link('/leaderboard')"><span>▤</span>Leaderboards</RouterLink>
-        <RouterLink :to="link('/evals')"><span>▷</span>Evaluation</RouterLink>
+    <header class="top">
+      <a class="brand" :href="home" aria-label="RoboColosseum home"><img :src="mark" alt="" width="40" height="33"><span>RoboColosseum</span></a>
+      <nav class="top-links" aria-label="Primary navigation">
+        <a :href="home">Overview</a>
+        <RouterLink :to="link('/leaderboard')">Leaderboards</RouterLink>
+        <RouterLink :to="link('/evals')">Evaluations</RouterLink>
+        <RouterLink :to="link('/tasks')">Tasks</RouterLink>
+        <RouterLink :to="link('/submit')">Submit a policy</RouterLink>
+        <RouterLink :to="link('/join')">Join</RouterLink>
       </nav>
-      <div class="sidebar-bottom"><div class="contribute-card"><span class="eyebrow">BUILD THE BENCHMARK</span><h3>Bring your policy.<br />Meet the real world.</h3><RouterLink :to="link('/submit')">Submit a policy <span>↗</span></RouterLink></div><RouterLink class="join-link" :to="link('/join')">Become an evaluator ↗</RouterLink></div>
-    </aside>
-    <div class="arena-workspace">
-      <header class="workspace-header"><span>Workspace <span class="crumb-divider">/</span> <strong>{{ titles[route.path] || 'Overview' }}</strong></span><div><span class="edition-tag">RESEARCH PREVIEW</span><a href="https://github.com/frodobots-org" target="_blank" rel="noreferrer">GitHub ↗</a></div></header>
-      <main><RouterView /></main>
-      <footer class="workspace-footer"><span>Real robots. Shared tasks. Measurable progress.</span><span>RoboColosseum</span></footer>
-    </div>
+      <span class="live"><i></i>Live data</span>
+    </header>
+    <main><RouterView /></main>
+    <footer class="foot">
+      <div><a class="brand" :href="home"><img :src="lockup" alt="RoboColosseum" height="34"></a><p class="prov">Every figure on this site is read live from the RoboColosseum API. Co-organized by Hugging Face, BitRobot, the Embodied AI Centre (Singapore) and MAGIC Lab (NUS).</p></div>
+      <div><h5>The benchmark</h5><ul><li><RouterLink :to="link('/leaderboard')">Leaderboards</RouterLink></li><li><RouterLink :to="link('/evals')">Evaluation viewer</RouterLink></li><li><RouterLink :to="link('/tasks')">Tasks and criteria</RouterLink></li></ul></div>
+      <div><h5>Take part</h5><ul><li><RouterLink :to="link('/submit')">Submit a policy</RouterLink></li><li><RouterLink :to="link('/join')">Join as an evaluator</RouterLink></li><li><a :href="home + 'brand/'">Brand kit</a></li></ul></div>
+      <div><h5>Partners</h5><ul><li><a href="https://huggingface.co/" target="_blank" rel="noreferrer">Hugging Face</a></li><li><a href="https://bitrobot.ai/" target="_blank" rel="noreferrer">BitRobot</a></li><li><a href="https://nrp.gov.sg/" target="_blank" rel="noreferrer">Embodied AI Centre</a></li><li><a href="https://magiclab-nus.github.io/" target="_blank" rel="noreferrer">MAGIC Lab, NUS</a></li><li><a href="https://github.com/frodobots-org/robo-colosseum" target="_blank" rel="noreferrer">GitHub</a></li></ul></div>
+    </footer>
   </div>
 </template>
 <script setup>
-import { useRoute } from 'vue-router'
 import { useArena } from './arena.js'
-const route = useRoute()
 const { link } = useArena()
-const titles = { '/': 'Overview', '/leaderboard': 'Leaderboards', '/tasks': 'Task library', '/evals': 'Evaluation', '/submit': 'Submit a policy', '/join': 'Join the arena' }
+// On Netlify the site root serves the /v5/ landing; on GitHub Pages the base path keeps the in-app overview.
+const home = import.meta.env.BASE_URL
+const mark = `${home}brand/rc-mark-white.svg`
+const lockup = `${home}brand/rc-lockup-white.svg`
 </script>
