@@ -100,6 +100,8 @@ const policiesOn = id => new Set([...rankedOpen(id), ...fineRows(id)].map(r => r
 const ago = iso => { const m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 48 * 60 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago` }
 const n = v => `<span class="n">${fmt(v)}</span>`
 
+// True once every board has answered and none failed: only then are counts across all robots complete.
+const allBoards = () => store.ready && ![...store.failed].some(key => key.includes('/'))
 const policyCount = () => new Set(ROBOTS.flatMap(r => [...rankedOpen(r.id), ...fineRows(r.id)].map(x => x.policyId || x.policy))).size
 const evaluations = () => store.evaluations && !store.failed.has('evaluations') ? store.evaluations : null
 const list = parts => parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}` : parts.join('')
@@ -118,16 +120,17 @@ function scale() {
   const t = totals(), ev = evaluations()
   const instructions = ev ? new Set(ev.map(e => String(e.instruction || e.task || '').trim().toLowerCase()).filter(Boolean)).size : null
   const runs = t.comparisons !== null && t.fineTrials !== null ? 2 * t.comparisons + t.fineTrials : null
-  const live = t.embodiments, joining = FLEET.filter(f => f.joining).length
+  const live = allBoards() ? t.embodiments : null, joining = FLEET.filter(f => f.joining).length
   const figures = [
     [runs, 'recorded runs', 'Both sides of every comparison, plus every task attempt.'],
     [t.scenes, 'scenes', 'Homes, offices, labs, canteens and corridors.'],
     [instructions, 'different instructions', 'Written on the spot by the evaluators.'],
-    [store.ready ? policyCount() : null, 'policies evaluated', 'Ranked on public leaderboards.'],
+    [allBoards() ? policyCount() : null, 'policies evaluated', 'Ranked on public leaderboards.'],
     [COUNTRIES, 'countries', 'Where open-track runs happen and fine-tuning data was recorded.'],
     [live, 'robot types', joining ? `${joining} more joining.` : 'Each with its own leaderboard.'],
   ]
-  $('#figures').innerHTML = figures.map(([v, label, note]) => `<div><dt>${v === null ? '<span class="skel">0,000</span>' : `<span class="n">${fmt(v)}</span>`}</dt><dd><b>${esc(label)}</b>${esc(note)}</dd></div>`).join('')
+  const settled = store.ready && store.evaluations !== null
+  $('#figures').innerHTML = figures.map(([v, label, note]) => `<div><dt>${v !== null ? `<span class="n">${fmt(v)}</span>` : settled ? '<span class="n" title="Could not be counted right now">—</span>' : '<span class="skel">0,000</span>'}</dt><dd><b>${esc(label)}</b>${esc(note)}</dd></div>`).join('')
   if (ev?.length) {
     const first = ev.reduce((m, e) => (e.date && e.date < m ? e.date : m), '9999')
     $('#scale-lede').textContent = `Counted live from every evaluation since the first comparison on ${day(first)}.`
@@ -135,11 +138,13 @@ function scale() {
 }
 
 // The leaderboard preview: one robot and one measurement at a time, the top five.
-const board = { robot: 'franka', track: 'open' }
+const board = { robot: 'franka', track: 'open', chosen: false }
 const MIN = { open: 20, fine: 10 }
 function rankings() {
   const has = { open: id => rankedOpen(id).length > 0, fine: id => fineRows(id).length > 0 }
   const empty = (id, track) => loaded(id, track) && !store.failed.has(KEY(id, track)) && !has[track](id)
+  const failedRobot = id => store.failed.has(KEY(id, 'open')) && (store.failed.has(KEY(id, 'fine')) || !has.fine(id))
+  if (!board.chosen && robotLoaded(board.robot) && failedRobot(board.robot)) board.robot = ROBOTS.find(r => hasData(r.id))?.id || board.robot
   if (robotLoaded(board.robot)) {
     if (empty(board.robot, 'open') && empty(board.robot, 'fine') && store.ready) board.robot = ROBOTS.find(r => hasData(r.id))?.id || board.robot
     if (empty(board.robot, board.track) && has[board.track === 'open' ? 'fine' : 'open'](board.robot)) board.track = board.track === 'open' ? 'fine' : 'open'
@@ -177,13 +182,14 @@ function rankings() {
 }
 document.querySelector('.board-controls').addEventListener('click', e => {
   const b = e.target.closest('button[role="tab"]'); if (!b || b.disabled) return
-  if (b.dataset.robot) board.robot = b.dataset.robot; else board.track = b.dataset.track
+  if (b.dataset.robot) { board.robot = b.dataset.robot; board.chosen = true } else board.track = b.dataset.track
   rankings()
 })
 
 function fleet() {
   $('#fleet').innerHTML = FLEET.map(f => {
-    const live = f.joining ? 'Joining' : !robotLoaded(f.id) ? '<span class="skel">00 policies ranked</span>' : hasData(f.id) ? `${fmt(policiesOn(f.id))} policies ranked` : 'Results coming soon'
+    const failed = store.failed.has(KEY(f.id, 'open')) || store.failed.has(KEY(f.id, 'fine'))
+    const live = f.joining ? 'Joining' : !robotLoaded(f.id) ? '<span class="skel">00 policies ranked</span>' : failed ? 'Rankings did not load' : hasData(f.id) ? `${fmt(policiesOn(f.id))} policies ranked` : 'Results coming soon'
     const body = `<span class="stage"><img src="${f.img}" alt="" loading="lazy"></span>
       <h3>${esc(f.name)}</h3><p class="count">${f.count ? `${n(f.count)} ${esc(f.unit)}` : esc(f.unit)}</p><p class="live${f.joining ? ' joining' : ''}">${live}</p>`
     return SETUPS[f.id]
