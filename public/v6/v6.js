@@ -1,5 +1,6 @@
-// v6: the launch page. Named sections in full-width bands (leaderboard, how it works, evaluations, robots, open data,
-// academic access, FAQ) on the night palette. One call to action, "Submit your policy", with one destination everywhere.
+// v6: the launch page. Named sections in full-width bands, in the order of importance set in the 21 Oct 2026 huddle:
+// in the wild, robots (cross-embodiment), scale; then the benchmark detail (leaderboard, how it works, one comparison,
+// open data, academic access, FAQ). One call to action, "Submit your policy", with one destination everywhere.
 // Fleet sizes are fixed facts; every other number is read from /api.
 import { API, ASSETS, ROBOTS, store, totals, rankedOpen, fineRows, hasData, fmt, esc, appLink } from '../landing/live.js'
 import { openRows, fineRowsModel, mark } from '../v3/board.js'
@@ -90,15 +91,39 @@ const policiesOn = id => new Set([...rankedOpen(id), ...fineRows(id)].map(r => r
 const ago = iso => { const m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 48 * 60 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago` }
 const n = v => `<span class="n">${fmt(v)}</span>`
 
-// The leaderboard's lede: what the rankings are built from, once every board has answered. If a board could not be read,
-// a plain sentence replaces the totals rather than showing a smaller count.
+const policyCount = () => new Set(ROBOTS.flatMap(r => [...rankedOpen(r.id), ...fineRows(r.id)].map(x => x.policyId || x.policy))).size
+const evaluations = () => store.evaluations && !store.failed.has('evaluations') ? store.evaluations : null
+const list = parts => parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}` : parts.join('')
+const day = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+
+// The leaderboard's lede says how fresh the rankings are.
 function proof() {
-  if (!store.ready) return
-  const t = totals(), el = $('#proof')
-  if (!t.comparisons && !t.fineTrials) { el.textContent = 'Rankings update as each evaluation is finished.'; return }
-  const policies = new Set(ROBOTS.flatMap(r => [...rankedOpen(r.id), ...fineRows(r.id)].map(x => x.policyId || x.policy))).size
-  const latest = store.evaluations?.length ? store.evaluations.reduce((m, e) => (e.date > m ? e.date : m), '') : ''
-  el.innerHTML = `Built from ${n(t.comparisons)} blind comparisons and ${n(t.fineTrials)} scored trials across ${n(policies)} policies and ${n(t.embodiments)} robot types.${latest ? ` Last result ${esc(ago(latest))}.` : ''}`
+  const ev = evaluations()
+  if (!ev?.length) return
+  const latest = ev.reduce((m, e) => (e.date > m ? e.date : m), '')
+  $('#proof').innerHTML = `Top five per robot. Rankings update as each evaluation is finished; the last one came in ${esc(ago(latest))}.`
+}
+
+// Scale on several axes at once. A figure that cannot be counted yet stays a placeholder rather than showing a partial total.
+function scale() {
+  const t = totals(), ev = evaluations()
+  const instructions = ev ? new Set(ev.map(e => String(e.instruction || e.task || '').trim().toLowerCase()).filter(Boolean)).size : null
+  const tasks = store.ready ? new Set(ROBOTS.flatMap(r => fineRows(r.id).map(x => `${r.id}/${x.taskId || x.task}`))).size : null
+  const runs = t.comparisons !== null && t.fineTrials !== null ? 2 * t.comparisons + t.fineTrials : null
+  const live = t.embodiments, joining = FLEET.filter(f => f.joining).length
+  const figures = [
+    [runs, 'recorded runs', 'Both sides of every comparison, plus every task attempt.'],
+    [t.scenes, 'scenes', 'Homes, offices, labs, canteens and corridors.'],
+    [instructions, 'different instructions', 'Written on the spot by the evaluators.'],
+    [store.ready ? policyCount() : null, 'policies evaluated', 'Ranked on public leaderboards.'],
+    [tasks, 'standard tasks', 'Each learned from the same 100 demonstrations.'],
+    [live, 'robot types', joining ? `${joining} more joining.` : 'Each with its own leaderboard.'],
+  ]
+  $('#figures').innerHTML = figures.map(([v, label, note]) => `<div><dt>${v === null ? '<span class="skel">0,000</span>' : `<span class="n">${fmt(v)}</span>`}</dt><dd><b>${esc(label)}</b>${esc(note)}</dd></div>`).join('')
+  if (ev?.length) {
+    const first = ev.reduce((m, e) => (e.date && e.date < m ? e.date : m), '9999')
+    $('#scale-lede').textContent = `Counted live from every evaluation since the first comparison on ${day(first)}.`
+  }
 }
 
 // The leaderboard preview: one robot and one measurement at a time, the top five.
@@ -156,12 +181,16 @@ function fleet() {
   }).join('')
 }
 
+// Under the wall: how the scenes spread across robot types.
 function places() {
-  const scenes = totals().scenes
-  $('#places').innerHTML = `Twelve recorded evaluations, played together.${scenes ? ` ${n(scenes)} different scenes on record so far.` : ''}`
+  const ev = evaluations(), scenes = totals().scenes
+  if (!ev || !scenes) return
+  const per = ROBOTS.map(r => ({ name: r.name, count: new Set(ev.filter(e => e.robotId === r.id && e.scene?.trim()).map(e => e.scene.trim().toLowerCase())).size }))
+    .filter(r => r.count).sort((a, b) => b.count - a.count)
+  $('#places').innerHTML = `Twelve recorded evaluations, played together. ${n(scenes)} scenes on record so far: ${list(per.map(r => `${n(r.count)} for ${esc(r.name)}`))}.`
 }
 
 const pair = matchup($('#pair'))
-function render() { proof(); rankings(); fleet(); places(); pair.refresh() }
+function render() { proof(); scale(); rankings(); fleet(); places(); pair.refresh() }
 render()
 load(render)
