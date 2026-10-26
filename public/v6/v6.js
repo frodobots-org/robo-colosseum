@@ -64,13 +64,19 @@ fetch(`${VIDEO}wall.json`).then(r => r.ok ? r.json() : []).then(tiles => {
 }).catch(() => {})
 playWhenVisible(wall)
 
-// Live data: the eight boards first, then the evaluation list (large, ~10 MB) for the matchup, freshness and scene count.
+// Live data: the eight boards, each shown as soon as it arrives (one slow board must not hold up the rest; a failed one is
+// retried once), then the evaluation list (large, ~10 MB) for the matchup, freshness and scene count.
 const get = path => fetch(API + path, { headers: { Accept: 'application/json' } }).then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
 const counted = e => e.finalized === true && !e.test && (e.track || 'open') === 'open'
+const KEY = (id, track) => `${id}/${track === 'fine' ? 'fine-tuning' : track}`
+const loaded = (id, track) => store.boards[KEY(id, track)] !== undefined || store.failed.has(KEY(id, track))
+const robotLoaded = id => loaded(id, 'open') && loaded(id, 'fine')
 function load(onChange) {
-  Promise.all(ROBOTS.flatMap(robot => ['open', 'fine-tuning'].map(track => get(`/leaderboard?robot=${robot.id}&track=${track}`)
-    .then(data => { store.boards[`${robot.id}/${track}`] = (data.board || []).filter(row => row.robotId === robot.id && row.track === track) })
-    .catch(() => store.failed.add(`${robot.id}/${track}`)))))
+  const fetchBoard = (robot, track, retry) => get(`/leaderboard?robot=${robot}&track=${track}`)
+    .then(data => { store.boards[`${robot}/${track}`] = (data.board || []).filter(row => row.robotId === robot && row.track === track) })
+    .catch(() => retry ? fetchBoard(robot, track, false) : store.failed.add(`${robot}/${track}`))
+    .finally(onChange)
+  Promise.all(ROBOTS.flatMap(robot => ['open', 'fine-tuning'].map(track => fetchBoard(robot.id, track, true))))
     .then(() => { store.ready = true; onChange() })
   get('/list_ab_evaluations')
     .then(data => { store.evaluations = (data.evaluations || []).filter(counted) })
@@ -82,16 +88,16 @@ const policiesOn = id => new Set([...rankedOpen(id), ...fineRows(id)].map(r => r
 const ago = iso => { const m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 48 * 60 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago` }
 const n = v => `<span class="n">${fmt(v)}</span>`
 
-// One sentence of proof under the hero.
+// One sentence of proof under the hero, once every board has answered. If one could not be read, the sentence is left out
+// rather than showing a smaller total.
 function proof() {
   if (!store.ready) return
-  const t = totals()
+  const t = totals(), el = $('#proof')
+  if (!t.comparisons && !t.fineTrials) { el.hidden = true; return }
   const policies = new Set(ROBOTS.flatMap(r => [...rankedOpen(r.id), ...fineRows(r.id)].map(x => x.policyId || x.policy))).size
   const latest = store.evaluations?.length ? store.evaluations.reduce((m, e) => (e.date > m ? e.date : m), '') : ''
-  const parts = []
-  if (t.comparisons) parts.push(`${n(t.comparisons)} blind head-to-head comparisons`)
-  if (t.fineTrials) parts.push(`${n(t.fineTrials)} scored trials`)
-  $('#proof').innerHTML = `${parts.join(' and ')} so far, from ${n(policies)} policies on ${n(t.embodiments)} robot types.${latest ? ` Latest result ${esc(ago(latest))}.` : ''}`
+  el.hidden = false
+  el.innerHTML = `${n(t.comparisons)} blind head-to-head comparisons and ${n(t.fineTrials)} scored trials so far, from ${n(policies)} policies on ${n(t.embodiments)} robot types.${latest ? ` Latest result ${esc(ago(latest))}.` : ''}`
 }
 
 // The leaderboard preview: one robot and one measurement at a time, the top five.
@@ -99,19 +105,21 @@ const board = { robot: 'franka', track: 'open' }
 const MIN = { open: 20, fine: 10 }
 function rankings() {
   const has = { open: id => rankedOpen(id).length > 0, fine: id => fineRows(id).length > 0 }
-  if (store.ready) {
-    if (!hasData(board.robot)) board.robot = ROBOTS.find(r => hasData(r.id))?.id || board.robot
-    if (!has[board.track](board.robot)) board.track = board.track === 'open' ? 'fine' : 'open'
+  const empty = (id, track) => loaded(id, track) && !store.failed.has(KEY(id, track)) && !has[track](id)
+  if (robotLoaded(board.robot)) {
+    if (empty(board.robot, 'open') && empty(board.robot, 'fine') && store.ready) board.robot = ROBOTS.find(r => hasData(r.id))?.id || board.robot
+    if (empty(board.robot, board.track) && has[board.track === 'open' ? 'fine' : 'open'](board.robot)) board.track = board.track === 'open' ? 'fine' : 'open'
   }
   const tab = (key, value, label, on, disabled) => `<button type="button" role="tab" data-${key}="${value}" aria-selected="${on}"${disabled ? ' disabled' : ''}>${esc(label)}</button>`
-  $('#robot-tabs').innerHTML = ROBOTS.map(r => tab('robot', r.id, r.name, r.id === board.robot, store.ready && !hasData(r.id))).join('')
-  $('#track-tabs').innerHTML = tab('track', 'open', 'Head-to-head', board.track === 'open', store.ready && !has.open(board.robot))
-    + tab('track', 'fine', 'Standard tasks', board.track === 'fine', store.ready && !has.fine(board.robot))
+  $('#robot-tabs').innerHTML = ROBOTS.map(r => tab('robot', r.id, r.name, r.id === board.robot, empty(r.id, 'open') && empty(r.id, 'fine'))).join('')
+  $('#track-tabs').innerHTML = tab('track', 'open', 'Head-to-head', board.track === 'open', empty(board.robot, 'open'))
+    + tab('track', 'fine', 'Standard tasks', board.track === 'fine', empty(board.robot, 'fine'))
   const rows = $('#rows'), note = $('#board-note')
-  $('#board-link').href = appLink('/leaderboard', { robot: board.robot, track: board.track === 'open' ? 'open' : 'fine-tuning' })
-  if (!store.ready) { rows.innerHTML = Array.from({ length: 5 }, () => '<li class="row loading"><span class="skel" style="min-width:60%">&nbsp;</span></li>').join(''); note.textContent = ''; return }
-  const model = board.track === 'open' ? openRows(board.robot) : fineRowsModel(board.robot)
   const robot = ROBOTS.find(r => r.id === board.robot)
+  $('#board-link').href = appLink('/leaderboard', { robot: board.robot, track: board.track === 'open' ? 'open' : 'fine-tuning' })
+  if (!loaded(board.robot, board.track)) { rows.innerHTML = Array.from({ length: 5 }, () => '<li class="row loading"><span class="skel" style="min-width:60%">&nbsp;</span></li>').join(''); note.textContent = ''; return }
+  if (store.failed.has(KEY(board.robot, board.track))) { rows.innerHTML = `<li class="row empty">The ${esc(robot.name)} rankings did not load. Reload the page, or open the full leaderboard.</li>`; note.textContent = ''; return }
+  const model = board.track === 'open' ? openRows(board.robot) : fineRowsModel(board.robot)
   if (!model) { rows.innerHTML = `<li class="row empty">No results for ${esc(robot.name)} yet.</li>`; note.textContent = ''; return }
   const evidence = board.track === 'open'
     ? Object.fromEntries(rankedOpen(board.robot).map(r => [r.policy, Number(r.evals) || 0]))
@@ -141,7 +149,7 @@ document.querySelector('.board-controls').addEventListener('click', e => {
 
 function fleet() {
   $('#fleet').innerHTML = FLEET.map(f => {
-    const live = f.joining ? 'Joining' : !store.ready ? '<span class="skel">00 policies ranked</span>' : hasData(f.id) ? `${fmt(policiesOn(f.id))} policies ranked` : 'Results coming soon'
+    const live = f.joining ? 'Joining' : !robotLoaded(f.id) ? '<span class="skel">00 policies ranked</span>' : hasData(f.id) ? `${fmt(policiesOn(f.id))} policies ranked` : 'Results coming soon'
     return `<li><span class="stage"><img src="${f.img}" alt="" loading="lazy"${f.mirror ? ' class="mirror"' : ''}></span>
       <h3>${esc(f.name)}</h3><p class="count">${f.count ? `${n(f.count)} ${esc(f.unit)}` : esc(f.unit)}</p><p class="live${f.joining ? ' joining' : ''}">${live}</p></li>`
   }).join('')
