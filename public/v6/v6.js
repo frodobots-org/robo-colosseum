@@ -1,5 +1,6 @@
-// v6: the launch page. The film's order (problem, reveal, fleet, how it works, open data, invitation) on the night palette.
-// One call to action, "Submit your policy", in four places with one destination. Everything numeric is read from /api.
+// v6: the launch page. Named sections in full-width bands (leaderboard, how it works, evaluations, robots, open data,
+// academic access, FAQ) on the night palette. One call to action, "Submit your policy", with one destination everywhere.
+// Fleet sizes are fixed facts; every other number is read from /api.
 import { API, ASSETS, ROBOTS, store, totals, rankedOpen, fineRows, hasData, fmt, esc, appLink } from '../landing/live.js'
 import { openRows, fineRowsModel, mark } from '../v3/board.js'
 import { matchup } from './matchup.js'
@@ -9,25 +10,26 @@ const ROOT = window.RC_ROOT || '/'
 const VIDEO = `${ROOT}v4/video/`
 const SUBMIT = appLink('/submit')
 
-// The fleet as the launch film states it; the live line under each robot comes from the API.
+// The fleet (sizes confirmed by the team); the live line under each robot comes from the API.
 const FLEET = [
   { id: 'g1', name: 'Unitree G1', count: 30, unit: 'humanoids', img: `${ASSETS}g1.webp` },
-  { id: 'yam', name: 'Bimanual YAM', count: 25, unit: 'pairs of arms', img: `${ASSETS}yam.webp`, mirror: true },
-  { id: 'franka', name: 'Franka', unit: 'Arms in the DROID setup', img: `${ASSETS}franka.webp` },
-  { id: 'so101', name: 'SO-ARM101', unit: 'Low-cost single arms', img: `${ASSETS}so101.webp` },
-  { id: 'earth-rover', name: 'Earth Rover Mini+', unit: 'Wheeled rovers, outdoors', img: `${ROOT}v3/bodies/earth-rover-mini-plus.webp`, joining: true },
+  { id: 'yam', name: 'Bimanual YAM', count: 25, unit: 'two-arm stations', img: `${ASSETS}yam.webp`, mirror: true },
+  { id: 'franka', name: 'Franka', unit: 'Single arm, DROID setup', img: `${ASSETS}franka.webp` },
+  { id: 'so101', name: 'SO-ARM101', unit: 'Low-cost single arm', img: `${ASSETS}so101.webp` },
+  { id: 'earth-rover', name: 'Earth Rover Mini+', unit: 'Outdoor wheeled robot', img: `${ROOT}v3/bodies/earth-rover-mini-plus.webp`, joining: true },
 ]
 
 const PARTNERS = [
-  { name: 'NUS MAGIC Lab', role: 'Scientific protocol', href: 'https://magiclab-nus.github.io/', logo: `<img src="${ASSETS}magic-lab-logo.webp" alt="MAGIC Lab, NUS" class="magic">` },
-  { name: 'BitRobot', role: 'Robot fleet and operations', href: 'https://bitrobot.ai/', logo: `<img src="${ASSETS}bitrobot-logo.webp" alt="BitRobot" class="br">` },
-  { name: 'EAIC Singapore', role: 'Evaluation sites in Singapore', href: 'https://nrp.gov.sg/', logo: '<span class="eaic"><b>EAIC</b><span>Embodied AI Centre<br>Singapore</span></span>' },
+  { name: 'NUS MAGIC Lab', role: 'Evaluation protocol', href: 'https://magiclab-nus.github.io/', logo: `<img src="${ASSETS}magic-lab-logo.webp" alt="MAGIC Lab, NUS" class="magic">` },
+  { name: 'BitRobot', role: 'Robots and operations', href: 'https://bitrobot.ai/', logo: `<img src="${ASSETS}bitrobot-logo.webp" alt="BitRobot" class="br">` },
+  { name: 'EAIC Singapore', role: 'Test sites in Singapore', href: 'https://nrp.gov.sg/', logo: '<span class="eaic"><b>EAIC</b><span>Embodied AI Centre<br>Singapore</span></span>' },
   { name: 'Hugging Face', role: 'Open data and LeRobot', href: 'https://huggingface.co/', logo: `<span class="hf"><img src="${ASSETS}huggingface-logo.svg" alt=""><b>Hugging Face</b></span>` },
 ]
 
 // Static wiring: the one call to action, the brand, partners, footer.
 document.querySelectorAll('[data-cta]').forEach(a => { a.href = SUBMIT })
 $('#brand-mark').src = `${ROOT}brand/rc-mark-white.svg`
+$('#evaluations .band-link').href = appLink('/evals')
 $('#partners').innerHTML = PARTNERS.map(p => `<li><a href="${p.href}" aria-label="${esc(p.name)}">${p.logo}</a><span>${esc(p.role)}</span></li>`).join('')
 $('#footer').innerHTML = `<div class="foot-brand"><img src="${ROOT}brand/rc-lockup-white.svg" alt="RoboColosseum" height="40"><p>Founded by NUS MAGIC Lab, BitRobot, EAIC Singapore and Hugging Face.</p></div>
   <nav aria-label="Footer"><div><h3>The benchmark</h3><ul><li><a href="${appLink('/leaderboard')}">Leaderboard</a></li><li><a href="${appLink('/evals')}">Evaluations</a></li><li><a href="${appLink('/tasks')}">Tasks and protocol</a></li><li><a href="https://huggingface.co/RoboColosseum">Open data</a></li></ul></div>
@@ -52,7 +54,7 @@ film.addEventListener('timeupdate', () => {
   if (i < 0 || i === current) return
   current = i
   const c = cues[i]
-  caption.innerHTML = `<b>${esc(c.body)}</b> ${esc(c.place)}${c.date ? `<span>${esc(c.date)}</span>` : ''}`
+  caption.innerHTML = `<b>${esc(c.body)}</b> ${esc(c.place.replace('Four bodies', 'Four robot types'))}${c.date ? `<span>${esc(c.date)}</span>` : ''}`
 })
 playWhenVisible(film)
 
@@ -88,16 +90,15 @@ const policiesOn = id => new Set([...rankedOpen(id), ...fineRows(id)].map(r => r
 const ago = iso => { const m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 48 * 60 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago` }
 const n = v => `<span class="n">${fmt(v)}</span>`
 
-// One sentence of proof under the hero, once every board has answered. If one could not be read, the sentence is left out
-// rather than showing a smaller total.
+// The leaderboard's lede: what the rankings are built from, once every board has answered. If a board could not be read,
+// a plain sentence replaces the totals rather than showing a smaller count.
 function proof() {
   if (!store.ready) return
   const t = totals(), el = $('#proof')
-  if (!t.comparisons && !t.fineTrials) { el.hidden = true; return }
+  if (!t.comparisons && !t.fineTrials) { el.textContent = 'Rankings update as each evaluation is finished.'; return }
   const policies = new Set(ROBOTS.flatMap(r => [...rankedOpen(r.id), ...fineRows(r.id)].map(x => x.policyId || x.policy))).size
   const latest = store.evaluations?.length ? store.evaluations.reduce((m, e) => (e.date > m ? e.date : m), '') : ''
-  el.hidden = false
-  el.innerHTML = `${n(t.comparisons)} blind head-to-head comparisons and ${n(t.fineTrials)} scored trials so far, from ${n(policies)} policies on ${n(t.embodiments)} robot types.${latest ? ` Latest result ${esc(ago(latest))}.` : ''}`
+  el.innerHTML = `Built from ${n(t.comparisons)} blind comparisons and ${n(t.fineTrials)} scored trials across ${n(policies)} policies and ${n(t.embodiments)} robot types.${latest ? ` Last result ${esc(ago(latest))}.` : ''}`
 }
 
 // The leaderboard preview: one robot and one measurement at a time, the top five.
@@ -136,10 +137,10 @@ function rankings() {
       <span class="bar" aria-hidden="true">${bar}</span>
       <span class="val">${value}</span></li>`
   }).join('')
-  const more = model.rows.length > 5 ? ` Showing the top 5 of ${model.rows.length}.` : ''
+  const more = model.rows.length > 5 ? ` Top 5 of ${model.rows.length} shown.` : ''
   note.textContent = board.track === 'open'
-    ? `Rating from blind head-to-head comparisons on ${robot.name}; ± is one standard error. Faded rows have fewer than 20 comparisons.${more}`
-    : `Share of trials with full success across the standard tasks on ${robot.name}; the band is a 95% interval.${more}`
+    ? `Ratings on ${robot.name} from blind comparisons; ± is one standard error. Faded rows have fewer than 20 comparisons so far.${more}`
+    : `Full successes on ${robot.name}'s standard tasks; the band is a 95% interval. Faded rows have fewer than 10 trials so far.${more}`
 }
 document.querySelector('.board-controls').addEventListener('click', e => {
   const b = e.target.closest('button[role="tab"]'); if (!b || b.disabled) return
@@ -157,7 +158,7 @@ function fleet() {
 
 function places() {
   const scenes = totals().scenes
-  $('#places').innerHTML = `Evaluations run in homes, offices, pantries and campus spaces${scenes ? `: ${n(scenes)} distinct scenes recorded so far` : ''}.`
+  $('#places').innerHTML = `Twelve recorded evaluations, played together.${scenes ? ` ${n(scenes)} different scenes on record so far.` : ''}`
 }
 
 const pair = matchup($('#pair'))

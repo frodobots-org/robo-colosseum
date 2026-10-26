@@ -1,6 +1,6 @@
 // One real head-to-head from the record: both runs side by side, the instruction, the evaluator's judgement and note.
-// Same data path as ../v3/pair.js, with the launch wording and poster frames resolved from that module's folder.
-import { API, ROBOTS, store, esc, appLink, sentence } from '../landing/live.js'
+// Same data path as ../v3/pair.js, with the v6 wording and poster frames resolved from that module's folder.
+import { API, ROBOTS, store, esc, sentence } from '../landing/live.js'
 import { FRAMES } from '../v3/frames.js'
 import { HERO_ID } from '../v3/pair.js'
 import { prettyScene } from '../v3/board.js'
@@ -29,14 +29,14 @@ export function matchup(root) {
     const where = [robotName(e.robotId), prettyScene(e.scene), e.institution].filter(Boolean).map(esc).join(', ')
     return `<p class="instruction">“${esc(sentence(e.instruction || e.task))}”</p>
       <p class="where">${where}${e.date ? `<span>${esc(when(e.date))}</span>` : ''}</p>
-      <p class="judgement">${winner ? `The evaluator preferred <b>run ${winner}</b>.` : 'The evaluator judged it <b>a tie</b>.'}${pa !== null && pb !== null ? ` Progress: A <span class="n">${pa}%</span>, B <span class="n">${pb}%</span>.` : ''}</p>
+      <p class="judgement">${winner ? `Evaluator's pick: <b>run ${winner}</b>.` : "Evaluator's call: <b>a tie</b>."}${pa !== null && pb !== null ? ` Progress: A <span class="n">${pa}%</span>, B <span class="n">${pb}%</span>.` : ''}</p>
       ${short ? `<blockquote class="note">${esc(short)}</blockquote>` : ''}
-      <p class="matchup-links"><button type="button" class="another"${store.evaluations ? '' : ' disabled'}>Show another matchup</button><a href="${appLink('/evals', { robot: e.robotId, track: 'open' })}">Watch more evaluations</a></p>`
+      <button type="button" class="another"${store.evaluations ? '' : ' disabled'}>Show another comparison</button>`
   }
   function bind() { root.querySelector('.another')?.addEventListener('click', () => { const next = pick(); if (next) { current = next; render() } }) }
   function render() {
     const winner = current.winner === 'A' || current.winner === 'B' ? current.winner : null
-    root.innerHTML = `<div class="runs">${['A', 'B'].map(s => `<div class="run${winner === s ? ' won' : ''}"><video muted loop playsinline preload="auto"></video><span class="side">Run ${s}${winner === s ? ', preferred' : ''}</span><span class="cam"></span></div>`).join('')}</div>
+    root.innerHTML = `<div class="runs">${['A', 'B'].map(s => `<div class="run${winner === s ? ' won' : ''}"><video muted loop playsinline preload="auto"></video><span class="side">Run ${s}${winner === s ? ', picked' : ''}</span><span class="cam"></span></div>`).join('')}</div>
       <div class="details">${details()}</div>`
     bind()
     loadClips()

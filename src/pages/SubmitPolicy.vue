@@ -3,8 +3,8 @@
     <section class="page-head">
       <div>
         <p class="eyebrow">Submit your policy</p>
-        <h1>You don't need to own a robot.</h1>
-        <p class="lede">Send us a policy and we run it on real robots, in real environments, against a shared standard. Results land on the public leaderboard with every recording behind them. Academic labs evaluate for free, from a pool of 10,000 hours.</p>
+        <h1>Get your policy evaluated on real robots.</h1>
+        <p class="lede">Tell us about your model and the robots you want results on. We run it under the same protocol as every other entry and publish the scores with the recordings behind them. Academic labs evaluate free, from a pool of 10,000 hours.</p>
       </div>
       <span class="live-tag"><i></i>Rolling intake</span>
     </section>
