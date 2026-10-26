@@ -2,15 +2,22 @@
 
 The decisions behind the landing pages, as the user stated them. Read this before touching any page under `public/`. When a decision changes, change it here first.
 
-## What we are and how we say it
+## What we are and how we say it (26 Oct 2026, BIT-3373)
 
-- **What we build:** the independent, real-world benchmark for physical AI. Policies from every lab run on real robots in real rooms, judged blind by people, ranked per robot body.
-- **Main message:** *Evaluations made in the wild.* It is the headline and the first section. "Tested in the wild" was rejected: it names the method, not the thing.
-- **Second message:** cross-embodiment. One protocol, every body: Franka, SO-ARM101, Bimanual YAM, Unitree G1, Earth Rover Mini+ (joining).
-- **Order of the page** (huddle with Michael Cho, 21 Oct 2026): in the wild → every body → scale on several axes (bodies, sites, rooms, tasks, rollouts, evaluators, days) → then the benchmark detail (leaderboards, a real pair, every trial, the two tracks) → join. The co-organizer logos (Hugging Face, BitRobot, EAIC, MAGIC Lab NUS: added after EAIC on 23 Oct 2026 at the user's request; its logo is the lab's own `magic-logo.png` with the white background removed, colours untouched) sit as one line directly under the hero, as a credibility strip, not a section (user decision, 22 Oct 2026); they appear once on the page plus the footer mention. **Always the official logos in their own colours**: never recolour, grey out or monochrome a partner logo (user correction, 22 Oct 2026).
-- **Less text, more footage.** The hero carries real recordings (the in-the-wild mashup), not copy. Benchmark examples and evaluations sit below the fold.
-- **Day-one call to action:** the 10,000-hour dataset. Second: see the leaderboards.
-- **Voice:** plain, specific, in sentence case. Every number on the page is live from the API; never a static figure.
+The v5 copy got bad feedback ("copy is bad or misleading... messy... doesn't give strong flow or CTA"). The **launch film script** is now the source of the message; the page follows its six scenes. The previous messaging rules ("Evaluations made in the wild" as headline, the 10,000-hour *dataset* as call to action, "every number is live") are superseded.
+
+- **Tagline and headline:** *The proving ground for Physical AI.* Under it: *Submit your policy. We run it on real robots, in real environments, and measure it against a shared standard. No robot required.*
+- **What we build:** real robots, real environments, a shared standard. Researchers submit a policy; trained operators run it on our fleet; every run is published. "In the wild" stays a supporting idea (real environments), not the headline.
+- **Order of the page** (the film's scenes, with the leaderboard pulled up as proof): hero → founding partners → live leaderboard → why (ten labs, ten answers) → how it works (no robot needed; head-to-head and standard tasks; what keeps the scores honest) → robots and environments → a real matchup → open data → "Enter the arena" with the 10,000-hour offer → questions.
+- **One call to action: "Submit your policy".** It appears in the top bar (site-wide, app pages included), the hero, after "How it works" and in the closing section. Every copy has the same label and the same destination. **No secondary buttons** (user rule, 26 Oct 2026): the leaderboard, evaluations, data and "Join as an evaluator" are plain links or footer items. Amber is used only for this button.
+- **The offer:** *Free for academic labs: 10,000 hours of real-robot evaluation.* It is evaluation time, **never a dataset**.
+- **Founding partners** (not "co-organizers"): NUS MAGIC Lab (scientific protocol), BitRobot (robot fleet and operations), EAIC Singapore (evaluation sites in Singapore), Hugging Face (open data and LeRobot), each with its role under the logo. **Always the official logos in their own colours**: never recolour, grey out or monochrome a partner logo (user correction, 22 Oct 2026).
+- **Fleet facts** from the launch film are confirmed fixed figures (user, 26 Oct 2026): 30 Unitree G1 humanoids, 25 pairs of YAM arms, Franka arms (DROID setup), Earth Rovers (joining); SO-ARM101 is also live. Every other number is read from the API.
+- **Open data:** "Every rollout, including the failures, is published on Hugging Face in LeRobot format." The RoboColosseum org goes public at launch (user decision).
+- **Words:** robot or robot type (not "body"), environment or scene (not "room"), judgement (not "verdict"), head-to-head (open track) and standard tasks (fine-tuning track) on public pages. Never "0–4 scale" (task maxima are 3–7), never "real rooms, not labs" (our partners are labs), no "independent" (BitRobot runs the fleet and is a partner), no "first" or "only" (RoboChallenge, PhAIL, RoboArena, XDOF and Artificial Analysis also evaluate on real robots).
+- **No globe or map.** None of the competitors uses one and ours implied reach we don't have. Diversity is shown with real footage (the wall of twelve evaluations) and a live count of scenes.
+- **Less text, more footage** still holds: the hero is the film, full bleed, with the claim over it.
+- **Voice:** plain, specific, sentence case, from the researcher's side ("you", "your policy").
 
 ## Logo
 
@@ -20,6 +27,7 @@ The decisions behind the landing pages, as the user stated them. Read this befor
 ## Direction
 
 - References: Artificial Analysis (the benchmark publisher: white, serif one-liner, charts in cards, a changelog of evaluations) and XDOF (the instrument: dark panels on a dotted grid, mono labels, almost no copy).
+- **Launch page (26 Oct 2026, BIT-3373): `/v6/`** (`public/v6/`: `index.html`, `v6.css`, `v6.js`, `matchup.js`), served at the site root once merged. Same night tokens and type as v5; layout rebuilt for flow: nine sections, one idea each, a full-bleed film hero, one amber button, mono only for numbers, no dotted panels. It reuses `public/landing/live.js` and `public/v3/board.js` (`openRows`, `fineRowsModel`, `mark`); it does not load the globe, the trial squares or the Robocurve figure.
 - Chosen (22 Oct 2026): **Index in night mode**, `/v5/`. **It is the default for the whole platform** (user decision, 22 Oct 2026): the site root serves `/v5/` on Netlify, and the app pages (leaderboards, evaluations, tasks, submit, join) use the same night tokens, the v5 top bar with the RC mark, Archivo + IBM Plex Mono and the amber accent. Tokens live in `src/styles/arena.css`; `src/styles/base.css` reads them. The Index layout (claim + film window, index cards, a live feed of verdicts) on a dark page, with the control room's live ticker. Earlier explorations stay for comparison: `/v3/` (sage), `/v4/wall/`, `/v4/cinema/`, `/v4/poster/`.
 
 ## Colour
