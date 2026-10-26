@@ -1,5 +1,5 @@
 // One real head-to-head from the record: both runs side by side, the instruction, the evaluator's judgement and note.
-// Same data path as ../v3/pair.js, with the v6 wording and poster frames resolved from that module's folder.
+// Same data path as ../v3/pair.js, with the v7 wording and poster frames resolved from that module's folder.
 import { API, ROBOTS, store, esc, sentence } from '../landing/live.js'
 import { FRAMES } from '../v3/frames.js'
 import { HERO_ID } from '../v3/pair.js'

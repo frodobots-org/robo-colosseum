@@ -1,24 +1,34 @@
-// v6: the launch page. Named sections in full-width bands, in the order of importance set in the 21 Oct 2026 huddle:
+// v7: the launch page. Named sections in full-width bands, in the order of importance set in the 21 Oct 2026 huddle:
 // in the wild, robots (cross-embodiment), scale; then the benchmark detail (leaderboard, how it works, one comparison,
 // open data, academic access, FAQ). One call to action, "Submit your policy", with one destination everywhere.
-// Fleet sizes are fixed facts; every other number is read from /api.
+// Fleet sizes and locations are fixed facts from the team; every other number is read from /api.
 import { API, ASSETS, ROBOTS, store, totals, rankedOpen, fineRows, hasData, fmt, esc, appLink } from '../landing/live.js'
 import { openRows, fineRowsModel, mark } from '../v3/board.js'
 import { matchup } from './matchup.js'
+import { ROOT, chrome } from './chrome.js'
+import { SETUPS, setupDialog } from './setups.js'
 
 const $ = (s, el = document) => el.querySelector(s)
-const ROOT = window.RC_ROOT || '/'
 const VIDEO = `${ROOT}v4/video/`
-const SUBMIT = appLink('/submit')
+const PICS = `${ROOT}v7/robots/`
 
-// The fleet (sizes confirmed by the team); the live line under each robot comes from the API.
+// The fleet (sizes confirmed by the team); the live line under each robot comes from the API. Robots with a documented
+// setup open it on click.
 const FLEET = [
-  { id: 'g1', name: 'Unitree G1', count: 30, unit: 'humanoids', img: `${ASSETS}g1.webp` },
-  { id: 'yam', name: 'Bimanual YAM', count: 25, unit: 'two-arm stations', img: `${ASSETS}yam.webp`, mirror: true },
-  { id: 'franka', name: 'Franka', unit: 'Single arm, DROID setup', img: `${ASSETS}franka.webp` },
-  { id: 'so101', name: 'SO-ARM101', unit: 'Low-cost single arm', img: `${ASSETS}so101.webp` },
+  { id: 'g1', name: 'Unitree G1', count: 30, unit: 'humanoids', img: `${PICS}g1.webp` },
+  { id: 'yam', name: 'Bimanual YAM', count: 25, unit: 'two-arm stations', img: `${PICS}yam.webp` },
+  { id: 'franka', name: 'Franka', unit: 'Single arm, DROID setup', img: `${PICS}franka.webp` },
+  { id: 'so101', name: 'SO-ARM101', unit: 'Low-cost single arm', img: `${PICS}so101.webp` },
   { id: 'earth-rover', name: 'Earth Rover Mini+', unit: 'Outdoor wheeled robot', img: `${ROOT}v3/bodies/earth-rover-mini-plus.webp`, joining: true },
 ]
+
+// Where evaluation happens, as the team confirmed it on 26 Oct 2026. The two tracks are kept apart: open-track runs happen
+// in these places, while the fine-tuning datasets were recorded in those.
+const PLACES = {
+  open: ['Singapore', 'China', 'Seattle, United States', 'Oxford, United Kingdom'],
+  fine: ['Singapore', 'Kuala Lumpur, Malaysia', 'China'],
+}
+const COUNTRIES = new Set([...PLACES.open, ...PLACES.fine].map(p => p.split(', ').at(-1))).size
 
 const PARTNERS = [
   { name: 'NUS MAGIC Lab', role: 'Evaluation protocol', href: 'https://magiclab-nus.github.io/', logo: `<img src="${ASSETS}magic-lab-logo.webp" alt="MAGIC Lab, NUS" class="magic">` },
@@ -27,15 +37,14 @@ const PARTNERS = [
   { name: 'Hugging Face', role: 'Open data and LeRobot', href: 'https://huggingface.co/', logo: `<span class="hf"><img src="${ASSETS}huggingface-logo.svg" alt=""><b>Hugging Face</b></span>` },
 ]
 
-// Static wiring: the one call to action, the brand, partners, footer.
-document.querySelectorAll('[data-cta]').forEach(a => { a.href = SUBMIT })
-$('#brand-mark').src = `${ROOT}brand/rc-mark-white.svg`
+// Static wiring: the shared chrome, partners, places, the setup dialog.
+chrome()
 $('#evaluations .band-link').href = appLink('/evals')
 $('#partners').innerHTML = PARTNERS.map(p => `<li><a href="${p.href}" aria-label="${esc(p.name)}">${p.logo}</a><span>${esc(p.role)}</span></li>`).join('')
-$('#footer').innerHTML = `<div class="foot-brand"><img src="${ROOT}brand/rc-lockup-white.svg" alt="RoboColosseum" height="40"><p>Founded by NUS MAGIC Lab, BitRobot, EAIC Singapore and Hugging Face.</p></div>
-  <nav aria-label="Footer"><div><h3>The benchmark</h3><ul><li><a href="${appLink('/leaderboard')}">Leaderboard</a></li><li><a href="${appLink('/evals')}">Evaluations</a></li><li><a href="${appLink('/tasks')}">Tasks and protocol</a></li><li><a href="https://huggingface.co/RoboColosseum">Open data</a></li></ul></div>
-  <div><h3>Take part</h3><ul><li><a href="${SUBMIT}">Submit your policy</a></li><li><a href="${appLink('/join')}">Join as an evaluator</a></li></ul></div>
-  <div><h3>Follow</h3><ul><li><a href="https://x.com/RoboColosseum">X</a></li><li><a href="https://github.com/frodobots-org/robo-colosseum">GitHub</a></li><li><a href="https://huggingface.co/RoboColosseum">Hugging Face</a></li></ul></div></nav>`
+$('#sites').innerHTML = [['Open track', 'Evaluations run in', PLACES.open], ['Fine-tuning track', 'Datasets recorded in', PLACES.fine]]
+  .map(([track, verb, places]) => `<div><dt>${track}</dt><dd><span>${verb}</span><ul>${places.map(p => `<li>${esc(p)}</li>`).join('')}</ul></dd></div>`).join('')
+const openSetup = setupDialog($('#setup'))
+$('#fleet').addEventListener('click', e => { const b = e.target.closest('[data-setup]'); if (b) openSetup(b.dataset.setup) })
 
 // Videos: play only while visible, never for people who asked for reduced motion.
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -108,7 +117,6 @@ function proof() {
 function scale() {
   const t = totals(), ev = evaluations()
   const instructions = ev ? new Set(ev.map(e => String(e.instruction || e.task || '').trim().toLowerCase()).filter(Boolean)).size : null
-  const tasks = store.ready ? new Set(ROBOTS.flatMap(r => fineRows(r.id).map(x => `${r.id}/${x.taskId || x.task}`))).size : null
   const runs = t.comparisons !== null && t.fineTrials !== null ? 2 * t.comparisons + t.fineTrials : null
   const live = t.embodiments, joining = FLEET.filter(f => f.joining).length
   const figures = [
@@ -116,7 +124,7 @@ function scale() {
     [t.scenes, 'scenes', 'Homes, offices, labs, canteens and corridors.'],
     [instructions, 'different instructions', 'Written on the spot by the evaluators.'],
     [store.ready ? policyCount() : null, 'policies evaluated', 'Ranked on public leaderboards.'],
-    [tasks, 'standard tasks', 'Each learned from the same 100 demonstrations.'],
+    [COUNTRIES, 'countries', 'Where open-track runs happen and fine-tuning data was recorded.'],
     [live, 'robot types', joining ? `${joining} more joining.` : 'Each with its own leaderboard.'],
   ]
   $('#figures').innerHTML = figures.map(([v, label, note]) => `<div><dt>${v === null ? '<span class="skel">0,000</span>' : `<span class="n">${fmt(v)}</span>`}</dt><dd><b>${esc(label)}</b>${esc(note)}</dd></div>`).join('')
@@ -176,8 +184,11 @@ document.querySelector('.board-controls').addEventListener('click', e => {
 function fleet() {
   $('#fleet').innerHTML = FLEET.map(f => {
     const live = f.joining ? 'Joining' : !robotLoaded(f.id) ? '<span class="skel">00 policies ranked</span>' : hasData(f.id) ? `${fmt(policiesOn(f.id))} policies ranked` : 'Results coming soon'
-    return `<li><span class="stage"><img src="${f.img}" alt="" loading="lazy"${f.mirror ? ' class="mirror"' : ''}></span>
-      <h3>${esc(f.name)}</h3><p class="count">${f.count ? `${n(f.count)} ${esc(f.unit)}` : esc(f.unit)}</p><p class="live${f.joining ? ' joining' : ''}">${live}</p></li>`
+    const body = `<span class="stage"><img src="${f.img}" alt="" loading="lazy"></span>
+      <h3>${esc(f.name)}</h3><p class="count">${f.count ? `${n(f.count)} ${esc(f.unit)}` : esc(f.unit)}</p><p class="live${f.joining ? ' joining' : ''}">${live}</p>`
+    return SETUPS[f.id]
+      ? `<li><button type="button" class="robot" data-setup="${f.id}" aria-haspopup="dialog">${body}<span class="see">See the setup and parts</span></button></li>`
+      : `<li class="robot">${body}</li>`
   }).join('')
 }
 

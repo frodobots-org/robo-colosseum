@@ -9,7 +9,7 @@
 <meta property="og:site_name" content="RoboColosseum">
 <meta property="og:title" content="RoboColosseum · Benchmarking robot policies in the wild">
 <meta property="og:description" content="Humanoids, arms and rovers running real models in homes, offices and campuses. Every run scored and published.">
-<meta property="og:url" content="https://robocolosseum.ai/">
+<meta property="og:url" content="https://robocolosseum.ai/v7/">
 <meta property="og:image" content="https://robocolosseum.ai/v4/video/mashup.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@RoboColosseum">
@@ -18,15 +18,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <script>
-// This page lives at /v6/ and is also served at the site root, so its assets are resolved from the site root.
-(function () { var p = location.pathname, i = p.indexOf('/v6/'); var root = i >= 0 ? p.slice(0, i + 1) : p.replace(/[^/]*$/, ''); window.RC_ROOT = root
-  document.write('<link rel="icon" href="' + root + 'brand/favicon.svg"><link rel="stylesheet" href="' + root + 'v6/v6.css"><link rel="modulepreload" href="' + root + 'landing/live.js"><script type="module" src="' + root + 'v6/v6.js"><\/script>') })()
+// This page lives at /v7/ (and may later be served at the site root), so its assets are resolved from the site root.
+(function () { var p = location.pathname, i = p.indexOf('/v7/'); var root = i >= 0 ? p.slice(0, i + 1) : p.replace(/[^/]*$/, ''); window.RC_ROOT = root
+  document.write('<link rel="icon" href="' + root + 'brand/favicon.svg"><link rel="stylesheet" href="' + root + 'v7/v7.css"><link rel="modulepreload" href="' + root + 'landing/live.js"><script type="module" src="' + root + 'v7/v7.js"><\/script>') })()
 </script>
 </head>
 <body>
 <header class="top" id="top">
   <a class="brand" href="#top" aria-label="RoboColosseum, back to top"><img id="brand-mark" alt="" width="36" height="30"><span>RoboColosseum</span></a>
-  <nav class="nav" aria-label="Sections"><a href="#wild">In the wild</a><a href="#robots">Robots</a><a href="#scale">Scale</a><a href="#leaderboard">Leaderboard</a><a href="#how">How it works</a><a href="#faq">FAQ</a></nav>
+  <nav class="nav" aria-label="Sections"><a href="#wild">In the wild</a><a href="#robots">Robots</a><a href="#leaderboard">Leaderboard</a><a href="#how">How it works</a><a data-blog href="blog/">Blog</a><a href="#faq">FAQ</a></nav>
   <a class="cta" data-cta href="/submit">Submit your policy</a>
 </header>
 <main>
@@ -61,6 +61,7 @@
         <ol class="wall-labels" id="wall-labels" aria-hidden="true"></ol>
         <figcaption id="places">Twelve recorded evaluations, played together.</figcaption>
       </figure>
+      <dl class="sites" id="sites" aria-label="Where evaluation happens"></dl>
     </div>
   </section>
 
@@ -69,7 +70,7 @@
       <header class="band-head">
         <div class="band-bar"><span class="band-name">Robots</span></div>
         <h2 id="robots-title">Humanoids, arms and rovers.</h2>
-        <p class="band-lede">One method across every robot type. Each type keeps its own leaderboard, so a score always refers to the same hardware.</p>
+        <p class="band-lede">One method across every robot type, each with its own leaderboard. Open a robot to see its setup and parts list.</p>
       </header>
       <ul class="fleet" id="fleet"></ul>
     </div>
@@ -189,5 +190,6 @@
 
 </main>
 <footer class="foot" id="footer"></footer>
+<dialog class="setup" id="setup" aria-labelledby="setup-title"></dialog>
 </body>
 </html>
