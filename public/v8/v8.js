@@ -56,7 +56,8 @@ function playWhenVisible(video) {
 
 // The hero film (cut from the team's footage on 27 Oct 2026); its caption follows the cut list that ships with it.
 const film = $('#film'), caption = $('#caption')
-film.poster = `${VIDEO}hero.jpg`; film.src = `${VIDEO}hero.mp4`
+// Phones get the 720p cut (3.2 MB instead of 6.4).
+film.poster = `${VIDEO}hero.jpg`; film.src = `${VIDEO}${matchMedia('(max-width: 760px)').matches ? 'hero-720' : 'hero'}.mp4`
 let cues = [], current = -1
 fetch(`${VIDEO}hero.json`).then(r => r.ok ? r.json() : []).then(list => { cues = list }).catch(() => {})
 film.addEventListener('timeupdate', () => {
@@ -69,14 +70,14 @@ film.addEventListener('timeupdate', () => {
 })
 playWhenVisible(film)
 
-// One run to hundreds: the camera pulls back three times, each view becoming the centre of nine. The counter follows the
-// film's own timeline (zooms end at 4.1, 7.1 and 10.1 s; the loop fades back from 13.3 s).
+// One run to thousands: the camera pulls back four times, each view becoming the centre of nine. The counter follows the
+// film's own timeline (zooms start at 2.5, 5.5, 8.5 and 11.5 s and last 1.6 s; the loop fades back from 16.3 s).
 const mosaic = $('#mosaic'), count = $('#mosaic-count')
 mosaic.poster = `${VIDEO}mosaic.jpg`; mosaic.src = `${VIDEO}mosaic.mp4`
-const STAGES = [[0, 1], [3.3, 9], [6.3, 81], [9.3, 729]]
+const STAGES = [[0, 1], [3.3, 9], [6.3, 81], [9.3, 729], [12.3, 6561]]
 mosaic.addEventListener('timeupdate', () => {
-  const t = mosaic.currentTime, n = t > 13.3 ? 1 : STAGES.filter(([at]) => t >= at).at(-1)[1]
-  const text = n === 729 && stats ? `${fmt(n)} recordings on screen, of ${fmt(stats.runs)} recorded runs` : `${fmt(n)} ${n === 1 ? 'recording' : 'recordings'}`
+  const t = mosaic.currentTime, n = t > 16.3 ? 1 : STAGES.filter(([at]) => t >= at).at(-1)[1]
+  const text = n === 6561 && stats ? `${fmt(n)} recordings on screen, of ${fmt(stats.runs)} recorded runs` : `${fmt(n)} ${n === 1 ? 'recording' : 'recordings'}`
   if (count.textContent !== text) count.textContent = text
 })
 playWhenVisible(mosaic)
@@ -166,7 +167,7 @@ function scale() {
 function places() {
   if (!stats?.scenes) return
   const per = Object.entries(stats.robots || {}).map(([id, r]) => ({ name: NAMES[id] || id, count: r.scenes })).filter(r => r.count).sort((a, b) => b.count - a.count)
-  $('#places').innerHTML = `From one robot at work to hundreds of recorded runs. ${n(stats.scenes)} scenes on record so far: ${list(per.map(r => `${n(r.count)} for ${esc(r.name)}`))}.`
+  $('#places').innerHTML = `From one robot at work to thousands of recorded runs. ${n(stats.scenes)} scenes on record so far: ${list(per.map(r => `${n(r.count)} for ${esc(r.name)}`))}.`
 }
 
 function fleet() {
