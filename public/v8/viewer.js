@@ -1,6 +1,7 @@
 // A preview of the evaluation viewer: one blind comparison from the daily record, both runs on one timeline (play, pause
 // and seek move them together), a choice of camera, the instruction, the evaluator's pick and note. The comparisons come
-// from /api/stats; the recordings from /evaluations/{id}/videos when a comparison is shown.
+// from /api/stats; the recordings from /evaluations/{id}/videos. Recordings reach storage hours after a comparison is
+// judged, so several are looked up at once and only one with both runs recorded is shown.
 import { API, ROBOTS, esc, sentence } from '../landing/live.js'
 import { prettyScene } from '../v3/board.js'
 
@@ -11,22 +12,32 @@ const camLabel = key => key.replace(/_image$/, '').replace(/_/g, ' ').replace(/^
 const when = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }
 const clock = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+const BATCH = 6
+
+async function recordings(e) {
+  try { const r = await fetch(`${API}/evaluations/${e.id}/videos`, { headers: { Accept: 'application/json' } }); if (r.ok) return (await r.json()).videos || {} } catch {}
+  return {}
+}
+// Cameras recorded on both sides, the overview first.
+const shared = v => Object.keys(v.a || {}).filter(k => v.b?.[k]).sort((x, y) => (ORDER.indexOf(x) + 1 || 99) - (ORDER.indexOf(y) + 1 || 99))
 
 export function viewer(root) {
   let list = [], current = null, videos = {}, cam = null, token = 0, playing = !still, visible = false, sync = null
   const missing = new Set()
+  const left = () => list.filter(e => e.id !== current?.id && !missing.has(e.id))
 
   const details = e => {
     const winner = e.winner === 'A' || e.winner === 'B' ? e.winner : null
     const raw = String(e.feedback || '').replace(/\s+/g, ' ').trim()
     const note = raw.length > 320 ? raw.slice(0, raw.lastIndexOf(' ', 300)) + '…' : raw
     const pa = Number.isFinite(e.partialSuccessA) ? Math.round(e.partialSuccessA * 100) : null, pb = Number.isFinite(e.partialSuccessB) ? Math.round(e.partialSuccessB * 100) : null
-    const where = [NAMES[e.robotId] || e.robotId, prettyScene(e.scene), e.institution].filter((x, i, all) => x && all.findIndex(y => String(y).toLowerCase() === String(x).toLowerCase()) === i).map(esc).join(', ')
+    // A scene named after its site keeps the site's own spelling ("NUS", not "Nus").
+    const where = [NAMES[e.robotId] || e.robotId, e.institution, prettyScene(e.scene)].filter((x, i, all) => x && all.findIndex(y => String(y).toLowerCase() === String(x).toLowerCase()) === i).map(esc).join(', ')
     return `<p class="instruction">“${esc(sentence(e.instruction))}”</p>
       <p class="where">${where}${e.date ? `<span>${esc(when(e.date))}</span>` : ''}</p>
       <p class="judgement">${winner ? `Evaluator's pick: <b>run ${winner}</b>.` : "Evaluator's call: <b>a tie</b>."}${pa !== null && pb !== null ? ` Progress: A <span class="n">${pa}%</span>, B <span class="n">${pb}%</span>.` : ''}</p>
       ${note ? `<blockquote class="note">${esc(note)}</blockquote>` : ''}
-      <button type="button" class="another"${list.length > 1 ? '' : ' disabled'}>Show another comparison</button>`
+      <button type="button" class="another"${left().length ? '' : ' disabled'}>Show another comparison</button>`
   }
 
   function render() {
@@ -36,28 +47,31 @@ export function viewer(root) {
         <input type="range" min="0" max="1000" value="0" step="1" aria-label="Position in both runs" disabled><time>0:00 / 0:00</time></div>
       <div class="cams" role="group" aria-label="Camera"></div>
       <div class="details">${details(e)}</div>`
-    root.querySelector('.another').addEventListener('click', next)
+    root.querySelector('.another').addEventListener('click', () => pick(true))
     load()
   }
 
-  function next() {
-    const pool = list.filter(e => e.id !== current?.id && !missing.has(e.id))
-    if (pool.length) { current = pool[Math.floor(Math.random() * pool.length)]; render() }
+  // The first comparison in list order (the daily snapshot puts the settled ones first), or a random other one.
+  async function pick(random) {
+    const mine = ++token, another = root.querySelector('.another')
+    const pool = left()
+    if (random) pool.sort(() => Math.random() - .5)
+    if (another) { another.disabled = true; another.textContent = 'Finding another comparison…' }
+    for (let i = 0; i < pool.length; i += BATCH) {
+      const found = await Promise.all(pool.slice(i, i + BATCH).map(async e => [e, await recordings(e)]))
+      if (mine !== token) return
+      found.forEach(([e, v]) => { if (!shared(v).length) missing.add(e.id) })
+      const hit = found.find(([, v]) => shared(v).length)
+      if (hit) { [current, videos] = hit; return render() }
+    }
+    if (current) { if (another) another.textContent = 'No other comparison has its recordings yet'; return }
+    root.innerHTML = '<p class="board-note">No comparison has its recordings ready right now. Open the evaluation viewer to browse every comparison.</p>'
   }
 
-  async function load() {
+  function load() {
     const mine = ++token
-    videos = {}; sync = null
-    try { const r = await fetch(`${API}/evaluations/${current.id}/videos`, { headers: { Accept: 'application/json' } }); if (r.ok) videos = (await r.json()).videos || {} } catch {}
-    if (mine !== token) return
-    const both = ORDER.filter(k => videos.a?.[k] && videos.b?.[k])
-    const keys = both.length ? both : [...new Set([...Object.keys(videos.a || {}), ...Object.keys(videos.b || {})])]
-    // Some comparisons have no recording to play yet: show another one instead, a few times at most.
-    if (!keys.length) {
-      missing.add(current.id)
-      if (missing.size < 6 && list.some(e => !missing.has(e.id))) return next()
-      root.querySelectorAll('.run').forEach(run => run.insertAdjacentHTML('beforeend', '<span class="note-off">Recording not available</span>')); return
-    }
+    sync = null
+    const keys = shared(videos)
     cam = keys.includes(cam) ? cam : keys[0]
     const cams = root.querySelector('.cams')
     cams.innerHTML = keys.length > 1 ? keys.map(k => `<button type="button" data-cam="${esc(k)}" aria-pressed="${k === cam}">${esc(camLabel(k))}</button>`).join('') : ''
@@ -109,7 +123,7 @@ export function viewer(root) {
     show(matchups) {
       list = matchups || []
       if (!list.length) { root.innerHTML = '<p class="board-note">The comparison did not load. Open the evaluation viewer to browse every comparison.</p>'; return }
-      if (!current) { current = list[0]; render() }
+      if (!current) pick(false)
     },
     loading() { root.innerHTML = '<div class="runs"><div class="run"></div><div class="run"></div></div><div class="details"><p class="instruction"><span class="skel">Loading a comparison from the record</span></p></div>' },
   }
