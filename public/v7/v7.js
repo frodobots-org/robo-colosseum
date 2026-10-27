@@ -31,16 +31,16 @@ const PLACES = {
 const COUNTRIES = new Set([...PLACES.open, ...PLACES.fine].map(p => p.split(', ').at(-1))).size
 
 const PARTNERS = [
-  { name: 'NUS MAGIC Lab', role: 'Evaluation protocol', href: 'https://magiclab-nus.github.io/', logo: `<img src="${ASSETS}magic-lab-logo.webp" alt="MAGIC Lab, NUS" class="magic">` },
-  { name: 'BitRobot', role: 'Robots and operations', href: 'https://bitrobot.ai/', logo: `<img src="${ASSETS}bitrobot-logo.webp" alt="BitRobot" class="br">` },
-  { name: 'EAIC Singapore', role: 'Test sites in Singapore', href: 'https://nrp.gov.sg/', logo: '<span class="eaic"><b>EAIC</b><span>Embodied AI Centre<br>Singapore</span></span>' },
-  { name: 'Hugging Face', role: 'Open data and LeRobot', href: 'https://huggingface.co/', logo: `<span class="hf"><img src="${ASSETS}huggingface-logo.svg" alt=""><b>Hugging Face</b></span>` },
+  { name: 'NUS MAGIC Lab', href: 'https://magiclab-nus.github.io/', logo: `<img src="${ASSETS}magic-lab-logo.webp" alt="MAGIC Lab, NUS" class="magic">` },
+  { name: 'BitRobot', href: 'https://bitrobot.ai/', logo: `<img src="${ASSETS}bitrobot-logo.webp" alt="BitRobot" class="br">` },
+  { name: 'EAIC Singapore', href: 'https://nrp.gov.sg/', logo: '<span class="eaic"><b>EAIC</b><span>Embodied AI Centre<br>Singapore</span></span>' },
+  { name: 'Hugging Face', href: 'https://huggingface.co/', logo: `<span class="hf"><img src="${ASSETS}huggingface-logo.svg" alt=""><b>Hugging Face</b></span>` },
 ]
 
 // Static wiring: the shared chrome, partners, places, the setup dialog.
 chrome()
 $('#evaluations .band-link').href = appLink('/evals')
-$('#partners').innerHTML = PARTNERS.map(p => `<li><a href="${p.href}" aria-label="${esc(p.name)}">${p.logo}</a><span>${esc(p.role)}</span></li>`).join('')
+$('#partners').innerHTML = PARTNERS.map(p => `<li><a href="${p.href}" aria-label="${esc(p.name)}">${p.logo}</a></li>`).join('')
 $('#sites').innerHTML = [['Open track', 'Evaluations run in', PLACES.open], ['Fine-tuning track', 'Datasets recorded in', PLACES.fine]]
   .map(([track, verb, places]) => `<div><dt>${track}</dt><dd><span>${verb}</span><ul>${places.map(p => `<li>${esc(p)}</li>`).join('')}</ul></dd></div>`).join('')
 const openSetup = setupDialog($('#setup'))
