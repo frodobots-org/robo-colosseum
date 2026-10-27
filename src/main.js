@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
-import Home from './pages/Home.vue'
 import Tasks from './pages/Tasks.vue'
 import Leaderboard from './pages/Leaderboard.vue'
 import EvalViewer from './pages/EvalViewer.vue'
@@ -12,7 +11,9 @@ import './styles/arena.css'
 import './styles/boards.css'
 
 const routes = [
-  { path: '/', component: Home },
+  // The landing page is the overview. Netlify serves it at the site root before the app loads; elsewhere (GitHub Pages,
+  // the dev server) the app sends the root to it.
+  { path: '/', component: { render: () => null }, beforeEnter: () => { window.location.replace(`${import.meta.env.BASE_URL}v8/`); return false } },
   { path: '/leaderboard', component: Leaderboard },
   { path: '/tasks', component: Tasks },
   { path: '/evals', component: EvalViewer },

@@ -103,6 +103,16 @@ The v5 copy got bad feedback ("copy is bad or misleading... messy... doesn't giv
 
 ## App pages (22 Oct 2026)
 
+- **In the landing page's brand since 27 Oct 2026 (user: "deploy now as the main website, and apply changes throughout the other pages to follow the styles"):** the site root serves `/v8/`, and the app (leaderboard, evaluations, tasks, submit, join) wears the same brand. That means:
+  - **Top bar and footer:** the landing's, with the same nav (Leaderboard and Evaluations open the app pages; Embodiments, How it works, Open data and FAQ open the landing's sections), the theme switch shared through `rc-theme`, and the one orange button "Apply for free evaluation" to `/#apply` (`src/cta.js`).
+  - **Tokens:** v8's (silver/ink, light first, dark on the switch) under the old token names.
+  - **Type:** Zalando Sans for words; Kode Mono in capitals for labels.
+  - **Shapes:** sharp rectangles; lab marks are round, fixed-size circles.
+  - **Robot tabs:** the robots' photos from the landing's cards.
+  - **Data marks:** ink, like the landing's leaderboard. The win/tie/loss bar runs from ink to hairline. Orange marks only the button and a picked run.
+  - **Words:** the landing's: *Head-to-head* and *Standard tasks* (not open track and fine-tuning), robot (not body), scene (not room), pick (not verdict). The standard-task score is success and progress, never "0–4" or "4 of 4".
+  - **Pages:** Submit is the free-evaluation page, with the landing's four steps and the same button. Join keeps its own form button outlined. The app root sends visitors to the landing page. The rules below still hold where they don't conflict.
+
 - Every app page (Leaderboards, Evaluations, Tasks, Submit a policy, Join) opens the same way: mono eyebrow → h1 "Body · Track" (the track in muted) → one-sentence lede → a live tag on the right; then the body tabs with the robot glyphs and the track switch with icons (`src/components/BoardControls.vue`); then four summary cards; then one `.board` panel with a toolbar (search, chips, count, refresh) and the content; then definitions as `<details>`. Shared rules live in `src/styles/boards.css`; page-specific rules stay scoped.
 - Evaluations, open track: the board is a two-column feed + review. Feed items carry time-ago, a verdict chip (amber when a side was preferred, plain for ties), the instruction and "A vs B · room". The review card quotes the instruction, shows both sides with progress bars (the preferred side outlined amber, verdict stamp between), the evaluator / site / difficulty (label · n/10) / confidence row, and the evaluator's note; below it the two camera packages with mono captions on the video.
 - Evaluations, fine-tuning: same feed and card for scored trials (outcome chips green / red / amber, score with a bar, episode, criteria, note, cameras) and for imported datasets (episode select in the result row, the synchronized player with play/pause icon, scrubber and speed).

@@ -1,31 +1,48 @@
 <template>
   <div class="app-shell">
     <header class="top">
-      <a class="brand" :href="home" aria-label="RoboColosseum home"><img :src="mark" alt="" width="40" height="33"><span>RoboColosseum</span></a>
-      <nav class="top-links" aria-label="Primary navigation">
-        <a :href="home">Overview</a>
-        <RouterLink :to="link('/leaderboard')">Leaderboards</RouterLink>
+      <a class="brand" :href="home" aria-label="RoboColosseum home"><img class="for-light" :src="`${home}brand/robocolosseum-lockup-light.svg`" alt="RoboColosseum" width="883" height="246"><img class="for-dark" :src="`${home}brand/robocolosseum-lockup-dark.svg`" alt="RoboColosseum" width="883" height="246"></a>
+      <nav id="nav-sheet" :class="['nav', { open: menuOpen }]" aria-label="Primary" @click="onNav">
+        <RouterLink :to="link('/leaderboard')">Leaderboard</RouterLink>
         <RouterLink :to="link('/evals')">Evaluations</RouterLink>
-        <RouterLink :to="link('/tasks')">Tasks</RouterLink>
-        <RouterLink :to="link('/submit')">Submit a policy</RouterLink>
-        <RouterLink :to="link('/join')">Join</RouterLink>
+        <a :href="`${home}#robots`">Embodiments</a>
+        <a :href="`${home}#how`">How it works</a>
+        <a :href="`${home}#data`">Open data</a>
+        <a :href="`${home}#faq`">FAQ</a>
       </nav>
-      <span class="live"><i></i>Live data</span>
+      <button type="button" class="menu" :aria-expanded="menuOpen" aria-controls="nav-sheet" @click="menuOpen = !menuOpen"><span aria-hidden="true"></span>Menu</button>
+      <button type="button" class="theme" :aria-label="`Switch to the ${dark ? 'light' : 'dark'} theme`" @click="toggleTheme"><span aria-hidden="true"></span></button>
+      <a class="cta" :href="apply">Apply<span class="long">&nbsp;for free evaluation</span></a>
     </header>
     <main><RouterView /></main>
     <footer class="foot">
-      <div><a class="brand" :href="home"><img :src="lockup" alt="RoboColosseum" height="34"></a><p class="prov">Every figure on this site is read live from the RoboColosseum API. Co-organized by Hugging Face, BitRobot, the Embodied AI Centre (Singapore) and MAGIC Lab (NUS).</p></div>
-      <div><h5>The benchmark</h5><ul><li><RouterLink :to="link('/leaderboard')">Leaderboards</RouterLink></li><li><RouterLink :to="link('/evals')">Evaluation viewer</RouterLink></li><li><RouterLink :to="link('/tasks')">Tasks and criteria</RouterLink></li></ul></div>
-      <div><h5>Take part</h5><ul><li><RouterLink :to="link('/submit')">Submit a policy</RouterLink></li><li><RouterLink :to="link('/join')">Join as an evaluator</RouterLink></li><li><a :href="home + 'brand/'">Brand kit</a></li></ul></div>
-      <div><h5>Partners</h5><ul><li><a href="https://huggingface.co/" target="_blank" rel="noreferrer">Hugging Face</a></li><li><a href="https://bitrobot.ai/" target="_blank" rel="noreferrer">BitRobot</a></li><li><a href="https://nrp.gov.sg/" target="_blank" rel="noreferrer">Embodied AI Centre</a></li><li><a href="https://magiclab-nus.github.io/" target="_blank" rel="noreferrer">MAGIC Lab, NUS</a></li><li><a href="https://github.com/frodobots-org/robo-colosseum" target="_blank" rel="noreferrer">GitHub</a></li></ul></div>
+      <div class="foot-brand"><img class="for-light" :src="`${home}brand/robocolosseum-lockup-full-light.svg`" alt="RoboColosseum" width="883" height="257"><img class="for-dark" :src="`${home}brand/robocolosseum-lockup-full-dark.svg`" alt="RoboColosseum" width="883" height="257"><p>Founded by NUS MAGIC Lab, BitRobot, EAIC Singapore and Hugging Face.</p></div>
+      <nav aria-label="Footer">
+        <div><h3>The benchmark</h3><ul><li><RouterLink :to="link('/leaderboard')">Leaderboard</RouterLink></li><li><RouterLink :to="link('/evals')">Evaluations</RouterLink></li><li><RouterLink :to="link('/tasks')">Tasks and protocol</RouterLink></li><li><a href="https://huggingface.co/RoboColosseum">Open data</a></li><li><a :href="`${home}v7/blog/`">Blog</a></li></ul></div>
+        <div><h3>Take part</h3><ul><li><a :href="apply">Apply for free evaluation</a></li><li><RouterLink :to="link('/join')">Join as an evaluator</RouterLink></li></ul></div>
+        <div><h3>Follow</h3><ul><li><a href="https://x.com/RoboColosseum">X</a></li><li><a href="https://github.com/frodobots-org/robo-colosseum">GitHub</a></li><li><a href="https://huggingface.co/RoboColosseum">Hugging Face</a></li></ul></div>
+      </nav>
     </footer>
   </div>
 </template>
 <script setup>
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useArena } from './arena.js'
+import { APPLY } from './cta.js'
 const { link } = useArena()
-// On Netlify the site root serves the /v5/ landing; on GitHub Pages the base path keeps the in-app overview.
+// The landing page is the site root; the one call to action leads to its application form.
 const home = import.meta.env.BASE_URL
-const mark = `${home}brand/rc-mark-white.svg`
-const lockup = `${home}brand/rc-lockup-white.svg`
+const apply = APPLY
+const menuOpen = ref(false)
+const dark = ref(document.documentElement.dataset.theme === 'dark')
+function toggleTheme() {
+  dark.value = !dark.value
+  document.documentElement.dataset.theme = dark.value ? 'dark' : 'light'
+  try { localStorage.setItem('rc-theme', dark.value ? 'dark' : 'light') } catch {}
+  window.dispatchEvent(new Event('rc-theme'))
+}
+function onNav(event) { if (event.target.closest('a')) menuOpen.value = false }
+const route = useRoute()
+watch(() => route.fullPath, () => { menuOpen.value = false })
 </script>

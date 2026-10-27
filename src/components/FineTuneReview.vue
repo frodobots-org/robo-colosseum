@@ -19,9 +19,9 @@
       <p v-if="error" class="state"><b>{{ error }}</b></p>
       <p v-else-if="datasetError" class="board-foot" role="alert">{{ datasetError }}</p>
       <div v-if="loading" class="state"><span class="skel" style="min-width:30ch">&nbsp;</span></div>
-      <div v-else-if="!error && !filtered.length" class="state"><h3>{{ query || outcomeFilter ? 'No trials match' : 'No scored trials on this body yet' }}</h3><p>Completed fine-tuning trials and published datasets appear here as they finish.</p><button v-if="query || outcomeFilter" class="button secondary" type="button" @click="query = ''; outcomeFilter = ''">Clear filters</button></div>
+      <div v-else-if="!error && !filtered.length" class="state"><h3>{{ query || outcomeFilter ? 'No trials match' : 'No scored trials on this robot yet' }}</h3><p>Completed standard-task trials and published datasets appear here as they finish.</p><button v-if="query || outcomeFilter" class="button secondary" type="button" @click="query = ''; outcomeFilter = ''">Clear filters</button></div>
       <div v-else-if="!error" class="ev-layout">
-        <ol class="feed" aria-label="Fine-tuning evaluations">
+        <ol class="feed" aria-label="Standard-task trials">
           <li v-for="trial in filtered" :key="trial.entryId">
             <button type="button" :class="['feed-item', { on: selectedId === trial.entryId }]" :aria-pressed="selectedId === trial.entryId" @click="selectEntry(trial)">
               <span class="feed-top"><time :datetime="trial.created" :title="trial.kind === 'dataset' ? 'Import date' : 'Evaluation date'">{{ ago(trial.created) }}</time><span v-if="trial.kind === 'dataset'" class="verdict">{{ trial.summary.episodes }} episode{{ trial.summary.episodes === 1 ? '' : 's' }}</span><span v-else :class="['verdict', outcome(trial)]">{{ outcomeLabel(trial) }}</span></span>
@@ -34,7 +34,7 @@
           <ImportedEvaluationFeed v-if="selectedEntry?.kind === 'dataset'" :key="selectedEntry.datasetId" :dataset-id="selectedEntry.datasetId" :model-name="registeredModelName(selectedEntry)" :robot-id="robotId" />
           <article v-else-if="selected" class="trial-card" aria-live="polite">
             <header class="tc-head">
-              <span class="tc-meta"><b>{{ robotName }}</b> · fine-tuning{{ selected.inference_mode === 'imported' ? ' · imported' : '' }}</span>
+              <span class="tc-meta"><b>{{ robotName }}</b> · standard task{{ selected.inference_mode === 'imported' ? ' · imported' : '' }}</span>
               <span class="tc-meta right"><span v-if="selected.test" class="verdict test">Test</span><time :datetime="selected.created">{{ dateLabel(selected.created) }}</time></span>
             </header>
             <div class="tc-who"><span class="lab-tile" :class="{ contain: lab(selected).fit === 'contain' }" :style="{ background: lab(selected).bg || '' }"><img v-if="lab(selected).logo" :src="lab(selected).logo" :alt="lab(selected).name" @error="e => e.target.remove()"><template v-else>{{ lab(selected).mono }}</template></span><div><h2>{{ policyName(selected.policy_id) }}</h2><small>{{ lab(selected).name }}</small></div></div>
@@ -190,31 +190,31 @@ onBeforeUnmount(() => { trialRequest?.abort(); videoRequest?.abort(); moreReques
 .feed-item:hover { background: var(--raised); }
 .feed-item.on { background: var(--raised); border-color: var(--accent-line); box-shadow: inset 3px 0 0 var(--accent); }
 .feed-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.feed-top time { font: 500 11.5px/1.4 var(--mono); color: var(--muted); }
+.feed-top time { font: 700 11.5px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); }
 .feed-item b { font: 600 14px/1.35 var(--sans); overflow-wrap: anywhere; }
 .feed-item small { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font: 400 12px/1.45 var(--sans); color: var(--muted); }
 .review { padding: 18px; min-width: 0; }
-.trial-card { display: grid; gap: 16px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel) var(--dots) 0 0 / 14px 14px; }
+.trial-card { display: grid; gap: 16px; padding: 18px 20px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--panel) var(--dots) 0 0 / 14px 14px; }
 .tc-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.tc-meta { font: 500 12px/1.5 var(--mono); color: var(--muted); } .tc-meta b { color: var(--ink); font-weight: 600; }
+.tc-meta { font: 700 12px/1.5 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); } .tc-meta b { color: var(--ink); font-weight: 600; }
 .tc-meta.right { display: inline-flex; align-items: center; gap: 8px; }
 .tc-who { display: flex; align-items: center; gap: 12px; }
-.tc-who .lab-tile { width: 44px; height: 44px; border-radius: 10px; font-size: 15px; }
+.tc-who .lab-tile { width: 44px; height: 44px; border-radius: 50%; font-size: 15px; }
 .tc-who h2 { margin: 0; font: 700 22px/1.15 var(--sans); letter-spacing: -.02em; overflow-wrap: anywhere; }
-.tc-who small { display: block; margin-top: 2px; font: 500 11.5px/1.4 var(--mono); color: var(--muted); }
+.tc-who small { display: block; margin-top: 2px; font: 700 11.5px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); }
 .tc-task { margin: 0; font: 500 clamp(17px, 1.6vw, 21px)/1.35 var(--sans); letter-spacing: -.01em; color: var(--ink); text-wrap: pretty; }
-.tc-result { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.tc-result { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 12px 14px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--paper); }
 .tc-outcome { display: grid; gap: 4px; } .tc-outcome small { font: 400 12px/1.4 var(--sans); color: var(--muted); max-width: 26ch; }
 .tc-score { display: grid; gap: 4px; min-width: 0; }
-.tc-score > span, .tc-episode > span { font: 500 11px/1.4 var(--mono); color: var(--muted); }
-.tc-score b { font: 500 24px/1.1 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.tc-score > span, .tc-episode > span { font: 700 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); }
+.tc-score b { font: 700 24px/1.1 var(--mono); text-transform: uppercase; letter-spacing: .02em; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .tc-episode b { display: block; font: 600 14px/1.3 var(--sans); }
 .prog { display: block; height: 6px; border-radius: 3px; background: var(--field); overflow: hidden; }
 .prog i { display: block; height: 100%; background: var(--fine); border-radius: 3px; }
 .prog i.success { background: var(--good); } .prog i.failure { background: var(--ink-4); } .prog i.aborted { background: var(--warn); }
 .tc-kv b { font-weight: 500; line-height: 1.45; }
 .tc-note { display: grid; gap: 4px; }
-.tc-note span { font: 500 11px/1.4 var(--mono); color: var(--muted); }
+.tc-note span { font: 700 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); }
 .tc-note p { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink); max-width: 80ch; }
 .tc-videos { padding-top: 14px; border-top: 1px solid var(--line); }
 .tc-error { margin: 0 0 10px; color: var(--bad); font-size: 13px; }
@@ -222,8 +222,8 @@ onBeforeUnmount(() => { trialRequest?.abort(); videoRequest?.abort(); moreReques
 .trial-videos figure { margin: 0; min-width: 0; }
 .trial-videos video, .review-video-placeholder { display: block; width: 100%; object-fit: contain; background: #000; }
 .review-camera { position: relative; border-radius: 10px; overflow: hidden; background: #000; }
-.review-video-placeholder { display: grid; place-items: center; font: 500 12px/1.4 var(--mono); color: var(--ink-4); }
-.video-caption { position: absolute; left: 10px; bottom: 10px; padding: 4px 7px; border-radius: 4px; font: 500 10.5px/1.2 var(--mono); color: #fff; background: rgba(0, 0, 0, .62); pointer-events: none; }
+.review-video-placeholder { display: grid; place-items: center; font: 700 12px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--ink-4); }
+.video-caption { position: absolute; left: 10px; bottom: 10px; padding: 4px 7px; border-radius: 4px; font: 700 10.5px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: #fff; background: rgba(0, 0, 0, .62); pointer-events: none; }
 @media (max-width: 980px) { .ev-layout { grid-template-columns: minmax(0, 1fr); } .feed { position: static; max-height: 300px; border-right: 0; border-bottom: 1px solid var(--line); } }
 @media (max-width: 640px) { .tc-result { grid-template-columns: minmax(0, 1fr); } .review { padding: 12px; } .trial-card { padding: 16px; } }
 </style>

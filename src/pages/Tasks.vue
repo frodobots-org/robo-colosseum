@@ -3,8 +3,8 @@
     <section class="page-head">
       <div>
         <p class="eyebrow">Tasks</p>
-        <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Open track' : 'Fine-tuning suite' }}</span></h1>
-        <p class="lede">{{ track === 'open' ? 'In the open track the evaluator writes the instruction on the spot, in a room the policy has never seen. A reviewer approves the task card before both policies run on the same setup.' : 'In the fine-tuning track every checkpoint is adapted to a fixed task with about 100 demonstrations, then scored over repeated trials against a written criterion.' }}</p>
+        <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Head-to-head' : 'Standard tasks' }}</span></h1>
+        <p class="lede">{{ track === 'open' ? 'In head-to-head comparisons the evaluator writes the instruction on the spot, in a scene the policy has never seen. A reviewer approves the task card before both policies run on the same setup.' : 'In the fine-tuning track every checkpoint is adapted to a fixed task with about 100 demonstrations, then scored over repeated trials against a written criterion.' }}</p>
       </div>
       <span class="live-tag"><i></i>Draft task cards</span>
     </section>
@@ -15,7 +15,7 @@
       <article v-for="card in cards" :key="card.label" class="sum-card text"><span class="sum-label"><Icon :name="card.icon" />{{ card.label }}</span><div class="sum-main"><b>{{ card.value }}</b></div><small>{{ card.sub }}</small></article>
     </section>
 
-    <section v-if="robot.id !== 'franka'" class="board"><div class="state"><h3>{{ robot.name }} task cards are not published yet</h3><p>The first cards were drafted for Franka. Tasks for this body will appear here once they are approved.</p><button class="button secondary" type="button" @click="select({ robot: 'franka' })">See the Franka drafts</button></div></section>
+    <section v-if="robot.id !== 'franka'" class="board"><div class="state"><h3>{{ robot.name }} task cards are not published yet</h3><p>The first cards were drafted for Franka. Tasks for this robot will appear here once they are approved.</p><button class="button secondary" type="button" @click="select({ robot: 'franka' })">See the Franka drafts</button></div></section>
     <template v-else>
       <section class="board">
         <div class="board-toolbar"><span class="count" style="margin-left:0">{{ taskDrafts.length }} draft cards · Franka</span><span class="verdict test">Draft</span></div>
@@ -32,7 +32,7 @@
         <div class="td-main">
           <p class="eyebrow">{{ selected.id }} · task card · draft</p>
           <h2>{{ selected.name }}</h2>
-          <div class="kv"><div><span>Category</span><b>{{ selected.category }}</b></div><div><span>Site</span><b>{{ selected.site }}</b></div><div><span>Body</span><b>Franka</b></div><div><span>Demonstrations</span><b>~{{ selected.demos }}</b></div></div>
+          <div class="kv"><div><span>Category</span><b>{{ selected.category }}</b></div><div><span>Site</span><b>{{ selected.site }}</b></div><div><span>Robot</span><b>Franka</b></div><div><span>Demonstrations</span><b>~{{ selected.demos }}</b></div></div>
           <div class="predicate"><span>Final-success predicate</span><p>{{ selected.success }}</p></div>
         </div>
         <div class="td-side">
@@ -60,25 +60,25 @@ const { robot, track, select, link } = useArena()
 const selected = ref(taskDrafts[0])
 const iconFor = category => /pour|grasp/i.test(category) ? 'trials' : /long/i.test(category) ? 'sort' : /articulated|door/i.test(category) ? 'grid' : /reorient|flip/i.test(category) ? 'trend-up' : 'ab'
 const cards = computed(() => track.value === 'open'
-  ? [{ icon: 'ab', label: 'Instruction', value: 'Written on the spot', sub: 'by the evaluator, unseen by the policy' }, { icon: 'grid', label: 'Setup', value: 'Same room, same objects', sub: 'both policies, back to back' }, { icon: 'trials', label: 'Verdict', value: 'Blind preference', sub: 'plus progress for each rollout' }, { icon: 'info', label: 'Approval', value: 'Reviewed card', sub: 'before the pair runs' }]
-  : [{ icon: 'grid', label: 'Suite', value: `${taskDrafts.length} tasks`, sub: 'drafted for Franka' }, { icon: 'trials', label: 'Demonstrations', value: '~100 per task', sub: 'for adapting a checkpoint' }, { icon: 'sort', label: 'Trials', value: 'up to 25', sub: 'per checkpoint per task' }, { icon: 'info', label: 'Score', value: '0 to 4', sub: 'full success is 4 of 4' }])
+  ? [{ icon: 'ab', label: 'Instruction', value: 'Written on the spot', sub: 'by the evaluator, unseen by the policy' }, { icon: 'grid', label: 'Setup', value: 'Same scene, same objects', sub: 'both policies, back to back' }, { icon: 'trials', label: 'Verdict', value: 'Blind preference', sub: 'plus progress for each rollout' }, { icon: 'info', label: 'Approval', value: 'Reviewed card', sub: 'before the pair runs' }]
+  : [{ icon: 'grid', label: 'Suite', value: `${taskDrafts.length} tasks`, sub: 'drafted for Franka' }, { icon: 'trials', label: 'Demonstrations', value: '~100 per task', sub: 'for adapting a checkpoint' }, { icon: 'sort', label: 'Trials', value: 'up to 25', sub: 'per checkpoint per task' }, { icon: 'info', label: 'Score', value: 'Success and progress', sub: 'milestones reached, out of the task\'s total' }])
 </script>
 <style scoped>
 .tk-page { gap: 22px; }
 .task-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 12px; }
-.task-card { display: grid; gap: 8px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); text-align: left; color: var(--ink); transition: border-color .15s, background .15s; min-width: 0; }
+.task-card { display: grid; gap: 8px; padding: 14px 16px; border: 1px solid var(--line-2); background: var(--paper); text-align: left; color: var(--ink); transition: border-color .15s, background .15s; min-width: 0; }
 .task-card:hover { background: var(--raised); }
-.task-card.on { border-color: var(--accent-line); background: var(--raised); box-shadow: inset 3px 0 0 var(--accent); }
+.task-card.on { border-color: var(--ink); background: var(--raised); box-shadow: inset 3px 0 0 var(--accent); }
 .task-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.task-id { font: 500 11.5px/1.4 var(--mono); color: var(--muted); }
-.task-cat { display: inline-flex; align-items: center; gap: 5px; font: 500 11px/1.4 var(--mono); color: var(--ink-2); }
+.task-id { font: 700 11px/1.4 var(--mono); text-transform: uppercase; color: var(--muted); }
+.task-cat { display: inline-flex; align-items: center; gap: 5px; font: 700 10.5px/1.4 var(--mono); text-transform: uppercase; color: var(--ink-2); }
 .task-cat .icon { font-size: 13px; color: var(--accent); }
 .task-card b { font: 600 15.5px/1.3 var(--sans); letter-spacing: -.01em; }
 .task-card small { font: 400 11.5px/1.5 var(--mono); color: var(--muted); }
 .task-detail { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(260px, 1fr); gap: 28px; }
-.td-main h2 { margin: 6px 0 14px; font: 800 clamp(24px, 2.6vw, 34px)/1.1 var(--sans); letter-spacing: -.03em; }
+.td-main h2 { margin: 6px 0 14px; font: 600 clamp(26px, 2.8vw, 36px)/1.1 var(--sans); letter-spacing: -.035em; }
 .predicate { margin-top: 16px; padding: 12px 14px; border-left: 2px solid var(--accent); background: var(--raised); border-radius: 0 8px 8px 0; }
-.predicate span { display: block; font: 500 11px/1.4 var(--mono); color: var(--muted); }
+.predicate span { display: block; font: 700 11px/1.4 var(--mono); text-transform: uppercase; color: var(--muted); }
 .predicate p { margin: 4px 0 0; font-size: 15px; color: var(--ink); }
 .td-side h3 { margin: 0 0 12px; font: 600 15px/1.3 var(--sans); }
 .td-side .panel-note { margin-top: 16px; font-size: 13px; }

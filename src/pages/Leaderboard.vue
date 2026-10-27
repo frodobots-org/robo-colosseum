@@ -2,11 +2,11 @@
   <div class="page-stack lb-page">
     <section class="page-head">
       <div>
-        <p class="eyebrow">Leaderboards</p>
-        <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Open track' : 'Fine-tuning' }}</span></h1>
-        <p class="lede">{{ track === 'open' ? 'Policies rated from blind A/B comparisons on this body, in rooms the policy has never seen. One rating per body; never pooled across bodies.' : 'Checkpoints adapted to a fixed task and scored over repeated trials. Full success and partial progress are reported separately.' }}</p>
+        <p class="eyebrow">Leaderboard</p>
+        <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Head-to-head' : 'Standard tasks' }}</span></h1>
+        <p class="lede">{{ track === 'open' ? 'Policies rated from blind comparisons on this robot, in scenes they have never seen. Each robot has its own leaderboard; ratings are never pooled across robots.' : 'Every model learns the same task from the same demonstrations, then makes up to 25 attempts. Full success and progress are reported separately.' }}</p>
       </div>
-      <span class="live-tag"><i></i>Live from the API</span>
+      <span class="live-tag"><i></i>Refreshed daily</span>
     </section>
 
     <BoardControls><RouterLink class="text-link" :to="link('/evals')">Review the evaluations <Icon name="external" /></RouterLink></BoardControls>
@@ -98,8 +98,8 @@
       </div>
 
       <div class="board-foot">
-        <span v-if="track === 'open'">Rating is fitted from blind pairwise preferences on this body; ±1 standard error. Fewer than 20 comparisons is marked low evidence. Pending policies are registered but not yet compared.</span>
-        <span v-else>Full success is the share of trials scored 4 of 4, with a Wilson 95% interval. Progress is the mean partial score. "All tasks" pools a checkpoint's trials across its tasks; a task tab ranks within that task.</span>
+        <span v-if="track === 'open'">Rating is fitted from blind pairwise preferences on this robot; ±1 standard error. Fewer than 20 comparisons is marked low evidence. Pending policies are registered but not yet compared.</span>
+        <span v-else>Full success is the share of trials that completed the task, with a Wilson 95% interval. Progress is the mean partial score. "All tasks" pools a checkpoint's trials across its tasks; a task tab ranks within that task.</span>
       </div>
     </section>
 
@@ -110,10 +110,10 @@
 
     <section class="definitions">
       <h2>Key definitions</h2>
-      <details><summary>Rating and standard error<Icon name="down" /></summary><p>Ratings are fitted per robot body from blind A/B preferences, so a rating only compares policies on the same body. The ±1 standard error shows how much the fit could move with more comparisons; two policies whose intervals overlap are not reliably ordered.</p></details>
-      <details><summary>Record and comparisons<Icon name="down" /></summary><p>Each comparison is one evaluator-written instruction run by two policies in the same room, judged blind. The record counts wins, ties and losses; comparisons is their total. Below 20 comparisons a rating is shown faded and marked low evidence.</p></details>
-      <details><summary>Full success, progress and the 95% interval<Icon name="down" /></summary><p>In the fine-tuning track a checkpoint is adapted to one task and run up to 25 times per task. Full success is the share of trials scored 4 of 4; progress is the mean of the 0–4 partial score, as a percentage. The interval on full success is a Wilson 95% interval for the number of trials.</p></details>
-      <details><summary>Pending and hidden entries<Icon name="down" /></summary><p>A registered policy without finalized comparisons is pending and unranked. Rows the organizers hide for a body or track are not counted here; their evaluations remain in the viewer.</p></details>
+      <details><summary>Rating and standard error<Icon name="down" /></summary><p>Ratings are fitted per robot from blind A/B preferences, so a rating only compares policies on the same robot. The ±1 standard error shows how much the fit could move with more comparisons; two policies whose intervals overlap are not reliably ordered.</p></details>
+      <details><summary>Record and comparisons<Icon name="down" /></summary><p>Each comparison is one evaluator-written instruction run by two policies in the same scene, judged blind. The record counts wins, ties and losses; comparisons is their total. Below 20 comparisons a rating is shown faded and marked low evidence.</p></details>
+      <details><summary>Full success, progress and the 95% interval<Icon name="down" /></summary><p>In standard tasks a checkpoint is adapted to one task from the shared demonstrations and run up to 25 times on it. Full success is the share of trials that completed the task; progress is the mean partial score (the share of the task's milestones reached), as a percentage. The interval on full success is a Wilson 95% interval for the number of trials.</p></details>
+      <details><summary>Pending and hidden entries<Icon name="down" /></summary><p>A registered policy without finalized comparisons is pending and unranked. Rows the organizers hide for a robot or kind of score are not counted here; their evaluations remain in the viewer.</p></details>
     </section>
   </div>
 </template>
@@ -259,7 +259,12 @@ async function fetchResults() {
 }
 
 // The Robocurve figure from the landing pages, fed with the rows this page already has.
-const THEME = { card: 'background:transparent;border:0;border-radius:0', surface: '#13161a', ink: '#e8eaed', secondary: '#b3b9c2', muted: '#8b929c', grid: '#23272d', axis: '#3a4149', ring: '#3a4149', sans: "'Archivo', system-ui, sans-serif", mono: "'IBM Plex Mono', monospace", titleWeight: 700, tipBg: '#e8eaed', tipInk: '#0b0d10', brand: 'RoboColosseum' }
+function theme() {
+  // Font stacks go into style attributes, so their quotes must be single.
+  const css = getComputedStyle(document.documentElement), v = name => css.getPropertyValue(name).trim().replace(/"/g, "'")
+  return { card: 'background:transparent;border:0;border-radius:0', surface: v('--panel'), ink: v('--ink'), secondary: v('--ink-2'), muted: v('--muted'), grid: v('--line'), axis: v('--line-2'), ring: v('--line-2'),
+    sans: v('--sans'), mono: v('--mono'), titleWeight: 600, tipBg: v('--ink'), tipInk: v('--paper'), brand: 'RoboColosseum' }
+}
 let figureLib = null
 async function drawFigure() {
   await nextTick()
@@ -270,12 +275,14 @@ async function drawFigure() {
     const [live, lb] = figureLib
     live.store.boards[`${robot.value.id}/${track.value}`] = apiRows.value
     live.store.ready = true
-    lb.renderFigure(figureEl.value, lb.figureModel(robot.value.id, track.value === 'open' ? 'open' : 'fine'), THEME)
+    lb.renderFigure(figureEl.value, lb.figureModel(robot.value.id, track.value === 'open' ? 'open' : 'fine'), theme())
   } catch (error) { figureEl.value.innerHTML = '' }
 }
 watch([() => robot.value.id, track], () => { clearFilters(); sortKey.value = 'rank'; sortDir.value = 1; fetchResults() }, { immediate: true })
 watch([apiRows, loading], () => { if (!loading.value) drawFigure() })
-onBeforeUnmount(() => requestController?.abort())
+const redraw = () => { if (!loading.value) drawFigure() }
+window.addEventListener('rc-theme', redraw)
+onBeforeUnmount(() => { requestController?.abort(); window.removeEventListener('rc-theme', redraw) })
 </script>
 
 <style scoped>
@@ -291,41 +298,41 @@ onBeforeUnmount(() => requestController?.abort())
 .row { display: grid; grid-template-columns: 44px minmax(220px, 1.4fr) minmax(200px, 1.6fr) minmax(150px, 1fr) minmax(120px, .7fr) 40px; gap: 14px; align-items: center; padding: 11px 18px; border-bottom: 1px solid var(--line); }
 .row:last-child { border-bottom: 0; }
 .row:not(.head):hover { background: var(--raised); }
-.row.head { padding: 8px 18px; background: var(--raised); font: 500 11.5px/1.4 var(--mono); color: var(--muted); position: sticky; top: 54px; z-index: 2; }
+.row.head { padding: 9px 18px; background: var(--raised); font: 700 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); position: sticky; top: 62px; z-index: 2; border-bottom: 1px solid var(--line-2); }
 .row.head > * { text-align: left; }
 .row.head .num { text-align: right; }
-.sortable { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 0; color: inherit; font: inherit; }
-.sortable small { color: var(--ink-4); }
+.sortable { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 0; color: inherit; font: inherit; text-transform: inherit; letter-spacing: inherit; white-space: nowrap; }
+.sortable small { color: var(--ink-4); text-transform: none; }
 .sortable .icon { font-size: 13px; opacity: .55; }
 .sortable.on { color: var(--ink); } .sortable.on .icon { opacity: 1; color: var(--accent); }
-.rank { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--line-2); font: 600 13px/1 var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.rank.r1 { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.rank.r2, .rank.r3 { background: var(--field); color: var(--ink); }
+.rank { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--line-2); font: 700 13px/1 var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.rank.r1 { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.rank.r2, .rank.r3 { border-color: var(--ink); color: var(--ink); }
 .who { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .who-text { display: grid; gap: 2px; min-width: 0; }
 .who b { display: flex; align-items: center; gap: 6px; font: 600 14.5px/1.25 var(--sans); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.who small { font: 400 12px/1.4 var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hf { color: var(--muted); display: inline-flex; font-size: 13px; } .hf:hover { color: var(--accent); }
+.who small { font: 700 10.5px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hf { color: var(--muted); display: inline-flex; font-size: 13px; } .hf:hover { color: var(--ink); }
 .metric { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; min-width: 0; }
 .bar { position: relative; height: 10px; border-radius: 3px; background: var(--field); overflow: visible; }
-.bar .ci { position: absolute; top: 2px; bottom: 2px; left: var(--lo); width: var(--span); border-radius: 2px; background: var(--open); opacity: .5; }
+.bar .ci { position: absolute; top: 2px; bottom: 2px; left: var(--lo); width: var(--span); background: var(--open); opacity: .28; }
 .bar .pt { position: absolute; top: -3px; width: 3px; height: 16px; left: var(--at); margin-left: -1.5px; border-radius: 1px; background: var(--open); }
 .pctbar .fill { position: absolute; left: 0; top: 0; bottom: 0; width: var(--at); border-radius: 3px; background: var(--fine); }
-.pctbar .ci { background: #fff; opacity: .35; } .pctbar .pt { background: #fff; }
+.pctbar .ci { background: var(--paper); opacity: .4; } .pctbar .pt { background: var(--paper); }
 .pctbar.progress .fill { background: var(--fine-line); }
 .val { display: grid; justify-items: end; min-width: 76px; }
-.val b { font: 500 15px/1.1 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.val em { font: 400 11px/1.4 var(--mono); font-style: normal; color: var(--muted); white-space: nowrap; }
+.val b { font: 600 16px/1.1 var(--sans); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.val em { font: 700 10.5px/1.4 var(--mono); font-style: normal; color: var(--muted); white-space: nowrap; }
 .record { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; }
-.wtl { display: flex; height: 8px; gap: 1px; border-radius: 3px; overflow: hidden; }
-.wtl i { display: block; min-width: 1px; } .wtl .w { background: var(--good); } .wtl .t { background: var(--line-2); } .wtl .l { background: var(--bad); opacity: .8; }
+.wtl { display: flex; height: 8px; gap: 2px; overflow: hidden; }
+.wtl i { display: block; min-width: 1px; } .wtl .w { background: var(--ink); } .wtl .t { background: var(--ink-4); } .wtl .l { background: var(--line-2); }
 .num { display: grid; justify-items: end; text-align: right; }
-.num b { font: 500 15px/1.1 var(--mono); font-variant-numeric: tabular-nums; }
-.num em { font: 400 11px/1.4 var(--mono); font-style: normal; color: var(--muted); }
+.num b { font: 600 16px/1.1 var(--sans); font-variant-numeric: tabular-nums; }
+.num em { font: 700 10.5px/1.4 var(--mono); text-transform: uppercase; font-style: normal; color: var(--muted); }
 .minis { display: flex; align-items: flex-end; gap: 2px; height: 16px; margin-top: 4px; }
 .minis i { display: block; width: 6px; height: var(--h); border-radius: 1px; background: var(--fine); opacity: .7; }
-.actions a { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--line); color: var(--muted); }
-.actions a:hover { color: var(--accent); border-color: var(--accent-line); }
+.actions a { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--line-2); color: var(--ink-2); }
+.actions a:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .row.faint .who, .row.faint .metric, .row.faint .record { opacity: .55; }
 .row.pending .who-text b { color: var(--ink-2); }
 .row.lead .who b { color: var(--ink); }

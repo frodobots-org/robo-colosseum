@@ -113,7 +113,7 @@ onBeforeUnmount(() => { datasetRequest?.abort(); replayRequest?.abort(); playbac
     <p v-else-if="!dataset" class="state" role="status"><span class="skel" style="min-width:24ch">&nbsp;</span></p>
     <article v-else-if="selected" class="trial-card" aria-live="polite">
       <header class="tc-head">
-        <span class="tc-meta"><b>{{ embodiments.find(e => e.id === robotId)?.name || robotId }}</b> · fine-tuning · imported dataset</span>
+        <span class="tc-meta"><b>{{ embodiments.find(e => e.id === robotId)?.name || robotId }}</b> · standard task · imported dataset</span>
         <span class="tc-meta right"><time>{{ selected.source_result?.saved_at || 'Recording time unavailable' }}</time></span>
       </header>
       <div class="tc-who"><span class="lab-tile" :class="{ contain: lab.fit === 'contain' }" :style="{ background: lab.bg || '' }"><img v-if="lab.logo" :src="lab.logo" :alt="lab.name" @error="e => e.target.remove()"><template v-else>{{ lab.mono }}</template></span><div><h2>{{ modelLabel }}</h2><small>{{ lab.name }} · {{ episodes.length }} episodes</small></div></div>
@@ -141,25 +141,25 @@ onBeforeUnmount(() => { datasetRequest?.abort(); replayRequest?.abort(); playbac
 .verdict.success { background: var(--good-tint); color: var(--good); }
 .verdict.failure { background: var(--bad-tint); color: var(--bad); }
 .verdict.big { font-size: 13px; padding: 8px 12px; }
-.trial-card { display: grid; gap: 16px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel) var(--dots) 0 0 / 14px 14px; min-width: 0; }
+.trial-card { display: grid; gap: 16px; padding: 18px 20px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--panel) var(--dots) 0 0 / 14px 14px; min-width: 0; }
 .tc-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.tc-meta { font: 500 12px/1.5 var(--mono); color: var(--muted); } .tc-meta b { color: var(--ink); font-weight: 600; }
+.tc-meta { font: 700 12px/1.5 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); } .tc-meta b { color: var(--ink); font-weight: 600; }
 .tc-who { display: flex; align-items: center; gap: 12px; }
-.tc-who .lab-tile { width: 44px; height: 44px; border-radius: 10px; font-size: 15px; }
+.tc-who .lab-tile { width: 44px; height: 44px; border-radius: 50%; font-size: 15px; }
 .tc-who h2 { margin: 0; font: 700 22px/1.15 var(--sans); letter-spacing: -.02em; overflow-wrap: anywhere; }
-.tc-who small { display: block; margin-top: 2px; font: 500 11.5px/1.4 var(--mono); color: var(--muted); }
+.tc-who small { display: block; margin-top: 2px; font: 700 11.5px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); }
 .tc-task { margin: 0; font: 500 clamp(17px, 1.6vw, 21px)/1.35 var(--sans); letter-spacing: -.01em; color: var(--ink); text-wrap: pretty; }
-.tc-result { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(150px, auto); gap: 18px; align-items: center; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.tc-result { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(150px, auto); gap: 18px; align-items: center; padding: 12px 14px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--paper); }
 .tc-score { display: grid; gap: 4px; min-width: 0; }
-.tc-score > span, .tc-episode > span { font: 500 11px/1.4 var(--mono); color: var(--muted); }
-.tc-score b { font: 500 24px/1.1 var(--mono); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.tc-score > span, .tc-episode > span { font: 700 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); }
+.tc-score b { font: 700 24px/1.1 var(--mono); text-transform: uppercase; letter-spacing: .02em; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .tc-episode { display: grid; gap: 4px; }
 .tc-episode select { font: 600 13.5px/1.3 var(--sans); padding: 8px 10px; border: 1px solid var(--line-2); border-radius: 7px; background: var(--field); color: var(--ink); }
 .prog { display: block; height: 6px; border-radius: 3px; background: var(--field); overflow: hidden; }
 .prog i { display: block; height: 100%; background: var(--fine); border-radius: 3px; }
 .prog i.success { background: var(--good); } .prog i.failure { background: var(--ink-4); }
 .tc-note { display: grid; gap: 4px; }
-.tc-note span { font: 500 11px/1.4 var(--mono); color: var(--muted); }
+.tc-note span { font: 700 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); }
 .tc-note p { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink); max-width: 80ch; }
 .tc-videos { padding-top: 14px; border-top: 1px solid var(--line); }
 .tc-error { margin: 0 0 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--bad); font-size: 13px; }
@@ -169,11 +169,11 @@ onBeforeUnmount(() => { datasetRequest?.abort(); replayRequest?.abort(); playbac
 .trial-videos figure { margin: 0; min-width: 0; }
 .trial-videos video { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #000; }
 .review-camera { position: relative; border-radius: 10px; overflow: hidden; background: #000; }
-.video-caption { position: absolute; left: 10px; bottom: 10px; padding: 4px 7px; border-radius: 4px; font: 500 10.5px/1.2 var(--mono); color: #fff; background: rgba(0, 0, 0, .62); pointer-events: none; }
+.video-caption { position: absolute; left: 10px; bottom: 10px; padding: 4px 7px; border-radius: 4px; font: 700 10.5px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: #fff; background: rgba(0, 0, 0, .62); pointer-events: none; }
 .player-controls { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
 .player-controls .play { display: grid; place-items: center; width: 38px; height: 36px; border-radius: 8px; border: 0; background: var(--accent); color: var(--accent-ink); flex-shrink: 0; cursor: pointer; font-size: 18px; }
 .player-controls .play:disabled { opacity: .4; cursor: default; }
-.player-controls > span { font: 500 12px/1 var(--mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.player-controls > span { font: 700 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .player-controls small { color: var(--muted); }
 .player-controls input { flex: 1 1 100px; width: auto; min-width: 20px; height: 4px; accent-color: var(--accent); }
 .player-controls select { width: 68px; flex: 0 0 68px; font: 500 12px/1.3 var(--mono); padding: 7px 8px; border: 1px solid var(--line-2); border-radius: 7px; background: var(--field); color: var(--ink); }
