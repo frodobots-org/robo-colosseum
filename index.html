@@ -3,13 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0b0d10" />
-    <meta name="description" content="The independent benchmark for physical AI. Evaluations made in the wild, on every robot body, judged blind by people." />
-    <link rel="icon" href="/brand/favicon.svg" />
+    <meta name="theme-color" content="#cbcbcb" />
+    <meta name="description" content="RoboColosseum evaluates and benchmarks robot policies in the wild: humanoids, arms and rovers running real models in real places, with every run scored and published." />
+    <link rel="icon" href="/brand/robocolosseum-mark-light.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&family=Zalando+Sans:wght@400..900&display=swap" />
     <title>RoboColosseum</title>
+    <script>
+      // The light theme is the default; a reader's choice from the landing page or the app is remembered on this device.
+      try { var t = localStorage.getItem('rc-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="app"></div>
