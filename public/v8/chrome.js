@@ -25,6 +25,14 @@ export function chrome() {
   const here = document.querySelector('#apply')
   document.querySelectorAll('[data-cta]').forEach(a => { a.href = here ? '#apply' : APPLY })
   const theme = document.querySelector('#theme'); if (theme) themeSwitch(theme)
+  // Narrow screens: the section links open from a menu button and close when one is chosen.
+  const menu = document.querySelector('#menu'), sheet = document.querySelector('#nav-sheet')
+  if (menu && sheet) {
+    const set = open => { menu.setAttribute('aria-expanded', open); sheet.classList.toggle('open', open) }
+    menu.addEventListener('click', () => set(menu.getAttribute('aria-expanded') !== 'true'))
+    sheet.addEventListener('click', e => { if (e.target.closest('a')) set(false) })
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') set(false) })
+  }
   const embed = document.querySelector('#form-embed')
   if (FORM_URL && embed) {
     embed.innerHTML = `<iframe src="${FORM_URL}" title="Apply for free evaluation" loading="lazy"></iframe>`
