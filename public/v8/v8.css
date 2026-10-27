@@ -197,9 +197,6 @@ button { font: inherit; color: inherit; }
 /* in the wild: the one-to-hundreds film, then the rover's own camera beside where evaluation happens */
 .mosaic { position: relative; margin-top: clamp(36px, 5vw, 52px); }
 .mosaic video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #121212; border: 1px solid var(--ink); }
-.mosaic-count { position: absolute; left: 0; top: 0; padding: 8px 12px; background: var(--shade); color: #e6e6e6; font: 700 13px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .02em; }
-.mosaic-count:empty { display: none; }
-.mosaic-count::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 9px; background: var(--accent); vertical-align: 1px; }
 .mosaic figcaption { margin-top: 16px; font-size: 16px; color: var(--ink-2); }
 .sites { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 32px; }
 .sites > div { padding: 22px 24px; border: 1px solid var(--line-2); }
