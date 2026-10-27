@@ -12,14 +12,14 @@ const $ = (s, el = document) => el.querySelector(s)
 const VIDEO = `${ROOT}v4/video/`
 const PICS = `${ROOT}v7/robots/`
 
-// The fleet (sizes confirmed by the team); the live line under each robot comes from the API. Robots with a documented
-// setup open it on click.
+// The robot types we run. Fleet sizes are never shown: the page says "hundreds of robots" (user, 26 Oct 2026). The live
+// line under each robot comes from the API. Robots with a documented setup open it on click.
 const FLEET = [
-  { id: 'g1', name: 'Unitree G1', count: 30, unit: 'humanoids', img: `${PICS}g1.webp` },
-  { id: 'yam', name: 'Bimanual YAM', count: 25, unit: 'two-arm stations', img: `${PICS}yam.webp` },
-  { id: 'franka', name: 'Franka', unit: 'Single arm, DROID setup', img: `${PICS}franka.webp` },
-  { id: 'so101', name: 'SO-ARM101', unit: 'Low-cost single arm', img: `${PICS}so101.webp` },
-  { id: 'earth-rover', name: 'Earth Rover Mini+', unit: 'Outdoor wheeled robot', img: `${ROOT}v3/bodies/earth-rover-mini-plus.webp`, joining: true },
+  { id: 'g1', name: 'Unitree G1', kind: 'Humanoid with two grippers', img: `${PICS}g1.webp` },
+  { id: 'yam', name: 'Bimanual YAM', kind: 'Two-arm station', img: `${PICS}yam.webp` },
+  { id: 'franka', name: 'Franka', kind: 'Single arm, DROID setup', img: `${PICS}franka.webp` },
+  { id: 'so101', name: 'SO-ARM101', kind: 'Low-cost single arm', img: `${PICS}so101.webp` },
+  { id: 'earth-rover', name: 'Earth Rover Mini+', kind: 'Outdoor wheeled robot', img: `${ROOT}v3/bodies/earth-rover-mini-plus.webp`, joining: true },
 ]
 
 // Where evaluation happens, as the team confirmed it on 26 Oct 2026. The two tracks are kept apart: open-track runs happen
@@ -191,7 +191,7 @@ function fleet() {
     const failed = store.failed.has(KEY(f.id, 'open')) || store.failed.has(KEY(f.id, 'fine'))
     const live = f.joining ? 'Joining' : !robotLoaded(f.id) ? '<span class="skel">00 policies ranked</span>' : failed ? 'Rankings did not load' : hasData(f.id) ? `${fmt(policiesOn(f.id))} policies ranked` : 'Results coming soon'
     const body = `<span class="stage"><img src="${f.img}" alt="" loading="lazy"></span>
-      <h3>${esc(f.name)}</h3><p class="count">${f.count ? `${n(f.count)} ${esc(f.unit)}` : esc(f.unit)}</p><p class="live${f.joining ? ' joining' : ''}">${live}</p>`
+      <h3>${esc(f.name)}</h3><p class="kind">${esc(f.kind)}</p><p class="live${f.joining ? ' joining' : ''}">${live}</p>`
     return SETUPS[f.id]
       ? `<li><button type="button" class="robot" data-setup="${f.id}" aria-haspopup="dialog">${body}<span class="see">See the setup and parts</span></button></li>`
       : `<li class="robot">${body}</li>`
