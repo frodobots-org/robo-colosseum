@@ -2,6 +2,19 @@
 
 The decisions behind the landing pages, as the user stated them. Read this before touching any page under `public/`. When a decision changes, change it here first.
 
+## Launch meeting and the new brand (27 Oct 2026, BIT-3373): `/v8/`
+
+The 26 Oct launch meeting (launch on 4 Nov: X thread, website and launch video together) and Ben's brand in Figma (file `VIYsAXvWfmt8My4PfpuumK`, page "RC Brand") replace several rules below. Where this section and an older bullet disagree, this section wins.
+
+- **Hero names the activity:** it must say evaluation **and** benchmark (user, 27 Oct: "It should have both evaluation AND benchmark"); "Physical AI, in the wild" alone read as robot deployment services. Headline: *Physical AI evaluation and benchmarking, in the wild.*
+- **One call to action: "Apply for free evaluation"** (an expression of interest; "Submit your policy" asked too much, since onboarding takes real engineering work). Every copy goes to the application form embedded at the foot of the landing page (`#apply`), never to a separate page. The form is a UForm that Karen brands and Santiago builds; until it exists the slot says the form opens there soon. Follow-up: Ian contacts applicants; strong university fits go to Jiafei.
+- **The 10,000 hours are free evaluation** (the open question below is settled): a large band directly under the hero, the page's one loud moment. The page does not state who is eligible beyond "teams with a policy for one of our robots"; allocation is the team's call.
+- **Order:** hero (claim, film, founders' logos) → 10,000-hour offer → the leaderboard → in the wild → our robots → our scale → how it works → evaluations (a preview of the evaluation viewer: both runs in sync, camera choice) → open data (the Hugging Face repositories themselves) → FAQ → the application form.
+- **Numbers are counted once a day, not live**, and carry the date: "Updated 27 Oct 2026" in the hero status line, the leaderboard and the scale band. They come from `/api/stats` and the published boards, written by the daily `robocolosseum-leaderboard` job (colosseum-router PR #8). If `/api/stats` is unavailable the page counts the same figures from the evaluation list in the browser (slower, fallback only).
+- **Scale wording:** "hundreds of robots" (the meeting's notes said "hundreds of embodiments"; we have five robot types, so robots it is). No fleet counts.
+- **Open data:** list the actual repositories (training sets per robot with episode counts, the evaluation sets) and link the organisation. The Earth Rover drives stay off the page until their release, licence and GPS precision are decided.
+- **Brand** (see Logo, Colour and Type below): light theme by default, dark theme on a switch in the top bar (remembered per device).
+
 ## What we are and how we say it (26 Oct 2026, BIT-3373)
 
 The v5 copy got bad feedback ("copy is bad or misleading... messy... doesn't give strong flow or CTA"). The **launch film script** (with its interview guide) is the source of **facts and positioning**, not of copy: a first v6 draft that followed the film scene by scene and reused its lines was rejected the same day ("u took literally the interview and made it a website... dont COPY exactly what is mentioned in the interview"). Write the page in our own words, organised as a website, not as a film. The previous rules ("Evaluations made in the wild" as headline, the 10,000-hour *dataset* as call to action, "every number is live") are superseded.
@@ -27,18 +40,21 @@ The v5 copy got bad feedback ("copy is bad or misleading... messy... doesn't giv
 
 ## Logo
 
-- The RC monogram under the colosseum arcade, from x.com/RoboColosseum. Kit in `public/brand/` (live at `/brand/`): `rc-mark.svg` (currentColor), black/white marks, dark/light/amber badges, `rc-letters.svg` and `favicon.svg` for 16–32 px, lockups and the wordmark (Archivo 800 outlines).
+- **New brand (Ben, Figma, Oct 2026; used from v8):** an orange round mark (a colosseum seen from above, like a gear) beside the wordmark *Robo Colosseum©* set in Zalando Sans Bold on two lines. Versions: full lockup (with *Real-world evaluation data >> Benchmark protocol* underneath), mark and wordmark, wordmark only, mark only; each in Default (dark), Light and Mono. Exported as SVG from the Figma file on 27 Oct 2026 (Ben's final edits were due 28 Oct; replace the files then): `public/brand/robocolosseum-lockup-{light,dark}.svg`, `robocolosseum-lockup-full-{light,dark}.svg`, `robocolosseum-mark-{light,dark}.svg`. The mark's cut-outs are filled with the background colour (`#cbcbcb` light, `#1c1c1c` dark), so use each file only on its own background.
+- Previous kit (v3 to v7): the RC monogram under the colosseum arcade, from x.com/RoboColosseum. Kit in `public/brand/` (live at `/brand/`): `rc-mark.svg` (currentColor), black/white marks, dark/light/amber badges, `rc-letters.svg` and `favicon.svg` for 16–32 px, lockups and the wordmark (Archivo 800 outlines).
 - One colour at a time; minimum 40 px for the full mark; the letters-only mark below that; clear space of one arch on each side; the arcade may be used as a pattern, the letters may not be redrawn.
 
 ## Direction
 
 - References: Artificial Analysis (the benchmark publisher: white, serif one-liner, charts in cards, a changelog of evaluations) and XDOF (the instrument: dark panels on a dotted grid, mono labels, almost no copy).
+- **Launch page in the new brand (27 Oct 2026, BIT-3373): `/v8/`** (`public/v8/`: `index.html`, `v8.css`, `v8.js`, `chrome.js` (lockups, the button, theme switch, footer), `viewer.js` (the synced comparison preview), `datasets.js` (the Hugging Face repositories)). It reuses `public/landing/live.js`, `public/v3/board.js`, the v7 robot photos and `public/v7/setups.js`. `/v7/` stays up for comparison; the site root still serves `/v5/`.
 - **Launch page (26 Oct 2026, BIT-3373): `/v7/`** (`public/v7/`: `index.html`, `v7.css`, `v7.js`, `matchup.js`, `setups.js`, `chrome.js`, and the blog at `/v7/blog/`). Deployed as its own namespace; the site root still serves `/v5/` until the user decides to switch it. Same night tokens and type as v5; layout rebuilt for flow: named full-width bands (one job each, alternating backgrounds, a header bar per section), a full-bleed film hero, one amber button, mono only for numbers, no dotted panels. It reuses `public/landing/live.js` and `public/v3/board.js` (`openRows`, `fineRowsModel`, `mark`); it does not load the globe, the trial squares or the Robocurve figure.
 - Chosen (22 Oct 2026): **Index in night mode**, `/v5/`. **It is the default for the whole platform** (user decision, 22 Oct 2026): the site root serves `/v5/` on Netlify, and the app pages (leaderboards, evaluations, tasks, submit, join) use the same night tokens, the v5 top bar with the RC mark, Archivo + IBM Plex Mono and the amber accent. Tokens live in `src/styles/arena.css`; `src/styles/base.css` reads them. The Index layout (claim + film window, index cards, a live feed of verdicts) on a dark page, with the control room's live ticker. Earlier explorations stay for comparison: `/v3/` (sage), `/v4/wall/`, `/v4/cinema/`, `/v4/poster/`.
 
 ## Colour
 
-- Night mode: page `#0b0d10`, panel `#13161a`, raised `#181c21`, line `#23272d`, text `#e8eaed`, muted `#8b929c`, dim `#5e6670`.
+- **New brand (v8):** light theme: paper silver `#cbcbcb` (Karen asked Ben for a lighter grey; change `--paper` when he does), text black `#1c1c1c`, orange `#ea5b02` for the one button and the offer band, a 15% black grain over the paper. Dark theme (the brand's Default): paper `#1c1c1c`, text silver `#cbcbcb`, orange `#ff6200` (the dark slides' Primary). Accent dots teal `#00b8c4` and red `#d42f33` exist in the brand but are not used on the page yet. Orange on silver is too light for text (2.3:1), so orange is a fill with black text on it, never a text colour on silver. Sharp rectangles and hairlines; no rounded cards.
+- Night mode (v5 to v7): page `#0b0d10`, panel `#13161a`, raised `#181c21`, line `#23272d`, text `#e8eaed`, muted `#8b929c`, dim `#5e6670`.
 - Accent: amber `#ffb224` (the badge colour). Used for the live dot, the primary button, the selected state. Nothing else is amber.
 - Track pair, validated with the dataviz checker on the panel colour: open track `#c98500`, fine-tuning `#3987e5`.
 - Categorical (bodies, rooms, sites, outcomes on the globe): the validated dark set `#3987e5 #d95926 #199e70 #c98500 #d55181 #008300 #9085e9 #e66767`.
@@ -46,7 +62,8 @@ The v5 copy got bad feedback ("copy is bad or misleading... messy... doesn't giv
 
 ## Type
 
-- Archivo (the wordmark's face) for claims and headings, wide (`wdth` 108–118) and heavy for claims; Archivo 400 for text; IBM Plex Mono for every measurement and label.
+- **New brand (v8):** Zalando Sans for every word (SemiBold with −4.5% tracking for headings, as the brand slides' −5%), Kode Mono Bold in capitals for labels, stamps and data, each live value marked with a small orange square as on the brand slides. Both from Google Fonts. Zalando Sans's tabular figures draw a slashed zero, so big figures use its default (proportional) digits.
+- v5 to v7: Archivo (the wordmark's face) for claims and headings, wide (`wdth` 108–118) and heavy for claims; Archivo 400 for text; IBM Plex Mono for every measurement and label.
 - No uppercase labels except the mono eyebrow style; no number markers unless the content is a sequence.
 
 ## Data and loading

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RoboColosseum · Physical AI evaluation and benchmarking, in the wild</title>
+<meta name="description" content="RoboColosseum evaluates and benchmarks robot policies in the wild: humanoids, arms and rovers running real models in homes, offices and campuses, with every run scored and published. 10,000 hours of free evaluation for new policies and models.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RoboColosseum">
+<meta property="og:title" content="RoboColosseum · Physical AI evaluation and benchmarking, in the wild">
+<meta property="og:description" content="Hundreds of robots, from humanoids to arms and rovers, running real models in homes, offices and campuses. Apply for free evaluation.">
+<meta property="og:url" content="https://robocolosseum.ai/v8/">
+<meta property="og:image" content="https://robocolosseum.ai/v4/video/mashup.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@RoboColosseum">
+<meta name="theme-color" content="#cbcbcb">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&family=Zalando+Sans:wght@400..900&display=swap">
+<script>
+// This page lives at /v8/ (and may later be served at the site root), so its assets are resolved from the site root.
+// The light theme is the default; a reader's own choice of theme is remembered on this device.
+(function () { var p = location.pathname, i = p.indexOf('/v8/'); var root = i >= 0 ? p.slice(0, i + 1) : p.replace(/[^/]*$/, ''); window.RC_ROOT = root
+  try { var t = localStorage.getItem('rc-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t } catch (e) {}
+  document.write('<link rel="icon" href="' + root + 'brand/robocolosseum-mark-light.svg"><link rel="stylesheet" href="' + root + 'v8/v8.css"><link rel="modulepreload" href="' + root + 'landing/live.js"><script type="module" src="' + root + 'v8/v8.js"><\/script>') })()
+</script>
+</head>
+<body>
+<header class="top" id="top">
+  <a class="brand" href="#top" aria-label="RoboColosseum, back to top"><img class="for-light" data-src="brand/robocolosseum-lockup-light.svg" alt="RoboColosseum" width="883" height="246"><img class="for-dark" data-src="brand/robocolosseum-lockup-dark.svg" alt="RoboColosseum" width="883" height="246"></a>
+  <nav class="nav" aria-label="Sections"><a href="#leaderboard">Leaderboard</a><a href="#wild">In the wild</a><a href="#robots">Robots</a><a href="#how">How it works</a><a href="#data">Open data</a><a href="#faq">FAQ</a></nav>
+  <button type="button" class="theme" id="theme" aria-label="Switch to the dark theme"><span aria-hidden="true"></span></button>
+  <a class="cta" data-cta href="#apply">Apply for free evaluation</a>
+</header>
+<main>
+
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <ul class="status" id="status" aria-label="The evaluation record">
+          <li><span class="skel">00,000 runs recorded</span></li><li><span class="skel">0 robot types</span></li><li><span class="skel">Updated 00 Oct 2026</span></li>
+        </ul>
+        <h1 id="hero-title">Physical AI evaluation and benchmarking, in the wild.</h1>
+        <p class="lead">Hundreds of robots, from humanoids to arms and rovers, run real models in homes, offices and campuses. Every run is scored and published.</p>
+        <a class="cta big" data-cta href="#apply">Apply for free evaluation</a>
+      </div>
+      <figure class="hero-film">
+        <video id="film" muted loop playsinline autoplay preload="metadata" aria-hidden="true"></video>
+        <figcaption id="caption" aria-live="off"></figcaption>
+      </figure>
+    </div>
+    <div class="partners">
+      <h2 class="partners-title">Founded by</h2>
+      <ul class="partner-list" id="partners"></ul>
+    </div>
+  </section>
+
+  <section class="offer" id="offer" aria-labelledby="offer-title">
+    <div class="wrap offer-grid">
+      <h2 id="offer-title"><span class="big-n">10,000</span> <span class="unit">hours of free evaluation</span></h2>
+      <div class="offer-copy">
+        <p>Robot time set aside for new policies and models, at no cost: real robots, trained operators and results you can publish.</p>
+        <p>Tell us about your policy and the robots you want results on, and we plan the evaluation with you.</p>
+        <a class="cta big on-accent" data-cta href="#apply">Apply for free evaluation</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="leaderboard" aria-labelledby="leaderboard-title">
+    <div class="wrap">
+      <header class="band-head">
+        <h2 id="leaderboard-title">The leaderboard</h2>
+        <a class="band-link" id="board-link" href="/leaderboard">Full leaderboard</a>
+        <p class="band-sub">Who leads on each robot. Top five per robot, refreshed once a day.</p>
+        <p class="stamp" data-updated></p>
+      </header>
+      <div class="board">
+        <div class="board-controls">
+          <div class="tabs" role="tablist" aria-label="Robot" id="robot-tabs"></div>
+          <div class="tabs small" role="tablist" aria-label="Kind of score" id="track-tabs"></div>
+        </div>
+        <ol class="rows" id="rows"></ol>
+        <p class="board-note" id="board-note"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt" id="wild" aria-labelledby="wild-title">
+    <div class="wrap">
+      <header class="band-head">
+        <h2 id="wild-title">In the wild</h2>
+        <p class="band-sub">Evaluations run in kitchens, bedrooms, offices, canteens and campus corridors, each from an instruction the evaluator writes on the spot.</p>
+      </header>
+      <figure class="wall">
+        <video id="wall" muted loop playsinline autoplay preload="none" aria-label="Twelve recorded evaluations playing at once"></video>
+        <ol class="wall-labels" id="wall-labels" aria-hidden="true"></ol>
+        <figcaption id="places">Twelve recorded evaluations, played together.</figcaption>
+      </figure>
+      <dl class="sites" id="sites" aria-label="Where evaluation happens"></dl>
+    </div>
+  </section>
+
+  <section class="band" id="robots" aria-labelledby="robots-title">
+    <div class="wrap">
+      <header class="band-head">
+        <h2 id="robots-title">Our robots</h2>
+        <p class="band-sub">Humanoids, arms and rovers, with more joining as the fleet grows. Each type has its own leaderboard; open a robot to see its setup and parts list.</p>
+      </header>
+      <ul class="fleet" id="fleet"></ul>
+    </div>
+  </section>
+
+  <section class="band alt" id="scale" aria-labelledby="scale-title">
+    <div class="wrap">
+      <header class="band-head">
+        <h2 id="scale-title">Our scale</h2>
+        <p class="band-sub" id="scale-lede">Counted from the evaluation record once a day.</p>
+        <p class="stamp" data-updated></p>
+      </header>
+      <dl class="figures" id="figures"></dl>
+    </div>
+  </section>
+
+  <section class="band" id="how" aria-labelledby="how-title">
+    <div class="wrap">
+      <header class="band-head">
+        <h2 id="how-title">How it works</h2>
+        <p class="band-sub">You bring the model. We provide the robots, operators, scenes and scoring.</p>
+      </header>
+      <ol class="steps">
+        <li><b>Apply</b><span>Tell us about your policy and the robots you want results on, in a short form.</span></li>
+        <li><b>Connect your model</b><span>We help you link your inference server through our policy SDK, or serve your checkpoint on a machine next to the robot.</span></li>
+        <li><b>We evaluate it in the wild</b><span>Operators set up each scene and run your model in blind comparisons and repeated task trials, recording every camera.</span></li>
+        <li><b>Results go public</b><span>Scores land on the leaderboard with their uncertainty, linked to the videos and data behind them.</span></li>
+      </ol>
+      <h3 class="sub-title">Two kinds of score</h3>
+      <div class="measures">
+        <article class="measure">
+          <h4>Head-to-head</h4>
+          <p>Two unnamed models try the same new instruction in the same scene. The evaluator picks the better run, or calls a tie.</p>
+        </article>
+        <article class="measure">
+          <h4>Standard tasks</h4>
+          <p>Every model learns a fixed task from the same 100 demonstrations, then makes 25 attempts.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band alt" id="evaluations" aria-labelledby="evaluations-title">
+    <div class="wrap">
+      <header class="band-head">
+        <h2 id="evaluations-title">Evaluations</h2>
+        <a class="band-link" id="viewer-link" href="/evals">Open the evaluation viewer</a>
+        <p class="band-sub">A preview of the evaluation viewer: one blind comparison from the record, both runs played in sync, with the evaluator's pick and note.</p>
+      </header>
+      <div class="viewer" id="viewer"></div>
+    </div>
+  </section>
+
+  <section class="band" id="data" aria-labelledby="data-title">
+    <div class="wrap">
+      <header class="band-head">
+        <h2 id="data-title">Open data</h2>
+        <a class="band-link" href="https://huggingface.co/RoboColosseum">RoboColosseum on Hugging Face</a>
+        <p class="band-sub">Training demonstrations and evaluation runs, failed attempts included, go on Hugging Face in LeRobot format. Check any score yourself, or train on the data.</p>
+      </header>
+      <dl class="data-figures" id="data-figures"></dl>
+      <div class="repos" id="repos"></div>
+    </div>
+  </section>
+
+  <section class="band alt" id="faq" aria-labelledby="faq-title">
+    <div class="wrap">
+      <header class="band-head">
+        <h2 id="faq-title">FAQ</h2>
+      </header>
+      <div class="faq-list">
+        <details><summary>Who can apply?</summary><p>Teams with a policy for one of our robots. The 10,000 free hours are allocated by the RoboColosseum team, who review every application and follow up with next steps.</p></details>
+        <details><summary>What happens after I apply?</summary><p>We read your application and get in touch to plan the evaluation with you: which robots and tasks, and how your model will connect. Then the runs start and results appear as they are scored.</p></details>
+        <details><summary>Which robots are available?</summary><p>Unitree G1 humanoids, bimanual YAM stations, Franka arms in the DROID setup and SO-ARM101 arms. Earth Rover Mini+ wheeled robots are being added. Your policy has to take the robot's camera inputs and produce its action format.</p></details>
+        <details><summary>How do I connect my model?</summary><p>Two ways. Run your own inference server and connect it with our policy SDK, and the robot streams observations to it during each run. Or hand over a checkpoint and we serve it on a machine next to the robot. We help you set up either one.</p></details>
+        <details><summary>How is a model scored?</summary><p>Head-to-head: two unnamed models try the same fresh instruction and the evaluator picks the better run or calls a tie. Ratings are fitted from all comparisons on that robot and shown with their uncertainty. Standard tasks: every model is fine-tuned on the same 100 demonstrations, then makes 25 attempts, and we report full successes and milestone progress.</p></details>
+        <details><summary>How is it kept fair?</summary><p>Evaluators see run A and run B, never the model names. Both models in a comparison face the same robot, scene and instruction, one after the other. Every fine-tuned model trains on identical demonstrations.</p></details>
+        <details><summary>Can I compare a score on one robot with another?</summary><p>No. Each robot type keeps its own board, because a rating earned on a Franka arm tells you nothing about a humanoid.</p></details>
+        <details><summary>Why real robots instead of simulation?</summary><p>Simulated benchmarks saturate: policies above 90% on LIBERO can fall close to zero once the scene is perturbed (<a href="https://arxiv.org/abs/2510.03827">LIBERO-PRO</a>). Physical scenes vary on their own and expose failures a simulator does not model.</p></details>
+        <details><summary>What gets published, and where?</summary><p>Every run from both kinds of evaluation, failures included, with its videos, in LeRobot format on <a href="https://huggingface.co/RoboColosseum">Hugging Face</a>. Scores go on the public leaderboard.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="band apply" id="apply" aria-labelledby="apply-title">
+    <div class="wrap apply-grid">
+      <header class="band-head">
+        <h2 id="apply-title">Apply for free evaluation</h2>
+        <p class="band-sub">Tell us about your policy and the robots you want results on. The RoboColosseum team reads every application and follows up with next steps.</p>
+      </header>
+      <div class="form-slot" id="form-slot" aria-live="polite"><p>The application form opens here soon.</p></div>
+    </div>
+  </section>
+
+</main>
+<footer class="foot" id="footer"></footer>
+<dialog class="setup" id="setup" aria-labelledby="setup-title"></dialog>
+</body>
+</html>
