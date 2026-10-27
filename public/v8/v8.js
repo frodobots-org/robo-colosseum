@@ -56,7 +56,7 @@ function playWhenVisible(video) {
 
 // The hero film (cut from the team's footage on 27 Oct 2026); its caption follows the cut list that ships with it.
 const film = $('#film'), caption = $('#caption')
-// Phones get the 720p cut (3.2 MB instead of 6.4).
+// Phones get the 720p cut (4.5 MB instead of 6.7).
 film.poster = `${VIDEO}hero.jpg`; film.src = `${VIDEO}${matchMedia('(max-width: 760px)').matches ? 'hero-720' : 'hero'}.mp4`
 let cues = [], current = -1
 fetch(`${VIDEO}hero.json`).then(r => r.ok ? r.json() : []).then(list => { cues = list }).catch(() => {})
