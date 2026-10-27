@@ -3,7 +3,8 @@
 import { appLink } from '../landing/live.js'
 
 export const ROOT = window.RC_ROOT || '/'
-export const APPLY = `${ROOT}v8/#apply`
+// The landing page is the site root, so the form is at /#apply from every other page.
+export const APPLY = `${ROOT}#apply`
 // The application form (Youform, set up by Karen). Every call to action leads to it: on the landing page it is embedded
 // in the closing section, so the buttons scroll there. Empty until the form exists.
 export const FORM_URL = ''
