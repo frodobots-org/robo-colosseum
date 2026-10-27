@@ -70,16 +70,9 @@ film.addEventListener('timeupdate', () => {
 })
 playWhenVisible(film)
 
-// One run to thousands: the camera pulls back four times, each view becoming the centre of nine. The counter follows the
-// film's own timeline (zooms start at 2.5, 5.5, 8.5 and 11.5 s and last 1.6 s; the loop fades back from 16.3 s).
-const mosaic = $('#mosaic'), count = $('#mosaic-count')
-mosaic.poster = `${VIDEO}mosaic.jpg`; mosaic.src = `${VIDEO}mosaic.mp4`
-const STAGES = [[0, 1], [3.3, 9], [6.3, 81], [9.3, 729], [12.3, 6561]]
-mosaic.addEventListener('timeupdate', () => {
-  const t = mosaic.currentTime, n = t > 16.3 ? 1 : STAGES.filter(([at]) => t >= at).at(-1)[1]
-  const text = n === 6561 && stats ? `${fmt(n)} recordings on screen, of ${fmt(stats.runs)} recorded runs` : `${fmt(n)} ${n === 1 ? 'recording' : 'recordings'}`
-  if (count.textContent !== text) count.textContent = text
-})
+// The in-the-wild film: real places, one run, then the pull-back to thousands, its words and counter drawn into the film.
+const mosaic = $('#mosaic')
+mosaic.poster = `${VIDEO}wild.jpg`; mosaic.src = `${VIDEO}${matchMedia('(max-width: 760px)').matches ? 'wild-960' : 'wild'}.mp4`
 playWhenVisible(mosaic)
 
 // The 10,000-hour offer follows the reader like a cookie notice: it appears once they scroll past the top of the hero,
