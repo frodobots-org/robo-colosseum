@@ -176,11 +176,11 @@ function scale() {
   for (const policy of policies) { const lab = labFor(policy); if (!lab) continue; const e = labs.get(lab.id) || { lab, policy, n: 0 }; e.n++; labs.set(lab.id, e) }
   $('#b-policies').innerHTML = `<figcaption><b>${fmt(s.policies)}</b><span>Policies evaluated, from these labs and more</span></figcaption>
     <ul class="labs">${[...labs.values()].sort((a, b) => b.n - a.n).map(e => `<li title="${esc(e.lab.name)}">${mark(e.policy, 40)}<span>${esc(e.lab.name)}</span></li>`).join('')}</ul>`
-  // Reach: the countries and the robot types.
+  // Reach: the countries and the embodiments (robot types).
   const countries = [...new Set([...PLACES.open, ...PLACES.fine].map(p => p.split(', ').at(-1)))]
   $('#b-reach').innerHTML = `<figcaption><b>${fmt(countries.length)}</b><span>Countries</span></figcaption>
     <ul class="places">${countries.map(c => `<li>${esc(c)}</li>`).join('')}</ul>
-    <figcaption class="second"><b>${fmt(s.robotTypes)}</b><span>Robot types</span></figcaption>
+    <figcaption class="second"><b>${fmt(s.robotTypes)}</b><span>Embodiments</span></figcaption>
     <ul class="bodies">${FLEET.map(f => `<li title="${esc(f.name)}"><img src="${f.img}" alt="${esc(f.name)}" loading="lazy"></li>`).join('')}</ul>`
   if (s.firstComparison) $('#scale-lede').textContent = `Counted once a day from every evaluation since the first comparison on ${day(s.firstComparison)}.`
 }
