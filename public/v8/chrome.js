@@ -1,0 +1,29 @@
+// The parts every v8 page shares: the brand lockups, the one call to action, the theme switch and the footer.
+// Every copy of the button leads to the application form at the foot of the landing page.
+import { appLink } from '../landing/live.js'
+
+export const ROOT = window.RC_ROOT || '/'
+export const APPLY = `${ROOT}v8/#apply`
+
+function themeSwitch(button) {
+  const label = () => { button.setAttribute('aria-label', `Switch to the ${document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'} theme`) }
+  label()
+  button.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
+    document.documentElement.dataset.theme = next
+    try { localStorage.setItem('rc-theme', next) } catch {}
+    label()
+  })
+}
+
+export function chrome() {
+  document.querySelectorAll('img[data-src]').forEach(img => { img.src = ROOT + img.dataset.src })
+  // On the landing page itself the button scrolls to the form; elsewhere it opens the landing page there.
+  const here = document.querySelector('#apply')
+  document.querySelectorAll('[data-cta]').forEach(a => { a.href = here ? '#apply' : APPLY })
+  const theme = document.querySelector('#theme'); if (theme) themeSwitch(theme)
+  document.querySelector('#footer').innerHTML = `<div class="foot-brand"><img class="for-light" src="${ROOT}brand/robocolosseum-lockup-full-light.svg" alt="RoboColosseum" width="883" height="257"><img class="for-dark" src="${ROOT}brand/robocolosseum-lockup-full-dark.svg" alt="RoboColosseum" width="883" height="257"><p>Founded by NUS MAGIC Lab, BitRobot, EAIC Singapore and Hugging Face.</p></div>
+  <nav aria-label="Footer"><div><h3>The benchmark</h3><ul><li><a href="${appLink('/leaderboard')}">Leaderboard</a></li><li><a href="${appLink('/evals')}">Evaluations</a></li><li><a href="${appLink('/tasks')}">Tasks and protocol</a></li><li><a href="https://huggingface.co/RoboColosseum">Open data</a></li><li><a href="${ROOT}v7/blog/">Blog</a></li></ul></div>
+  <div><h3>Take part</h3><ul><li><a href="${here ? '#apply' : APPLY}">Apply for free evaluation</a></li><li><a href="${appLink('/join')}">Join as an evaluator</a></li></ul></div>
+  <div><h3>Follow</h3><ul><li><a href="https://x.com/RoboColosseum">X</a></li><li><a href="https://github.com/frodobots-org/robo-colosseum">GitHub</a></li><li><a href="https://huggingface.co/RoboColosseum">Hugging Face</a></li></ul></div></nav>`
+}
