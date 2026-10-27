@@ -256,8 +256,9 @@ function openData() {
   const sets = TRAINING.flatMap(g => g.sets), demos = sets.reduce((s, [, eps]) => s + eps, 0)
   $('#data-figures').innerHTML = [[sets.length, 'training sets'], [demos, 'demonstrations'], [HOURS, 'hours of demonstrations'], [EVAL_SETS, 'evaluation sets so far']]
     .map(([v, label]) => `<div><dt>${n(v)}</dt><dd>${esc(label)}</dd></div>`).join('')
-  $('#repos').innerHTML = TRAINING.map(g => `<section class="repo-group"><h3>${esc(g.robot)}</h3><p>${g.sets.length} sets, ${g.cameras} cameras each</p>
-    <ul>${g.sets.map(([name, eps]) => `<li><a href="${HUB}${name}"><span class="repo-name">${esc(name)}</span><span class="repo-eps">${fmt(eps)} ep.</span></a></li>`).join('')}</ul></section>`).join('')
+  $('#repos').innerHTML = TRAINING.flatMap(g => g.sets.map(([name, eps]) => `<li><a class="repo" href="${HUB}${name}">
+    <img src="${ROOT}v8/data/${name}.jpg" alt="" loading="lazy" width="480" height="270">
+    <span class="repo-name">${esc(name)}</span><span class="repo-meta">${esc(g.robot)} · ${fmt(eps)} episodes · ${g.cameras} cameras</span></a></li>`)).join('')
   $('#repos').insertAdjacentHTML('afterend', `<p class="repos-note">Each training set is the 100 or so teleoperated demonstrations every model learns a standard task from. Evaluation runs are published per model and task, for example <a href="${HUB}${EVAL_EXAMPLE}"><code>${EVAL_EXAMPLE}</code></a>. All load with the LeRobot library.</p>`)
 }
 
