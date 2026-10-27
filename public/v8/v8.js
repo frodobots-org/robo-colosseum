@@ -11,7 +11,7 @@ import { viewer } from './viewer.js'
 import { HUB, TRAINING, HOURS, EVAL_SETS, EVAL_EXAMPLE } from './datasets.js'
 
 const $ = (s, el = document) => el.querySelector(s)
-const VIDEO = `${ROOT}v4/video/`
+const VIDEO = `${ROOT}v8/video/`
 const PICS = `${ROOT}v7/robots/`
 
 // The robot types we run. Fleet sizes are never shown: the page says "hundreds of robots" (user, 26 Oct 2026).
@@ -54,28 +54,46 @@ function playWhenVisible(video) {
   new IntersectionObserver(es => es.forEach(e => { e.isIntersecting ? video.play().catch(() => {}) : video.pause() })).observe(video)
 }
 
-// The hero film; its caption follows the cut list that ships with it.
+// The hero film (cut from the team's footage on 27 Oct 2026); its caption follows the cut list that ships with it.
 const film = $('#film'), caption = $('#caption')
-film.poster = `${VIDEO}mashup.jpg`; film.src = `${VIDEO}mashup.mp4`
+film.poster = `${VIDEO}hero.jpg`; film.src = `${VIDEO}hero.mp4`
 let cues = [], current = -1
-fetch(`${VIDEO}cues.json`).then(r => r.ok ? r.json() : []).then(list => { cues = list }).catch(() => {})
+fetch(`${VIDEO}hero.json`).then(r => r.ok ? r.json() : []).then(list => { cues = list }).catch(() => {})
 film.addEventListener('timeupdate', () => {
   const t = film.currentTime
   const i = cues.findIndex((c, k) => t >= c.t && (k === cues.length - 1 || t < cues[k + 1].t))
   if (i < 0 || i === current) return
   current = i
   const c = cues[i]
-  caption.innerHTML = `${esc(c.body)}, ${esc(c.place.replace('Four bodies', 'Four robot types'))}${c.date ? `<span>${esc(c.date)}</span>` : ''}`
+  caption.innerHTML = `${esc(c.body)}<span>${esc(c.place)}${c.date ? `, ${esc(c.date)}` : ''}</span>`
 })
 playWhenVisible(film)
 
-// The wall of real scenes: twelve evaluations at once, labelled in reading order.
-const wall = $('#wall')
-wall.poster = `${VIDEO}wall.jpg`; wall.src = `${VIDEO}wall.mp4`
-fetch(`${VIDEO}wall.json`).then(r => r.ok ? r.json() : []).then(tiles => {
-  $('#wall-labels').innerHTML = tiles.map(t => `<li>${esc(t.body)}<span>${esc(t.place)}</span></li>`).join('')
-}).catch(() => {})
-playWhenVisible(wall)
+// One run to hundreds: the camera pulls back three times, each view becoming the centre of nine. The counter follows the
+// film's own timeline (zooms end at 4.1, 7.1 and 10.1 s; the loop fades back from 13.3 s).
+const mosaic = $('#mosaic'), count = $('#mosaic-count')
+mosaic.poster = `${VIDEO}mosaic.jpg`; mosaic.src = `${VIDEO}mosaic.mp4`
+const STAGES = [[0, 1], [3.3, 9], [6.3, 81], [9.3, 729]]
+mosaic.addEventListener('timeupdate', () => {
+  const t = mosaic.currentTime, n = t > 13.3 ? 1 : STAGES.filter(([at]) => t >= at).at(-1)[1]
+  const text = n === 729 && stats ? `${fmt(n)} recordings on screen, of ${fmt(stats.runs)} recorded runs` : `${fmt(n)} ${n === 1 ? 'recording' : 'recordings'}`
+  if (count.textContent !== text) count.textContent = text
+})
+playWhenVisible(mosaic)
+const rover = $('#rover')
+rover.poster = `${VIDEO}rover.jpg`; rover.src = `${VIDEO}rover.mp4`
+playWhenVisible(rover)
+
+// The 10,000-hour offer follows the reader like a cookie notice: it appears once they scroll past the top of the hero,
+// steps aside while the form itself is on screen, and stays closed for the rest of the visit once dismissed.
+const callout = $('#offer')
+let dismissed = false, formInView = false
+try { dismissed = sessionStorage.getItem('rc-offer') === 'closed' } catch {}
+const offer = () => { callout.hidden = dismissed || formInView || scrollY < 120 }
+callout.querySelector('.callout-close').addEventListener('click', () => { dismissed = true; offer(); try { sessionStorage.setItem('rc-offer', 'closed') } catch {} })
+new IntersectionObserver(es => es.forEach(e => { formInView = e.isIntersecting; offer() })).observe($('#apply'))
+addEventListener('scroll', offer, { passive: true })
+offer()
 
 // Data: the published figures (one small request) and the two published boards. A failed request is retried once.
 const get = (path, retry = true) => fetch(API + path, { headers: { Accept: 'application/json' } })
@@ -123,13 +141,10 @@ const day = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', m
 const list = parts => parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}` : parts.join('')
 const n = v => `<span class="n">${fmt(v)}</span>`
 
-// "Updated" stamps and the hero's status lines: the date the daily snapshot was counted.
+// "Updated" stamps: the date the daily snapshot was counted.
 function freshness() {
   const updated = stats ? `Updated ${day(stats.computedAt)}` : statsFailed ? '' : null
   document.querySelectorAll('[data-updated]').forEach(el => { if (updated !== null) el.textContent = updated })
-  if (!stats && !statsFailed) return
-  const lines = stats ? [`${fmt(stats.runs)} runs recorded`, `${fmt(stats.robotTypes)} robot types`, updated] : ['Hundreds of robots', 'Humanoids, arms and rovers']
-  $('#status').innerHTML = lines.map(l => `<li>${esc(l)}</li>`).join('')
 }
 
 // Scale on several axes. A figure that is not counted yet stays a placeholder, never a partial total.
@@ -147,11 +162,11 @@ function scale() {
   if (s?.firstComparison) $('#scale-lede').textContent = `Counted once a day from every evaluation since the first comparison on ${day(s.firstComparison)}.`
 }
 
-// Under the wall: how the scenes spread across robot types.
+// Under the mosaic: how the scenes spread across robot types.
 function places() {
   if (!stats?.scenes) return
   const per = Object.entries(stats.robots || {}).map(([id, r]) => ({ name: NAMES[id] || id, count: r.scenes })).filter(r => r.count).sort((a, b) => b.count - a.count)
-  $('#places').innerHTML = `Twelve recorded evaluations, played together. ${n(stats.scenes)} scenes on record so far: ${list(per.map(r => `${n(r.count)} for ${esc(r.name)}`))}.`
+  $('#places').innerHTML = `From one robot at work to hundreds of recorded runs. ${n(stats.scenes)} scenes on record so far: ${list(per.map(r => `${n(r.count)} for ${esc(r.name)}`))}.`
 }
 
 function fleet() {

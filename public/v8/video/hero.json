@@ -1,0 +1,74 @@
+[
+ {
+  "body": "SO-ARM101",
+  "place": "A campus walkway",
+  "date": "21 Oct 2026",
+  "t": 0.0
+ },
+ {
+  "body": "Humanoid",
+  "place": "A kitchen island",
+  "date": "19 Sep 2026",
+  "t": 2.6
+ },
+ {
+  "body": "Bimanual YAM",
+  "place": "An open corridor",
+  "date": "22 Oct 2026",
+  "t": 4.67
+ },
+ {
+  "body": "Earth Rover Mini+",
+  "place": "A plaza in Wuhan",
+  "date": "24 Oct 2026",
+  "t": 7.07
+ },
+ {
+  "body": "Franka",
+  "place": "An office by the window",
+  "date": "10 Oct 2026",
+  "t": 9.67
+ },
+ {
+  "body": "Humanoid",
+  "place": "A hallway, hanging laundry",
+  "date": "9 Oct 2026",
+  "t": 12.07
+ },
+ {
+  "body": "Bimanual YAM",
+  "place": "A building lobby",
+  "date": "23 Oct 2026",
+  "t": 14.13
+ },
+ {
+  "body": "Earth Rover Mini+",
+  "place": "A plaza in Wuhan",
+  "date": "24 Oct 2026",
+  "t": 16.53
+ },
+ {
+  "body": "SO-ARM101",
+  "place": "A campus walkway",
+  "date": "21 Oct 2026",
+  "t": 19.1
+ },
+ {
+  "body": "Humanoid",
+  "place": "A sofa, laundry basket",
+  "date": "16 Oct 2026",
+  "t": 21.5
+ },
+ {
+  "body": "Earth Rover Mini+",
+  "place": "Two rovers in Wuhan",
+  "date": "24 Oct 2026",
+  "t": 23.57
+ },
+ {
+  "body": "Unitree G1",
+  "place": "The humanoid fleet",
+  "date": "9 Oct 2026",
+  "t": 26.17
+ }
+]

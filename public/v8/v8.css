@@ -1,5 +1,5 @@
 /* v8: the launch page in the RoboColosseum brand (Figma "RC Brand", Ben, Oct 2026). Light theme by default: silver
-   paper with a fine grain, near-black type, the brand orange for the one call to action and the offer band.
+   paper with a fine grain, near-black type, the brand orange for the one call to action. The hero is a full-bleed film.
    Zalando Sans carries every word; Kode Mono, in capitals, carries labels, stamps and data. Sharp rectangles and
    hairlines throughout, like the brand slides. The dark theme is the brand's Default: black paper, silver type. */
 :root {
@@ -41,8 +41,8 @@ button { font: inherit; color: inherit; }
 :root[data-theme="dark"] .for-dark { display: block; }
 
 /* Kode Mono in capitals: the brand's voice for labels, stamps and the record. An orange square marks a live value. */
-.stamp, .status, .partners-title, .tag { font: 700 12.5px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .02em; }
-.stamp:not(:empty)::before, .status li::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 9px; background: var(--accent); vertical-align: 1px; }
+.stamp, .partners-title { font: 700 12.5px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .02em; }
+.stamp:not(:empty)::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 9px; background: var(--accent); vertical-align: 1px; }
 
 /* the one call to action */
 .cta { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 10px 18px; background: var(--accent); color: var(--on-accent); font: 650 15px/1 var(--sans); text-decoration: none; white-space: nowrap; transition: background .15s, color .15s; }
@@ -66,31 +66,28 @@ button { font: inherit; color: inherit; }
 @media (max-width: 520px) { .brand img { height: 30px; } .top { gap: 12px; } .top .cta { padding: 10px 12px; font-size: 14px; } }
 @media (max-width: 400px) { .theme { display: none; } .top .cta { margin-left: auto; } }
 
-/* hero: the claim across the page, then the film in a frame, then the founders */
-.hero { position: relative; padding: clamp(40px, 6vw, 72px) max(var(--gutter), calc((100% - var(--maxw)) / 2)) 0; overflow: hidden; isolation: isolate; }
-.hero::before { content: ""; position: absolute; z-index: -1; width: min(980px, 110vw); aspect-ratio: 1; right: max(-260px, -20vw); top: -120px; background: url("../brand/robocolosseum-mark-light.svg") center / contain no-repeat; opacity: .07; }
-:root[data-theme="dark"] .hero::before { background-image: url("../brand/robocolosseum-mark-dark.svg"); opacity: .1; }
-.status { display: flex; flex-wrap: wrap; gap: 6px 28px; color: var(--ink-2); }
-.hero h1 { max-width: 20ch; margin-top: clamp(24px, 3vw, 36px); font: 600 clamp(40px, 6.4vw, 92px)/.98 var(--sans); letter-spacing: -.045em; text-wrap: balance; }
-.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
-.hero-copy { display: grid; justify-items: start; }
-.lead { max-width: 34em; margin-top: 24px; font-size: clamp(18px, 1.6vw, 21px); line-height: 1.45; color: var(--ink-2); }
-.hero-copy .cta { margin-top: 30px; justify-self: start; }
-@media (min-width: 980px) {
-  .hero-grid { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); grid-template-rows: auto auto auto 1fr; gap: 0 48px; }
-  .hero-copy { display: contents; }
-  .status { grid-column: 1 / -1; grid-row: 1; }
-  .hero h1 { grid-column: 1 / -1; grid-row: 2; }
-  .lead { grid-column: 1; grid-row: 3; margin-top: 40px; }
-  .hero-copy .cta { grid-column: 1; grid-row: 4; align-self: start; }
-  .hero-film { grid-column: 2; grid-row: 3 / span 2; margin-top: 40px; }
-}
-.hero-film { position: relative; margin-top: 36px; border: 1px solid var(--ink); background: #000; }
-.hero-film video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-.hero-film figcaption { position: absolute; left: 0; bottom: 0; max-width: 100%; padding: 7px 12px; background: var(--shade); color: #e6e6e6; font: 700 12px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .02em; }
-.hero-film figcaption:empty { display: none; }
-.hero-film figcaption span { margin-left: 10px; color: #a8a8a8; }
-.partners { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 24px; align-items: center; margin-top: clamp(48px, 6vw, 72px); padding: 26px 0 30px; border-top: 1px solid var(--line-2); }
+/* hero: the film fills the first screen, the claim sits over it in the lower left. The footage is bright, so a dark
+   shade rises from the bottom left; the hero keeps the brand's dark look in both themes. */
+.hero { position: relative; display: grid; align-content: end; min-height: max(560px, min(calc(100svh - 61px), 920px)); padding: 120px max(var(--gutter), calc((100% - var(--maxw)) / 2)) clamp(40px, 6vw, 72px); overflow: hidden; isolation: isolate; background: #111; color: #f0f0f0; }
+.hero-film { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+.hero-shade { position: absolute; inset: 0; z-index: -1; background:
+  linear-gradient(to top, rgba(17, 17, 17, .9) 0%, rgba(17, 17, 17, .62) 38%, rgba(17, 17, 17, .3) 70%, rgba(17, 17, 17, .32) 100%),
+  linear-gradient(to right, rgba(17, 17, 17, .72) 0%, rgba(17, 17, 17, .3) 45%, rgba(17, 17, 17, 0) 75%); }
+.hero h1, .lead { text-shadow: 0 2px 24px rgba(0, 0, 0, .35); }
+.hero-copy { display: grid; justify-items: start; max-width: 980px; }
+.hero h1 { font: 600 clamp(42px, 7vw, 104px)/.96 var(--sans); letter-spacing: -.045em; text-wrap: balance; }
+.lead { max-width: 36em; margin-top: 24px; font-size: clamp(18px, 1.6vw, 21px); line-height: 1.45; color: #d8d8d8; }
+.hero-copy .cta { margin-top: 32px; }
+.hero .cta:hover { background: #f0f0f0; color: #111; }
+.hero .cta:focus-visible, .hero :focus-visible { outline-color: #f0f0f0; }
+.hero-caption { position: absolute; right: max(var(--gutter), calc((100% - var(--maxw)) / 2)); bottom: clamp(40px, 6vw, 72px); max-width: 30ch; text-align: right; font: 700 12px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: #e6e6e6; }
+.hero-caption:not(:empty)::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 9px; background: var(--accent); vertical-align: 1px; }
+.hero-caption span { display: block; color: #a8a8a8; }
+@media (max-width: 860px) { .hero-caption { display: none; } }
+
+/* the founders, a slim strip under the hero */
+.partners { padding: 26px 0 30px; border-bottom: 1px solid var(--line-2); }
+.partners-wrap { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 24px; align-items: center; }
 .partners-title { color: var(--ink-3); }
 .partner-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; align-items: center; }
 .partner-list a { display: flex; align-items: center; min-height: 40px; text-decoration: none; color: var(--ink); }
@@ -102,16 +99,26 @@ button { font: inherit; color: inherit; }
 .partner-list .eaic { display: inline-flex; align-items: center; gap: 10px; }
 .partner-list .eaic b { font: 800 28px/1 var(--sans); letter-spacing: -.03em; }
 .partner-list .eaic span { font-size: 11px; line-height: 1.25; color: var(--ink-3); }
-@media (max-width: 960px) { .partners { grid-template-columns: 1fr; gap: 16px; } }
+@media (max-width: 960px) { .partners-wrap { grid-template-columns: 1fr; gap: 16px; } }
 @media (max-width: 760px) { .partner-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 20px; } }
 
-/* the offer: the page's one loud moment */
-.offer { padding: clamp(64px, 8vw, 112px) 0; background: var(--accent) var(--grain); color: var(--on-accent); }
-.offer h2 { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 36px; font-weight: 600; }
-.big-n { font: 700 clamp(92px, 19vw, 280px)/.8 var(--sans); letter-spacing: -.06em; }
-.offer .unit { max-width: 9ch; padding-bottom: .12em; font: 600 clamp(28px, 3.6vw, 52px)/1 var(--sans); letter-spacing: -.035em; }
-.offer-copy { display: grid; grid-template-columns: repeat(2, minmax(0, 36ch)) auto; gap: 16px 40px; align-items: end; justify-content: space-between; margin-top: clamp(36px, 5vw, 56px); padding-top: 24px; border-top: 1px solid var(--on-accent); font-size: clamp(17px, 1.4vw, 19px); line-height: 1.5; }
-@media (max-width: 980px) { .offer-copy { grid-template-columns: minmax(0, 1fr); justify-items: start; } }
+/* the offer: a notice that follows the reader, like a cookie notice, until it is dismissed or the form is in view */
+.callout { position: fixed; z-index: 60; right: 24px; bottom: 24px; display: grid; gap: 12px; justify-items: start; width: min(380px, calc(100% - 32px)); padding: 22px 22px 22px; background: #161616; color: #d6d6d6; border: 1px solid #333; border-top: 4px solid var(--accent); box-shadow: 0 18px 50px rgba(0, 0, 0, .35); transition: transform .35s ease, opacity .35s ease; }
+.callout[hidden] { display: grid; visibility: hidden; opacity: 0; transform: translateY(16px); pointer-events: none; }
+.callout h2 { padding-right: 28px; font: 600 20px/1.2 var(--sans); letter-spacing: -.02em; color: #f0f0f0; }
+.callout-n { display: block; font: 700 40px/1 var(--sans); letter-spacing: -.05em; color: var(--accent); }
+.callout p { font-size: 15px; line-height: 1.45; }
+.callout .cta { margin-top: 4px; }
+.callout .cta:hover { background: #f0f0f0; color: #111; }
+.callout :focus-visible { outline-color: #f0f0f0; }
+.callout-close { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; padding: 0; border: 1px solid #444; background: none; color: #d6d6d6; font: 400 20px/1 var(--sans); cursor: pointer; }
+.callout-close:hover { border-color: #d6d6d6; }
+@media (prefers-reduced-motion: reduce) { .callout { transition: none; } }
+@media (max-width: 560px) {
+  .callout { right: 0; bottom: 0; width: 100%; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 16px 16px 18px; border-left: 0; border-right: 0; }
+  .callout h2 { font-size: 17px; } .callout-n { font-size: 30px; }
+  .callout p { display: none; }
+}
 
 /* page sections: full-width bands, each opened by its plain title */
 .wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gutter); }
@@ -163,20 +170,24 @@ button { font: inherit; color: inherit; }
   .tabs button { white-space: nowrap; }
 }
 
-/* in the wild */
-.wall { position: relative; margin-top: clamp(36px, 5vw, 52px); }
-.wall video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #000; border: 1px solid var(--ink); }
-.wall-labels { position: absolute; inset: 0 0 auto; aspect-ratio: 16 / 9; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); pointer-events: none; }
-.wall-labels li { align-self: end; justify-self: start; margin: 0 0 8px 8px; padding: 4px 8px; background: var(--shade); font: 700 11.5px/1.3 var(--mono); text-transform: uppercase; color: #e6e6e6; }
-.wall-labels span { display: block; font-weight: 400; color: #b5b5b5; }
-.wall figcaption { margin-top: 16px; font-size: 16px; color: var(--ink-2); }
-.sites { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 32px; }
+/* in the wild: the one-to-hundreds film, then the rover's own camera beside where evaluation happens */
+.mosaic { position: relative; margin-top: clamp(36px, 5vw, 52px); }
+.mosaic video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #121212; border: 1px solid var(--ink); }
+.mosaic-count { position: absolute; left: 0; top: 0; padding: 8px 12px; background: var(--shade); color: #e6e6e6; font: 700 13px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .02em; }
+.mosaic-count:empty { display: none; }
+.mosaic-count::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 9px; background: var(--accent); vertical-align: 1px; }
+.mosaic figcaption { margin-top: 16px; font-size: 16px; color: var(--ink-2); }
+.wild-row { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px; align-items: start; margin-top: 40px; }
+.rover video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #121212; border: 1px solid var(--ink); }
+.rover figcaption { margin-top: 12px; font-size: 15.5px; color: var(--ink-2); }
+.rover figcaption b { display: block; font: 700 12.5px/1.4 var(--mono); text-transform: uppercase; color: var(--ink); }
+.sites { display: grid; gap: 16px; }
 .sites > div { padding: 22px 24px; border: 1px solid var(--line-2); }
 .sites dt { font: 650 18px/1.3 var(--sans); }
 .sites dd > span { display: block; margin-top: 4px; font-size: 15px; color: var(--ink-3); }
 .sites ul { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .sites li { padding: 4px 10px; border: 1px solid var(--line-2); font: 700 12.5px/1.4 var(--mono); text-transform: uppercase; }
-@media (max-width: 760px) { .sites { grid-template-columns: 1fr; } .wall-labels { display: none; } }
+@media (max-width: 860px) { .wild-row { grid-template-columns: 1fr; } }
 
 /* robots */
 .fleet { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-top: clamp(36px, 5vw, 52px); }

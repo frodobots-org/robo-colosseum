@@ -14,6 +14,11 @@ The 26 Oct launch meeting (launch on 4 Nov: X thread, website and launch video t
 - **Scale wording:** "hundreds of robots" (the meeting's notes said "hundreds of embodiments"; we have five robot types, so robots it is). No fleet counts.
 - **Open data:** list the actual repositories (training sets per robot with episode counts, the evaluation sets) and link the organisation. The Earth Rover drives stay off the page until their release, licence and GPS precision are decided.
 - **Brand** (see Logo, Colour and Type below): light theme by default, dark theme on a switch in the top bar (remembered per device).
+- **Second round of feedback (user, 27 Oct 2026):**
+  - No status pills or stat lines in the hero ("those top notes 15k runs... I don't like them").
+  - **The hero is the film, full bleed, behind the claim** ("I loved before was like in the bg... the hero space is very important"). The film is cut from the team's own footage (Drive folder of Franka, YAM and SO-101 camera files, the humanoid team's clips and the Earth Rover's front camera), bright, with people around, 12 shots of about 2.4 s, ending on the room full of G1 humanoids; `public/v8/video/hero.mp4` + `hero.json` (captions: robot, place, date). It stays dark in both themes, with a shade from the lower left.
+  - **The 10,000 hours are a callout, not a band**, "like websites use for cookies": a dark notice with the one button, bottom right (a bottom sheet on phones). It appears once the reader scrolls, steps aside while the form is on screen, and stays closed for the visit once dismissed.
+  - **In the wild shows scale growing:** a film that starts on one run and pulls back three times into 9, 81 and 729 runs (`mosaic.mp4`, made by `tools/mosaic.py` in the session scratchpad: the outer ring is 600 real evaluation recordings from the API plus rover drives), with a counter over it; the dark YAM tile of the old wall is gone. Beside it, the **Earth Rover's own camera** among passers-by in Wuhan (`rover.mp4`, from the drives with people around: rides 155717, 155791, 155703, 155761, 155807).
 
 ## What we are and how we say it (26 Oct 2026, BIT-3373)
 
