@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RoboColosseum · Physical AI evaluation and benchmarking, in the wild</title>
+<title>RoboColosseum · Benchmarking Physical AI, eval in the wild</title>
 <meta name="description" content="RoboColosseum evaluates and benchmarks robot policies in the wild: humanoids, arms and rovers running real models in homes, offices and campuses, with every run scored and published. 10,000 hours of free evaluation for new policies and models.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="RoboColosseum">
-<meta property="og:title" content="RoboColosseum · Physical AI evaluation and benchmarking, in the wild">
+<meta property="og:title" content="RoboColosseum · Benchmarking Physical AI, eval in the wild">
 <meta property="og:description" content="Hundreds of robots, from humanoids to arms and rovers, running real models in homes, offices and campuses. Apply for free evaluation.">
 <meta property="og:url" content="https://robocolosseum.ai/v8/">
 <meta property="og:image" content="https://robocolosseum.ai/v8/video/hero.jpg">
@@ -28,7 +28,7 @@
 <body>
 <header class="top" id="top">
   <a class="brand" href="#top" aria-label="RoboColosseum, back to top"><img class="for-light" data-src="brand/robocolosseum-lockup-light.svg" alt="RoboColosseum" width="883" height="246"><img class="for-dark" data-src="brand/robocolosseum-lockup-dark.svg" alt="RoboColosseum" width="883" height="246"></a>
-  <nav class="nav" aria-label="Sections"><a href="#leaderboard">Leaderboard</a><a href="#wild">In the wild</a><a href="#robots">Robots</a><a href="#how">How it works</a><a href="#data">Open data</a><a href="#faq">FAQ</a></nav>
+  <nav class="nav" aria-label="Sections"><a href="#leaderboard">Leaderboard</a><a href="#wild">Evaluations</a><a href="#robots">Embodiments</a><a href="#how">How it works</a><a href="#data">Open data</a><a href="#faq">FAQ</a></nav>
   <button type="button" class="theme" id="theme" aria-label="Switch to the dark theme"><span aria-hidden="true"></span></button>
   <a class="cta" data-cta href="#apply">Apply for free evaluation</a>
 </header>
@@ -38,7 +38,7 @@
     <video class="hero-film" id="film" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video>
     <div class="hero-shade" aria-hidden="true"></div>
     <div class="hero-copy">
-      <h1 id="hero-title">Physical AI evaluation and benchmarking, in the wild.</h1>
+      <h1 id="hero-title"><span>Benchmarking Physical AI</span> <span>Eval In the Wild</span></h1>
       <p class="lead">Hundreds of robots, from humanoids to arms and rovers, run real models in homes, labs, offices and campuses. Every run is scored and published.</p>
       <a class="cta big" data-cta href="#apply">Apply for free evaluation</a>
     </div>
@@ -56,7 +56,7 @@
     <div class="wrap">
       <header class="band-head">
         <h2 id="leaderboard-title">The leaderboard</h2>
-        <a class="band-link" id="board-link" href="/leaderboard">Full leaderboard</a>
+        <a class="btn-line" id="board-link" href="/leaderboard">Full leaderboard <svg class="arr" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 3.5 13 8l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></a>
         <p class="band-sub">Who leads on each robot. Top five per robot, refreshed once a day.</p>
         <p class="stamp" data-updated></p>
       </header>
@@ -74,28 +74,22 @@
   <section class="band alt" id="wild" aria-labelledby="wild-title">
     <div class="wrap">
       <header class="band-head">
-        <h2 id="wild-title">In the wild</h2>
-        <p class="band-sub">Evaluations run in kitchens, bedrooms, offices, canteens and campus corridors, each from an instruction the evaluator writes on the spot.</p>
+        <h2 id="wild-title">Real-world evaluations</h2>
+        <p class="band-sub">Kitchens, bedrooms, offices, canteens and campus walkways, each run from an instruction the evaluator writes on the spot. From one run to thousands.</p>
       </header>
       <figure class="mosaic">
         <video id="mosaic" muted loop playsinline autoplay preload="none" aria-label="One recorded evaluation, then nine, eighty-one, seven hundred twenty-nine and six thousand five hundred sixty-one at once"></video>
         <p class="mosaic-count" id="mosaic-count" aria-hidden="true"></p>
         <figcaption id="places">From one robot at work to thousands of recorded runs: arms, humanoids and rovers in real places.</figcaption>
       </figure>
-      <div class="wild-row">
-        <figure class="rover">
-          <video id="rover" muted loop playsinline autoplay preload="none" aria-label="Earth Rover Mini+ driving among passers-by on a plaza in Wuhan"></video>
-          <figcaption><b>Earth Rover Mini+</b> Driving among passers-by on a plaza in Wuhan, China, seen from its own front camera.</figcaption>
-        </figure>
-        <dl class="sites" id="sites" aria-label="Where evaluation happens"></dl>
-      </div>
+      <dl class="sites" id="sites" aria-label="Where evaluation happens"></dl>
     </div>
   </section>
 
   <section class="band" id="robots" aria-labelledby="robots-title">
     <div class="wrap">
       <header class="band-head">
-        <h2 id="robots-title">Our robots</h2>
+        <h2 id="robots-title">Multiple embodiments</h2>
         <p class="band-sub">Humanoids, arms and rovers, with more joining as the fleet grows. Each type has its own leaderboard; open a robot to see its setup and parts list.</p>
       </header>
       <ul class="fleet" id="fleet"></ul>
@@ -109,7 +103,13 @@
         <p class="band-sub" id="scale-lede">Counted from the evaluation record once a day.</p>
         <p class="stamp" data-updated></p>
       </header>
-      <dl class="figures" id="figures"></dl>
+      <div class="total" id="total"></div>
+      <div class="breadth">
+        <figure class="b-card" id="b-scenes"></figure>
+        <figure class="b-card" id="b-instructions"></figure>
+        <figure class="b-card" id="b-policies"></figure>
+        <figure class="b-card" id="b-reach"></figure>
+      </div>
     </div>
   </section>
 
@@ -142,8 +142,8 @@
   <section class="band alt" id="evaluations" aria-labelledby="evaluations-title">
     <div class="wrap">
       <header class="band-head">
-        <h2 id="evaluations-title">Evaluations</h2>
-        <a class="band-link" id="viewer-link" href="/evals">Open the evaluation viewer</a>
+        <h2 id="evaluations-title">Evaluation viewer</h2>
+        <a class="btn-line" id="viewer-link" href="/evals">Open the evaluation viewer <svg class="arr" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 3.5 13 8l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></a>
         <p class="band-sub">A preview of the evaluation viewer: one blind comparison from the record, both runs played in sync, with the evaluator's pick and note.</p>
       </header>
       <div class="viewer" id="viewer"></div>
@@ -154,7 +154,7 @@
     <div class="wrap">
       <header class="band-head">
         <h2 id="data-title">Open data</h2>
-        <a class="band-link" href="https://huggingface.co/RoboColosseum">RoboColosseum on Hugging Face</a>
+        <a class="cta cta-hf" data-cta href="#apply"><img data-src="landing/assets/huggingface-logo.svg" alt="" width="22" height="20">Get 10,000 hours of free evals</a>
         <p class="band-sub">Training demonstrations and evaluation runs, failed attempts included, go on Hugging Face in LeRobot format. Check any score yourself, or train on the data.</p>
       </header>
       <dl class="data-figures" id="data-figures"></dl>
@@ -181,13 +181,15 @@
     </div>
   </section>
 
-  <section class="band apply" id="apply" aria-labelledby="apply-title">
-    <div class="wrap apply-grid">
-      <header class="band-head">
-        <h2 id="apply-title">Apply for free evaluation</h2>
-        <p class="band-sub">10,000 hours of robot time are set aside for new policies and models. Tell us about yours and the robots you want results on; the RoboColosseum team reads every application and follows up with next steps.</p>
-      </header>
-      <div class="form-slot" id="form-slot" aria-live="polite"><p>The application form opens here soon.</p></div>
+  <section class="final" id="apply" aria-labelledby="apply-title">
+    <div class="wrap final-grid">
+      <h2 id="apply-title"><span class="final-n">10,000 hours</span> <span class="final-unit">of free evaluation</span></h2>
+      <div class="final-copy">
+        <p>Robot time set aside for new policies and models: real robots in real places, trained operators, and results you can publish.</p>
+        <p>Tell us about your policy and the robots you want results on. The RoboColosseum team reads every application and follows up with next steps.</p>
+        <a class="cta big on-accent" data-cta data-form href="#apply">Apply for free evaluation</a>
+      </div>
+      <div class="form-embed" id="form-embed" hidden></div>
     </div>
   </section>
 
@@ -196,7 +198,6 @@
 <aside class="callout" id="offer" aria-labelledby="offer-title" hidden>
   <button type="button" class="callout-close" aria-label="Dismiss the free evaluation offer">×</button>
   <h2 id="offer-title"><span class="callout-n">10,000 hours</span> of free evaluation</h2>
-  <p>Robot time set aside for new policies and models: real robots, trained operators and results you can publish.</p>
   <a class="cta" data-cta href="#apply">Apply for free evaluation</a>
 </aside>
 <dialog class="setup" id="setup" aria-labelledby="setup-title"></dialog>

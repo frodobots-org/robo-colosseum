@@ -3,8 +3,9 @@
 // the evaluation viewer, open data, FAQ and the application form. One call to action, "Apply for free evaluation",
 // and every copy of it leads to the form. Numbers come from the daily snapshot (/api/stats and the published boards),
 // never from a live count, and carry the date they were counted.
-import { API, ASSETS, ROBOTS, store, rankedOpen, fineRows, hasData, fmt, esc, appLink } from '../landing/live.js'
+import { API, ASSETS, ROBOTS, store, rankedOpen, fineRows, hasData, fmt, esc, appLink, sentence } from '../landing/live.js'
 import { openRows, fineRowsModel, mark } from '../v3/board.js'
+import { labFor } from '../landing/leaderboard.js'
 import { SETUPS, setupDialog } from '../v7/setups.js'
 import { ROOT, chrome } from './chrome.js'
 import { viewer } from './viewer.js'
@@ -29,7 +30,6 @@ const PLACES = {
   open: ['Singapore', 'China', 'Seattle, United States', 'Oxford, United Kingdom'],
   fine: ['Singapore', 'Kuala Lumpur, Malaysia', 'China'],
 }
-const COUNTRIES = new Set([...PLACES.open, ...PLACES.fine].map(p => p.split(', ').at(-1))).size
 
 const PARTNERS = [
   { name: 'NUS MAGIC Lab', href: 'https://magiclab-nus.github.io/', logo: `<img src="${ASSETS}magic-lab-logo.webp" alt="MAGIC Lab, NUS" class="magic">` },
@@ -81,9 +81,6 @@ mosaic.addEventListener('timeupdate', () => {
   if (count.textContent !== text) count.textContent = text
 })
 playWhenVisible(mosaic)
-const rover = $('#rover')
-rover.poster = `${VIDEO}rover.jpg`; rover.src = `${VIDEO}rover.mp4`
-playWhenVisible(rover)
 
 // The 10,000-hour offer follows the reader like a cookie notice: it appears once they scroll past the top of the hero,
 // steps aside while the form itself is on screen, and stays closed for the rest of the visit once dismissed.
@@ -148,19 +145,44 @@ function freshness() {
   document.querySelectorAll('[data-updated]').forEach(el => { if (updated !== null) el.textContent = updated })
 }
 
-// Scale on several axes. A figure that is not counted yet stays a placeholder, never a partial total.
+// Scale: one total and how it splits, then four views of breadth (scenes per robot, the instructions themselves, who made
+// the policies, where and on what). Placeholders until the daily figures arrive; never a partial total.
+const ROBOT_ORDER = ['so101', 'yam', 'franka', 'g1', 'earth_rover_mini_plus']
 function scale() {
   const s = stats
-  const figures = [
-    [s?.runs, 'recorded runs', 'Both sides of every comparison, plus every task attempt.'],
-    [s?.scenes, 'scenes', 'Homes, offices, labs, canteens and corridors.'],
-    [s?.instructions, 'different instructions', 'Written on the spot by the evaluators.'],
-    [s?.policies, 'policies evaluated', 'Ranked on public leaderboards.'],
-    [COUNTRIES, 'countries', 'Where open-track runs happen and fine-tuning data was recorded.'],
-    [s?.robotTypes, 'robot types', 'Humanoids, arms and rovers, each with its own leaderboard.'],
-  ]
-  $('#figures').innerHTML = figures.map(([v, label, note]) => `<div><dt>${v != null ? n(v) : statsFailed ? '<span title="Could not be loaded right now">—</span>' : '<span class="skel">0,000</span>'}</dt><dd><b>${esc(label)}</b>${esc(note)}</dd></div>`).join('')
-  if (s?.firstComparison) $('#scale-lede').textContent = `Counted once a day from every evaluation since the first comparison on ${day(s.firstComparison)}.`
+  if (!s) {
+    const wait = statsFailed ? '<p class="b-wait">These figures could not be loaded right now.</p>' : '<span class="skel">00,000</span>'
+    $('#total').innerHTML = `<p class="total-n">${wait}</p>`
+    return
+  }
+  const h2h = 2 * s.comparisons
+  $('#total').innerHTML = `<p class="total-n">${fmt(s.runs)}</p><p class="total-label">Recorded runs</p>
+    <div class="split" role="img" aria-label="${fmt(h2h)} runs from ${fmt(s.comparisons)} head-to-head comparisons and ${fmt(s.trials)} standard-task trials">
+      <span class="seg a" style="flex:${h2h}"></span><span class="seg b" style="flex:${s.trials}"></span></div>
+    <dl class="split-key"><div><dt><i class="sw a"></i>${fmt(h2h)}</dt><dd>runs in ${fmt(s.comparisons)} head-to-head comparisons, two models on the same instruction</dd></div>
+      <div><dt><i class="sw b"></i>${fmt(s.trials)}</dt><dd>standard-task trials, 25 attempts per model and task</dd></div></dl>`
+  // Scenes as a unit chart: one square per scene, grouped by robot type.
+  const per = ROBOT_ORDER.map(id => ({ id, name: NAMES[id] || id, n: s.robots?.[id]?.scenes || 0 })).filter(r => r.n)
+  $('#b-scenes').innerHTML = `<figcaption><b>${fmt(s.scenes)}</b><span>Scenes</span></figcaption>
+    <div class="units" role="img" aria-label="${esc(per.map(r => `${r.n} for ${r.name}`).join(', '))}">${per.map((r, k) => `<i class="u u${k}"></i>`.repeat(r.n)).join('')}</div>
+    <ul class="units-key">${per.map((r, k) => `<li><i class="u u${k}"></i>${esc(r.name)} <span>${fmt(r.n)}</span></li>`).join('')}</ul>`
+  // Instructions: the evaluators' own words, scrolling.
+  const said = [...new Set((s.matchups || []).map(m => sentence(m.instruction)).filter(t => t.length > 12 && t.length < 110))].slice(0, 24)
+  $('#b-instructions').innerHTML = `<figcaption><b>${fmt(s.instructions)}</b><span>Different instructions, written on the spot</span></figcaption>
+    <div class="ticker" aria-hidden="true"><ul>${[...said, ...said].map(t => `<li>“${esc(t)}”</li>`).join('')}</ul></div>`
+  // Policies: who made them, one mark per lab.
+  const policies = [...new Set(ROBOTS.flatMap(r => [...rankedOpen(r.id), ...fineRows(r.id)]).map(x => x.policy))]
+  const labs = new Map()
+  for (const policy of policies) { const lab = labFor(policy); if (!lab) continue; const e = labs.get(lab.id) || { lab, policy, n: 0 }; e.n++; labs.set(lab.id, e) }
+  $('#b-policies').innerHTML = `<figcaption><b>${fmt(s.policies)}</b><span>Policies evaluated, from these labs and more</span></figcaption>
+    <ul class="labs">${[...labs.values()].sort((a, b) => b.n - a.n).map(e => `<li title="${esc(e.lab.name)}">${mark(e.policy, 40)}<span>${esc(e.lab.name)}</span></li>`).join('')}</ul>`
+  // Reach: the countries and the robot types.
+  const countries = [...new Set([...PLACES.open, ...PLACES.fine].map(p => p.split(', ').at(-1)))]
+  $('#b-reach').innerHTML = `<figcaption><b>${fmt(countries.length)}</b><span>Countries</span></figcaption>
+    <ul class="places">${countries.map(c => `<li>${esc(c)}</li>`).join('')}</ul>
+    <figcaption class="second"><b>${fmt(s.robotTypes)}</b><span>Robot types</span></figcaption>
+    <ul class="bodies">${FLEET.map(f => `<li title="${esc(f.name)}"><img src="${f.img}" alt="${esc(f.name)}" loading="lazy"></li>`).join('')}</ul>`
+  if (s.firstComparison) $('#scale-lede').textContent = `Counted once a day from every evaluation since the first comparison on ${day(s.firstComparison)}.`
 }
 
 // Under the mosaic: how the scenes spread across robot types.
