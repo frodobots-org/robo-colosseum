@@ -127,7 +127,10 @@ async function countHere(boards) {
   const dates = evs.map(e => e.date).filter(Boolean).sort(), comparisons = evs.length
   const trials = Object.values(robots).reduce((n, r) => n + r.trials, 0)
   const real = e => key(e.instruction) && !/^test(ing)?$/.test(key(e.instruction)) && String(e.feedback || '').trim().length > 60 && e.videos?.a && e.videos?.b
-  const matchups = evs.filter(real).sort((a, b) => Number(!!b.institution) - Number(!!a.institution) || String(b.evalTime || '').localeCompare(String(a.evalTime || ''))).slice(0, 60)
+  // As the daily snapshot does: comparisons from the last 12 hours last (their recordings are still uploading), then named
+  // sites, then the newest.
+  const settled = e => Date.now() - Date.parse(e.evalTime) > 12 * 3600e3
+  const matchups = evs.filter(real).sort((a, b) => Number(settled(b)) - Number(settled(a)) || Number(!!b.institution) - Number(!!a.institution) || String(b.evalTime || '').localeCompare(String(a.evalTime || ''))).slice(0, 60)
   return { computedAt: new Date().toISOString(), runs: 2 * comparisons + trials, comparisons, trials,
     scenes: Object.values(robots).reduce((n, r) => n + r.scenes, 0), instructions: new Set(evs.map(e => key(e.instruction)).filter(Boolean)).size,
     policies: new Set([...ranked, ...tried].map(policy)).size, robotTypes: new Set([...ranked, ...tried].map(r => r.robotId)).size,
