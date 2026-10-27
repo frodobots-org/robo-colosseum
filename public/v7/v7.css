@@ -76,10 +76,8 @@ button { font: inherit; color: inherit; }
 .partners { padding: 28px 0 30px; border-top: 1px solid var(--line); }
 .partners-wrap { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 24px; align-items: center; }
 .partners-title { font: 650 15px/1.4 var(--sans); color: var(--ink-3); }
-.partner-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
-.partner-list li { display: grid; gap: 8px; align-content: start; }
+.partner-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; align-items: center; }
 .partner-list a { display: flex; align-items: center; min-height: 40px; text-decoration: none; color: var(--ink); }
-.partner-list li > span { font-size: 14px; color: var(--ink-3); line-height: 1.4; }
 .partner-list img { height: 28px; width: auto; }
 .partner-list .br { height: 30px; filter: brightness(1.35); }
 .partner-list .magic { height: 24px; }
