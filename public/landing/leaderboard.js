@@ -8,7 +8,7 @@ const LABS = {
   nvidia: { name: 'NVIDIA', fit: 'zoom', bg: '#fff', scale: 1.6, dy: 0.3 },
   galaxea: { name: 'Galaxea', fit: 'cover' },
   robbyant: { name: 'Robbyant', fit: 'cover' },
-  pi: { name: 'Physical Intelligence', fit: 'contain', bg: '#111' },
+  pi: { name: 'Physical Intelligence', fit: 'cover' },   // pi.webp is a round mark (white π on a black disc)
   openai: { name: 'OpenAI', fit: 'contain', bg: '#fff' },
   anthropic: { name: 'Anthropic', fit: 'cover' },
   xai: { name: 'xAI', fit: 'contain', bg: '#fff' },
