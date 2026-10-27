@@ -87,6 +87,10 @@ button { font: inherit; color: inherit; }
 .hero h1 span { display: block; }
 .lead { max-width: 36em; margin-top: 24px; font-size: clamp(18px, 1.6vw, 21px); line-height: 1.45; color: #d8d8d8; }
 .hero-copy .cta { margin-top: 32px; }
+/* the three-part line under the claim, divided by thin rules; stacked on phones */
+.triple { display: flex; flex-wrap: wrap; align-items: center; max-width: none; font: 600 clamp(18px, 1.8vw, 24px)/1.3 var(--sans); letter-spacing: -.01em; color: #f0f0f0; }
+.triple span + span::before { content: ""; display: inline-block; width: 1.5px; height: .95em; margin: 0 18px; background: var(--accent); vertical-align: -.12em; }
+@media (max-width: 560px) { .triple { display: grid; gap: 2px; } .triple span + span::before { display: none; } }
 .hero .cta:hover { background: #f0f0f0; color: #111; }
 .hero .cta:focus-visible, .hero :focus-visible { outline-color: #f0f0f0; }
 .hero-caption { position: absolute; right: max(var(--gutter), calc((100% - var(--maxw)) / 2)); bottom: clamp(40px, 6vw, 72px); max-width: 30ch; text-align: right; font: 700 12px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: #e6e6e6; }
