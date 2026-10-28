@@ -14,10 +14,10 @@
   status = 200
   force = true
 
-# The site root serves the /v8/ landing page (it resolves its own assets from the site root).
+# The site root serves the /v9/ landing page (it resolves its own assets from the site root).
 [[redirects]]
   from = "/"
-  to = "/v8/index.html"
+  to = "/v9/index.html"
   status = 200
   force = true
 
