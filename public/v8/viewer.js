@@ -1,4 +1,4 @@
-// A preview of the evaluation viewer: one blind comparison from the daily record, both runs on one timeline (play, pause
+// A preview of the evaluation viewer: one blind comparison from the hourly record, both runs on one timeline (play, pause
 // and seek move them together), a choice of camera, the instruction, the evaluator's pick and note. The comparisons come
 // from /api/stats; the recordings from /evaluations/{id}/videos. Recordings reach storage hours after a comparison is
 // judged, so several are looked up at once and only one with both runs recorded is shown.
@@ -51,7 +51,7 @@ export function viewer(root) {
     load()
   }
 
-  // The first comparison in list order (the daily snapshot puts the settled ones first), or a random other one.
+  // The first comparison in list order (the hourly snapshot puts the settled ones first), or a random other one.
   async function pick(random) {
     const mine = ++token, another = root.querySelector('.another')
     const pool = left()

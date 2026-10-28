@@ -6,7 +6,7 @@
         <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Head-to-head' : 'Standard tasks' }}</span></h1>
         <p class="lede">{{ track === 'open' ? 'Policies rated from blind comparisons on this robot, in scenes they have never seen. Each robot has its own leaderboard; ratings are never pooled across robots.' : 'Every model learns the same task from the same demonstrations, then makes up to 25 attempts. Full success and progress are reported separately.' }}</p>
       </div>
-      <span class="live-tag"><i></i>Refreshed daily</span>
+      <span class="live-tag"><i></i>Refreshed hourly</span>
     </section>
 
     <BoardControls><RouterLink class="text-link" :to="link('/evals')">Review the evaluations <Icon name="external" /></RouterLink></BoardControls>

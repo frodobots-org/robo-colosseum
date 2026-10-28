@@ -2,7 +2,7 @@
 // v8: the launch page in the new brand, after the 26 Oct 2026 launch meeting. Order: hero (evaluation and benchmarking,
 // in the wild), the 10,000-hour offer, the current benchmark, in the wild, robots, scale, then how it works, a preview of
 // the evaluation viewer, open data, FAQ and the application form. One call to action, "Apply for free evaluation",
-// and every copy of it leads to the form. Numbers come from the daily snapshot (/api/stats and the published boards),
+// and every copy of it leads to the form. Numbers come from the hourly snapshot (/api/stats and the published boards),
 // never from a live count, and carry the date they were counted.
 import { API, ASSETS, ROBOTS, store, rankedOpen, fineRows, hasData, fmt, esc, appLink, sentence } from '../landing/live.js'
 import { openRows, fineRowsModel, mark } from '../v3/board.js'
@@ -122,7 +122,7 @@ async function countHere(boards) {
   const dates = evs.map(e => e.date).filter(Boolean).sort(), comparisons = evs.length
   const trials = Object.values(robots).reduce((n, r) => n + r.trials, 0)
   const real = e => key(e.instruction) && !/^test(ing)?$/.test(key(e.instruction)) && String(e.feedback || '').trim().length > 60 && e.videos?.a && e.videos?.b
-  // As the daily snapshot does: comparisons from the last 12 hours last (their recordings are still uploading), then named
+  // As the hourly snapshot does: comparisons from the last 12 hours last (their recordings are still uploading), then named
   // sites, then the newest.
   const settled = e => Date.now() - Date.parse(e.evalTime) > 12 * 3600e3
   const matchups = evs.filter(real).sort((a, b) => Number(settled(b)) - Number(settled(a)) || Number(!!b.institution) - Number(!!a.institution) || String(b.evalTime || '').localeCompare(String(a.evalTime || ''))).slice(0, 60)
@@ -137,14 +137,14 @@ const day = iso => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', m
 const list = parts => parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}` : parts.join('')
 const n = v => `<span class="n">${fmt(v)}</span>`
 
-// "Updated" stamps: the date the daily snapshot was counted.
+// "Updated" stamps: the date the hourly snapshot was counted.
 function freshness() {
   const updated = stats ? `Updated ${day(stats.computedAt)}` : statsFailed ? '' : null
   document.querySelectorAll('[data-updated]').forEach(el => { if (updated !== null) el.textContent = updated })
 }
 
 // Scale: one total and how it splits, then four views of breadth (scenes per robot, the instructions themselves, who made
-// the policies, where and on what). Placeholders until the daily figures arrive; never a partial total.
+// the policies, where and on what). Placeholders until the hourly figures arrive; never a partial total.
 const ROBOT_ORDER = ['so101', 'yam', 'franka', 'g1', 'earth_rover_mini_plus']
 function scale() {
   const s = stats
@@ -180,7 +180,7 @@ function scale() {
     <ul class="places">${countries.map(c => `<li>${esc(c)}</li>`).join('')}</ul>
     <figcaption class="second"><b>${fmt(s.robotTypes)}</b><span>Embodiments</span></figcaption>
     <ul class="bodies">${FLEET.map(f => `<li title="${esc(f.name)}"><img src="${f.img}" alt="${esc(f.name)}" loading="lazy"></li>`).join('')}</ul>`
-  if (s.firstComparison) $('#scale-lede').textContent = `Counted once a day from every evaluation since the first comparison on ${day(s.firstComparison)}.`
+  if (s.firstComparison) $('#scale-lede').textContent = `Counted hourly from every evaluation since the first comparison on ${day(s.firstComparison)}.`
 }
 
 // Under the mosaic: how the scenes spread across robot types.
