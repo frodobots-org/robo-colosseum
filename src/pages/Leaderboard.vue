@@ -137,11 +137,9 @@ let requestController
 const LOW = 20
 const initialOf = name => String(name || '').replace(/^[^a-z0-9]*/i, '').charAt(0).toUpperCase() || '?'
 
-// Policy labels: the name without its revision, made unique when two revisions of one policy are rated.
+// Display only the model name; policy IDs still keep their revision for identity and routing.
 function labelled(items, key) {
-  const seen = new Map()
-  for (const it of items) { const n = policyName(it[key]); seen.set(n, (seen.get(n) || 0) + 1) }
-  return items.map(it => { const n = policyName(it[key]); const rev = String(it.policy || '').split('@')[1]; return { ...it, label: seen.get(n) > 1 && rev ? `${n} @${rev.slice(0, 7)}` : n } })
+  return items.map(it => ({ ...it, label: policyName(it[key]) }))
 }
 
 const scoped = computed(() => apiRows.value.filter(r => r.robotId === robot.value.id && r.track === track.value))
