@@ -14,7 +14,7 @@
   --open: var(--ink); --fine: var(--ink); --fine-tint: var(--field); --fine-line: var(--ink-4);
   --good: #285f30; --good-tint: rgba(40, 95, 48, .14); --bad: #9e1f19; --bad-tint: rgba(158, 31, 25, .12); --warn: #7a4f00; --warn-tint: rgba(122, 79, 0, .14);
   --lime: var(--accent); --purple: var(--field); --dots: none;
-  --stage: #f7f7f7;
+  --stage: #f2e3d9;
   --grain: none;
   --maxw: 1240px; --gutter: clamp(16px, 4vw, 48px);
   color-scheme: light; color: var(--ink); background: var(--paper); font-family: var(--sans);
