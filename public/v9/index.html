@@ -66,7 +66,7 @@
       <div class="board">
         <div class="board-controls">
           <div class="tabs" role="tablist" aria-label="Robot" id="robot-tabs"></div>
-          <div class="tabs small" role="tablist" aria-label="Kind of score" id="track-tabs"></div>
+          <div class="tabs small" role="tablist" aria-label="Track" id="track-tabs"></div>
         </div>
         <ol class="rows" id="rows"></ol>
         <button type="button" class="rows-more" id="rows-more" aria-controls="rows" aria-expanded="false" hidden></button>
@@ -125,18 +125,18 @@
       <ol class="steps">
         <li><b>Apply</b><span>Tell us about your policy and the robots you want results on, in a short form.</span></li>
         <li><b>Connect your model</b><span>We help you link your inference server through our policy SDK, or serve your checkpoint on a machine next to the robot.</span></li>
-        <li><b>We evaluate it in the wild</b><span>Operators set up each scene and run your model in blind comparisons and repeated task trials, recording every camera.</span></li>
+        <li><b>We evaluate it in the wild</b><span>Operators set up each scene and run your model in Open track comparisons and Fine-tune track trials, recording every camera.</span></li>
         <li><b>Results go public</b><span>Scores land on the leaderboard with their uncertainty, linked to the videos and data behind them.</span></li>
       </ol>
-      <h3 class="sub-title">Two kinds of score</h3>
+      <h3 class="sub-title">Two tracks</h3>
       <div class="measures">
         <article class="measure">
-          <h4>Head-to-head</h4>
+          <h4>Open track</h4>
           <p>Two unnamed models try the same new instruction in the same scene. The evaluator picks the better run, or calls a tie.</p>
         </article>
         <article class="measure">
-          <h4>Standard tasks</h4>
-          <p>Every model learns a fixed task from the same 100 demonstrations, then makes 25 attempts.</p>
+          <h4>Fine-tune track</h4>
+          <p>Every model is fine-tuned on a fixed task from the same 100 demonstrations, then makes 25 attempts.</p>
         </article>
       </div>
     </div>
@@ -175,7 +175,7 @@
         <details><summary>What happens after I apply?</summary><p>We read your application and get in touch to plan the evaluation with you: which robots and tasks, and how your model will connect. Then the runs start and results appear as they are scored.</p></details>
         <details><summary>Which robots are available?</summary><p>Unitree G1 humanoids, bimanual YAM stations, Franka arms in the DROID setup and SO-ARM101 arms. Earth Rover Mini+ wheeled robots are being added. Your policy has to take the robot's camera inputs and produce its action format.</p></details>
         <details><summary>How do I connect my model?</summary><p>Two ways. Run your own inference server and connect it with our policy SDK, and the robot streams observations to it during each run. Or hand over a checkpoint and we serve it on a machine next to the robot. We help you set up either one.</p></details>
-        <details><summary>How is a model scored?</summary><p>Head-to-head: two unnamed models try the same fresh instruction and the evaluator picks the better run or calls a tie. Ratings are fitted from all comparisons on that robot and shown with their uncertainty. Standard tasks: every model is fine-tuned on the same 100 demonstrations, then makes 25 attempts, and we report full successes and milestone progress.</p></details>
+        <details><summary>How is a model scored?</summary><p>Open track: two unnamed models try the same fresh instruction and the evaluator picks the better run or calls a tie. Ratings are fitted from all comparisons on that robot and shown with their uncertainty. Fine-tune track: every model is fine-tuned on the same 100 demonstrations, then makes 25 attempts, and we report full successes and milestone progress.</p></details>
         <details><summary>How is it kept fair?</summary><p>Evaluators see run A and run B, never the model names. Both models in a comparison face the same robot, scene and instruction, one after the other. Every fine-tuned model trains on identical demonstrations.</p></details>
         <details><summary>Can I compare a score on one robot with another?</summary><p>No. Each robot type keeps its own board, because a rating earned on a Franka arm tells you nothing about a humanoid.</p></details>
         <details><summary>Why real robots instead of simulation?</summary><p>Simulated benchmarks saturate: policies above 90% on LIBERO can fall close to zero once the scene is perturbed (<a href="https://arxiv.org/abs/2510.03827">LIBERO-PRO</a>). Physical scenes vary on their own and expose failures a simulator does not model.</p></details>

@@ -104,7 +104,7 @@ export function homeBoard(root, note, state, onState) {
       if (state.track === 'fine' && !fineRows(state.robot).length && rankedOpen(state.robot).length) state.track = 'open'
     }
     const m = store.ready ? model() : null
-    const trackName = state.track === 'open' ? 'Open track' : 'Fine-tuning'
+    const trackName = state.track === 'open' ? 'Open track' : 'Fine-tune track'
     let html = ''
     if (!store.ready) html += `<div class="lbh-empty"><span class="skel" style="min-width:22ch">&nbsp;</span></div>`
     else if (!m) html += `<div class="lbh-empty">${store.failed.has(`${state.robot}/${state.track === 'open' ? 'open' : 'fine-tuning'}`) ? `${robot.name} results are temporarily unavailable. Reload to try again.` : `No ${trackName.toLowerCase()} results for ${robot.name} yet.`}</div>`

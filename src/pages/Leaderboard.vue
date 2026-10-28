@@ -3,7 +3,7 @@
     <section class="page-head">
       <div>
         <p class="eyebrow">Leaderboard</p>
-        <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Head-to-head' : 'Standard tasks' }}</span></h1>
+        <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Open track' : 'Fine-tune track' }}</span></h1>
         <p class="lede">{{ track === 'open' ? 'Policies rated from blind comparisons on this robot, in scenes they have never seen. Each robot has its own leaderboard; ratings are never pooled across robots.' : 'Every model learns the same task from the same demonstrations, then makes up to 25 attempts. Full success and progress are reported separately.' }}</p>
       </div>
       <span class="live-tag"><i></i>Refreshed hourly</span>
@@ -112,8 +112,8 @@
       <h2>Key definitions</h2>
       <details><summary>Rating and standard error<Icon name="down" /></summary><p>Ratings are fitted per robot from blind A/B preferences, so a rating only compares policies on the same robot. The ±1 standard error shows how much the fit could move with more comparisons; two policies whose intervals overlap are not reliably ordered.</p></details>
       <details><summary>Record and comparisons<Icon name="down" /></summary><p>Each comparison is one evaluator-written instruction run by two policies in the same scene, judged blind. The record counts wins, ties and losses; comparisons is their total. Below 20 comparisons a rating is shown faded and marked low evidence.</p></details>
-      <details><summary>Full success, progress and the 95% interval<Icon name="down" /></summary><p>In standard tasks a checkpoint is adapted to one task from the shared demonstrations and run up to 25 times on it. Full success is the share of trials that completed the task; progress is the mean partial score (the share of the task's milestones reached), as a percentage. The interval on full success is a Wilson 95% interval for the number of trials.</p></details>
-      <details><summary>Pending and hidden entries<Icon name="down" /></summary><p>A registered policy without finalized comparisons is pending and unranked. Rows the organizers hide for a robot or kind of score are not counted here; their evaluations remain in the viewer.</p></details>
+      <details><summary>Full success, progress and the 95% interval<Icon name="down" /></summary><p>In the Fine-tune track a checkpoint is adapted to one task from the shared demonstrations and run up to 25 times on it. Full success is the share of trials that completed the task; progress is the mean partial score (the share of the task's milestones reached), as a percentage. The interval on full success is a Wilson 95% interval for the number of trials.</p></details>
+      <details><summary>Pending and hidden entries<Icon name="down" /></summary><p>A registered policy without finalized comparisons is pending and unranked. Rows the organizers hide for a robot or track are not counted here; their evaluations remain in the viewer.</p></details>
     </section>
   </div>
 </template>

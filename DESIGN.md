@@ -2,6 +2,21 @@
 
 The decisions behind the landing pages, as the user stated them. Read this before touching any page under `public/`. When a decision changes, change it here first.
 
+## Track names and which tasks exist (standing rules, 28 Oct 2026)
+
+These override every older wording below.
+
+- **The two tracks are always "Open track" and "Fine-tune track"** (user, 28 Oct 2026: "lets standardize on the term"). This applies to every public page and the app: tabs, headings, labels, notes, FAQ, alt and aria text. Capitalise the first word, lower-case "track". Never "Head-to-head", "Standard tasks", "fine-tuning track", "Fine-tuning" or "kind of score" for a track. Describing what happens inside a track stays plain: Open track **comparisons** (blind, two models, the evaluator's pick) and Fine-tune track **trials** (25 attempts per model and task). API values (`track=fine-tuning`, `'fine'`) are identifiers, not copy, and do not change.
+- **Datasets are "Fine-tune track datasets"**, never "training sets": the demonstrations a model is fine-tuned on for one task. Evaluation runs on Hugging Face stay "evaluation sets".
+- **A task exists while it is on the published Fine-tune track leaderboard.** The router's `eval_tasks` table is where tasks live, and the hourly snapshot (`public_leaderboard_data`, `/api/leaderboard?track=fine-tuning`) lists the ones with results. Pages never list a task or its dataset on their own say:
+  - `public/v8/datasets.js` ties every Fine-tune track dataset to its router task id, and `liveSets()` shows only those whose task is on the published board (landing Open data and the app's Tasks page). A task removed from the router leaves the page at the next hourly refresh, with no frontend change.
+  - When a task is retired, move its dataset to `RETIRED` in that file with the date and the reason, and add a line under "Retired tasks" here.
+  - The app's Tasks page lists the real tasks from the published board (no draft or example cards).
+- **Retired tasks:**
+  - Franka **pour water** (`droid-pour-water`, 100 episodes): not one of the five Franka tasks since the 26 Oct 2026 Franka correction (close laptop, open drawer, mug on coaster, put marker pen, towel in basket); the router has no task for it. Removed from the site on 28 Oct 2026. The Hugging Face repository is kept.
+  - The five draft Franka task cards in the app (carrot in bowl, pour corn, flip pot, microwave door, cup in drawer) were examples that never became tasks; removed on 28 Oct 2026.
+- The older directions still online (`/v3/` to `/v8/`, `/pink/`, `/orange/`) are archives, unlinked from the site, and keep their old wording; they share `datasets.js`, so retired datasets leave them too.
+
 ## Launch meeting and the new brand (27 Oct 2026, BIT-3373): `/v8/`
 
 The 26 Oct launch meeting (launch on 4 Nov: X thread, website and launch video together) and Ben's brand in Figma (file `VIYsAXvWfmt8My4PfpuumK`, page "RC Brand") replace several rules below. Where this section and an older bullet disagree, this section wins.
@@ -12,7 +27,7 @@ The 26 Oct launch meeting (launch on 4 Nov: X thread, website and launch video t
 - **Order:** hero (claim, film, founders' logos) → 10,000-hour offer → the leaderboard → in the wild → our robots → our scale → how it works → evaluations (a preview of the evaluation viewer: both runs in sync, camera choice) → open data (the Hugging Face repositories themselves) → FAQ → the application form.
 - **Numbers are counted hourly, not live**, and carry the date: "Updated 27 Oct 2026" in the hero status line, the leaderboard and the scale band. They come from `/api/stats` and the published boards, written by the hourly `robocolosseum-leaderboard` job (colosseum-router PR #8). If `/api/stats` is unavailable the page counts the same figures from the evaluation list in the browser (slower, fallback only).
 - **Scale wording:** "hundreds of robots" (the meeting's notes said "hundreds of embodiments"; we have five robot types, so robots it is). No fleet counts.
-- **Open data:** list the actual repositories (training sets per robot with episode counts, the evaluation sets) and link the organisation. The Earth Rover drives stay off the page until their release, licence and GPS precision are decided.
+- **Open data:** list the actual repositories (Fine-tune track datasets per robot with episode counts, the evaluation sets) and link the organisation. The Earth Rover drives stay off the page until their release, licence and GPS precision are decided.
 - **Brand** (see Logo, Colour and Type below): light theme by default, dark theme on a switch in the top bar (remembered per device).
 - **Second round of feedback (user, 27 Oct 2026):**
   - No status pills or stat lines in the hero ("those top notes 15k runs... I don't like them").
@@ -25,7 +40,7 @@ The 26 Oct launch meeting (launch on 4 Nov: X thread, website and launch video t
   - **Every face in every video is blurred** ("BLUR all people's faces. This is a general direction for ALL videos from now on"). People are found with a pose model (YOLO11m-pose: it catches profiles and small people that face detectors miss) at full resolution before any downscaling, and a padded head region is blurred and held for a few frames; humanoid-only clips are left alone (the model takes humanoids for people). Tool: `tools/blurfaces.py` in the session scratchpad. Live recordings streamed by the evaluation viewer are not processed.
   - **Section names:** the evaluations film is "Real-world evaluations" (not "In the wild", which the hero already says); "Multiple embodiments" for the robots; "Evaluation viewer" for the comparison preview. The top bar says Leaderboard, Evaluations, Embodiments, How it works, Open data, FAQ.
   - **The rover's solo reel is gone** ("unnecessary"); rovers stay in the hero film and the evaluations film.
-  - **Our scale** is not six numbers in a grid any more: one large total (recorded runs) with a bar splitting it into head-to-head runs and standard-task trials, then four cards that show breadth: scenes as one square per scene by robot, the evaluators' own instructions scrolling, the logos of the labs whose policies were evaluated, and the countries and robot types.
+  - **Our scale** is not six numbers in a grid any more: one large total (recorded runs) with a bar splitting it into Open track runs and Fine-tune track trials, then four cards that show breadth: scenes as one square per scene by robot, the evaluators' own instructions scrolling, the logos of the labs whose policies were evaluated, and the countries and robot types.
   - **Buttons, not small links:** "Full leaderboard" and "Open the evaluation viewer" are outlined buttons with an arrow. Open data carries **"Get 10,000 hours of free evals"** with the Hugging Face logo, an orange button that, like every call to action, goes to the application form (a Youform; Karen builds it, its link goes into `FORM_URL` in `public/v8/chrome.js` and it is embedded in the closing section).
   - **The closing section is the offer, big:** "10,000 hours of free evaluation" on the brand orange with the button, not the dashed form placeholder. The cookie-style notice is compact (the offer and the button only).
 
@@ -55,7 +70,7 @@ The v5 copy got bad feedback ("copy is bad or misleading... messy... doesn't giv
 - **Robot cards and setups (v7, Jiafei's request):** the card photos are the team-supplied product shots (`public/v7/robots/`, shot on white, so the stages are light `#eceef1` with `mix-blend-mode: multiply`). A robot with a documented setup opens a dialog with its labelled setup photo (`public/v7/setups/`) and its parts list from the team's purchase sheet (`public/v7/setups.js`; shop links without tracking parameters; prices as listed, currency per supplier). Franka has no list in the sheet and links to the DROID hardware guide instead.
 - **Locations (Jiafei, 26 Oct 2026), kept apart by track:** open-track evaluations run in Singapore, China, Seattle (United States) and Oxford (United Kingdom); fine-tuning datasets were recorded in Singapore, Kuala Lumpur (Malaysia) and China. No city in China, coordinates or per-site counts were given, so none are shown. Scale counts 5 countries.
 - **Open data:** every evaluation run, failed attempts included, is released on Hugging Face in LeRobot format. The RoboColosseum org goes public at launch (user decision).
-- **Words:** robot or robot type (not "body"), scene (not "room"), comparison and the evaluator's pick (not "verdict"), head-to-head (open track) and standard tasks (fine-tuning track) on public pages. Never "0–4 scale" (task maxima are 3–7), never "real rooms, not labs" (our partners are labs), no "independent" (BitRobot runs the fleet and is a partner), no "first" or "only" (RoboChallenge, PhAIL, RoboArena, XDOF and Artificial Analysis also evaluate on real robots).
+- **Words:** robot or robot type (not "body"), scene (not "room"), comparison and the evaluator's pick (not "verdict"), Open track and Fine-tune track for the two tracks (see the standing rules at the top). Never "0–4 scale" (task maxima are 3–7), never "real rooms, not labs" (our partners are labs), no "independent" (BitRobot runs the fleet and is a partner), no "first" or "only" (RoboChallenge, PhAIL, RoboArena, XDOF and Artificial Analysis also evaluate on real robots).
 - **No globe or map.** None of the competitors uses one and ours implied reach we don't have. Diversity is shown with real footage (the wall of twelve evaluations) and a live count of scenes.
 - **Less text, more footage** still holds: the hero is the film, full bleed, with the claim over it.
 - **Voice:** plain, specific, sentence case, from the researcher's side ("you", "your policy").
@@ -116,7 +131,7 @@ The v5 copy got bad feedback ("copy is bad or misleading... messy... doesn't giv
   - **Shapes:** sharp rectangles; lab marks are round, fixed-size circles.
   - **Robot tabs:** the robots' photos from the landing's cards.
   - **Data marks:** ink, like the landing's leaderboard. The win/tie/loss bar runs from ink to hairline. Orange marks only the button and a picked run.
-  - **Words:** the landing's: *Head-to-head* and *Standard tasks* (not open track and fine-tuning), robot (not body), scene (not room), pick (not verdict). The standard-task score is success and progress, never "0–4" or "4 of 4".
+  - **Words:** the landing's: *Open track* and *Fine-tune track* (see the standing rules at the top), robot (not body), scene (not room), pick (not verdict). The standard-task score is success and progress, never "0–4" or "4 of 4".
   - **Pages:** Submit is the free-evaluation page, with the landing's four steps and the same button. Join keeps its own form button outlined. The app root sends visitors to the landing page. The rules below still hold where they don't conflict.
 
 - Every app page (Leaderboards, Evaluations, Tasks, Submit a policy, Join) opens the same way: mono eyebrow → h1 "Body · Track" (the track in muted) → one-sentence lede → a live tag on the right; then the body tabs with the robot glyphs and the track switch with icons (`src/components/BoardControls.vue`); then four summary cards; then one `.board` panel with a toolbar (search, chips, count, refresh) and the content; then definitions as `<details>`. Shared rules live in `src/styles/boards.css`; page-specific rules stay scoped.
