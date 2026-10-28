@@ -12,14 +12,14 @@
       </nav>
       <button type="button" class="menu" :aria-expanded="menuOpen" aria-controls="nav-sheet" @click="menuOpen = !menuOpen"><span aria-hidden="true"></span>Menu</button>
       <button type="button" class="theme" :aria-label="`Switch to the ${dark ? 'light' : 'dark'} theme`" @click="toggleTheme"><span aria-hidden="true"></span></button>
-      <a class="cta" :href="apply">Apply<span class="long">&nbsp;for free evaluation</span></a>
+      <a class="cta" :href="apply" target="_blank" rel="noopener">Apply<span class="long">&nbsp;for free evaluation</span></a>
     </header>
     <main><RouterView /></main>
     <footer class="foot">
       <div class="foot-brand"><img class="for-light" :src="`${home}v9/brand/lockup-full-light.svg`" alt="RoboColosseum" width="905" height="257"><img class="for-dark" :src="`${home}v9/brand/lockup-full-dark.svg`" alt="RoboColosseum" width="905" height="257"><p>Founded by NUS MAGIC Lab, BitRobot, EAIC Singapore and Hugging Face.</p></div>
       <nav aria-label="Footer">
         <div><h3>The benchmark</h3><ul><li><RouterLink :to="link('/leaderboard')">Leaderboard</RouterLink></li><li><RouterLink :to="link('/evals')">Evaluations</RouterLink></li><li><RouterLink :to="link('/tasks')">Tasks and protocol</RouterLink></li><li><a href="https://huggingface.co/RoboColosseum">Open data</a></li><li><a :href="`${home}v7/blog/`">Blog</a></li></ul></div>
-        <div><h3>Take part</h3><ul><li><a :href="apply">Apply for free evaluation</a></li><li><RouterLink :to="link('/join')">Join as an evaluator</RouterLink></li></ul></div>
+        <div><h3>Take part</h3><ul><li><a :href="apply" target="_blank" rel="noopener">Apply for free evaluation</a></li><li><RouterLink :to="link('/join')">Join as an evaluator</RouterLink></li></ul></div>
         <div><h3>Follow</h3><ul><li><a href="https://x.com/RoboColosseum">X</a></li><li><a href="https://github.com/frodobots-org/robo-colosseum">GitHub</a></li><li><a href="https://huggingface.co/RoboColosseum">Hugging Face</a></li></ul></div>
       </nav>
     </footer>
