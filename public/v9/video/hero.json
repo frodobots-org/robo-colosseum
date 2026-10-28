@@ -1,0 +1,9 @@
+[
+ { "t": 0.0, "body": "Unitree G1", "place": "The humanoid fleet" },
+ { "t": 3.2, "body": "Franka", "place": "A lab bench" },
+ { "t": 5.8, "body": "Bimanual YAM", "place": "At the evaluation station" },
+ { "t": 8.4, "body": "Bimanual YAM", "place": "Outdoors, under a tree" },
+ { "t": 11.4, "body": "Bimanual YAM", "place": "Outside a canteen" },
+ { "t": 14.2, "body": "Earth Rover Mini+", "place": "An event hall" },
+ { "t": 16.8, "body": "Unitree G1", "place": "The humanoid fleet" }
+]

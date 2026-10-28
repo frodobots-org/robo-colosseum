@@ -13,7 +13,7 @@ import { viewer } from '../v8/viewer.js'
 import { HUB, liveSets, hours, EVAL_SETS, EVAL_EXAMPLE } from '../v8/datasets.js'
 
 const $ = (s, el = document) => el.querySelector(s)
-// The films and the repository pictures are v8's files.
+// The in-the-wild film and the repository pictures are v8's files; the hero film is v9's own (below).
 const VIDEO = `${ROOT}v8/video/`
 // The robots cut out of their white backdrops, so white arms stay visible on the peach stage.
 const PICS = `${ROOT}v9/robots/`
@@ -57,19 +57,21 @@ function playWhenVisible(video) {
   new IntersectionObserver(es => es.forEach(e => { e.isIntersecting ? video.play().catch(() => {}) : video.pause() })).observe(video)
 }
 
-// The hero film (cut from the team's footage on 27 Oct 2026); its caption follows the cut list that ships with it.
+// The hero film (BITROBOT-39.1, 28 Oct 2026); its caption names the robot and the place of each shot, from the cue list
+// that ships with it (no dates, user request). The 27 Oct film it replaced stays in v8/video for /v8/.
+const HERO = `${ROOT}v9/video/`
 const film = $('#film'), caption = $('#caption')
-// Phones get the 720p cut (4.5 MB instead of 6.7).
-film.poster = `${VIDEO}hero.jpg`; film.src = `${VIDEO}${matchMedia('(max-width: 760px)').matches ? 'hero-720' : 'hero'}.mp4`
+// Phones get the 720p cut (3.8 MB instead of 6.6).
+film.poster = `${HERO}hero.jpg`; film.src = `${HERO}${matchMedia('(max-width: 760px)').matches ? 'hero-720' : 'hero'}.mp4`
 let cues = [], current = -1
-fetch(`${VIDEO}hero.json`).then(r => r.ok ? r.json() : []).then(list => { cues = list }).catch(() => {})
+fetch(`${HERO}hero.json`).then(r => r.ok ? r.json() : []).then(list => { cues = list }).catch(() => {})
 film.addEventListener('timeupdate', () => {
   const t = film.currentTime
   const i = cues.findIndex((c, k) => t >= c.t && (k === cues.length - 1 || t < cues[k + 1].t))
   if (i < 0 || i === current) return
   current = i
   const c = cues[i]
-  caption.innerHTML = `${esc(c.body)}<span>${esc(c.place)}${c.date ? `, ${esc(c.date)}` : ''}</span>`
+  caption.innerHTML = `${esc(c.body)}<span>${esc(c.place)}</span>`
 })
 playWhenVisible(film)
 
