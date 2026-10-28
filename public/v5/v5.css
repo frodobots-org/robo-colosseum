@@ -110,7 +110,7 @@ h1, h2, h3, p, dl, dd, dt, ol, ul { margin: 0; }
 .partners img { height: 26px; width: auto; }
 .partners .br img { height: 28px; filter: brightness(1.35); }
 .partners .hf b { font: 700 16px/1 var(--sans); }
-.partners .eaic b { font: 800 26px/1 var(--sans); font-variation-settings: "wdth" 112; letter-spacing: -.02em; }
+.partners .eaic img { box-sizing: content-box; height: 20px; padding: 4px 7px; background: #f1f1f1; border-radius: 3px; }
 .partners .eaic span { font: 400 11px/1.25 var(--sans); color: var(--ink-3); }
 .partners .magic img { height: 22px; }
 
