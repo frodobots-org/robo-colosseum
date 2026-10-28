@@ -3,11 +3,11 @@
 import { appLink } from '../landing/live.js'
 
 export const ROOT = window.RC_ROOT || '/'
-// The landing page is the site root, so the form is at /#apply from every other page.
-export const APPLY = `${ROOT}#apply`
+// The landing page is the site root, so the form is at /#form-embed from every other page.
+export const APPLY = `${ROOT}#form-embed`
 // The application form (Youform, set up by Karen). Every call to action leads to it: on the landing page it is embedded
-// in the closing section, so the buttons scroll there. Empty until the form exists.
-export const FORM_URL = ''
+// in the closing section, so the buttons scroll straight to it; other pages link to /#form-embed.
+export const FORM_URL = 'https://app.youform.com/forms/riubycrq'
 
 function themeSwitch(button) {
   const label = () => { button.setAttribute('aria-label', `Switch to the ${document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'} theme`) }
@@ -38,12 +38,16 @@ export function chrome() {
   if (FORM_URL && embed) {
     embed.innerHTML = `<iframe src="${FORM_URL}" title="Apply for free evaluation" loading="lazy"></iframe>`
     embed.hidden = false
-    document.querySelectorAll('[data-form]').forEach(a => { a.href = '#form-embed' })
+    document.querySelectorAll('[data-cta], [data-form]').forEach(a => { a.href = '#form-embed' })
+    // Arriving from another page (/#form-embed, or an older /#apply link): once the page has loaded and the content above
+    // has settled, bring the form itself into view.
+    const toForm = () => setTimeout(() => embed.scrollIntoView(), 0)
+    if (['#apply', '#form-embed'].includes(location.hash)) document.readyState === 'complete' ? toForm() : addEventListener('load', toForm, { once: true })
   } else if (FORM_URL) {
     document.querySelectorAll('[data-cta]').forEach(a => { a.href = FORM_URL })
   }
   document.querySelector('#footer').innerHTML = `<div class="foot-brand"><img class="for-light" src="${ROOT}v9/brand/lockup-full-light.svg" alt="RoboColosseum" width="905" height="257"><img class="for-dark" src="${ROOT}v9/brand/lockup-full-dark.svg" alt="RoboColosseum" width="905" height="257"><p>Founded by NUS MAGIC Lab, BitRobot, EAIC Singapore and Hugging Face.</p></div>
   <nav aria-label="Footer"><div><h3>The benchmark</h3><ul><li><a href="${appLink('/leaderboard')}">Leaderboard</a></li><li><a href="${appLink('/evals')}">Evaluations</a></li><li><a href="${appLink('/tasks')}">Tasks and protocol</a></li><li><a href="https://huggingface.co/RoboColosseum">Open data</a></li><li><a href="${ROOT}v7/blog/">Blog</a></li></ul></div>
-  <div><h3>Take part</h3><ul><li><a href="${here ? '#apply' : APPLY}">Apply for free evaluation</a></li><li><a href="${appLink('/join')}">Join as an evaluator</a></li></ul></div>
+  <div><h3>Take part</h3><ul><li><a href="${here ? (FORM_URL ? '#form-embed' : '#apply') : APPLY}">Apply for free evaluation</a></li><li><a href="${appLink('/join')}">Join as an evaluator</a></li></ul></div>
   <div><h3>Follow</h3><ul><li><a href="https://x.com/RoboColosseum">X</a></li><li><a href="https://github.com/frodobots-org/robo-colosseum">GitHub</a></li><li><a href="https://huggingface.co/RoboColosseum">Hugging Face</a></li></ul></div></nav>`
 }
