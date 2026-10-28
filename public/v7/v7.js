@@ -33,7 +33,7 @@ const COUNTRIES = new Set([...PLACES.open, ...PLACES.fine].map(p => p.split(', '
 const PARTNERS = [
   { name: 'NUS MAGIC Lab', href: 'https://magiclab-nus.github.io/', logo: `<img src="${ASSETS}magic-lab-logo.webp" alt="MAGIC Lab, NUS" class="magic">` },
   { name: 'BitRobot', href: 'https://bitrobot.ai/', logo: `<img src="${ASSETS}bitrobot-logo.webp" alt="BitRobot" class="br">` },
-  { name: 'EAIC Singapore', href: 'https://nrp.gov.sg/', logo: '<span class="eaic"><b>EAIC</b><span>Embodied AI Centre<br>Singapore</span></span>' },
+  { name: 'EAIC Singapore', href: 'https://nrp.gov.sg/', logo: `<span class="eaic"><img src="${ASSETS}eaic-mark.webp" alt="EAIC"><span>Embodied AI Centre<br>Singapore</span></span>` },
   { name: 'Hugging Face', href: 'https://huggingface.co/', logo: `<span class="hf"><img src="${ASSETS}huggingface-logo.svg" alt=""><b>Hugging Face</b></span>` },
 ]
 

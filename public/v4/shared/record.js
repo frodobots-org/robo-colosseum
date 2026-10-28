@@ -112,7 +112,7 @@ export function boot(roots, theme, onChange) {
 // Partner logos, the same four everywhere.
 export const partners = () => `<a class="hf" href="https://huggingface.co/"><img src="${ASSETS}huggingface-logo.svg" alt=""><b>Hugging Face</b></a>
   <a class="br" href="https://bitrobot.ai/"><img src="${ASSETS}bitrobot-logo.webp" alt="BitRobot"></a>
-  <a class="eaic" href="https://nrp.gov.sg/"><b>EAIC</b><span>Embodied AI Centre<br>Singapore</span></a>
+  <a class="eaic" href="https://nrp.gov.sg/"><img src="${ASSETS}eaic-mark.webp" alt="EAIC"><span>Embodied AI Centre<br>Singapore</span></a>
   <a class="magic" href="https://magiclab-nus.github.io/"><img src="${ASSETS}magic-lab-logo.webp" alt="MAGIC Lab, NUS"></a>`
 
 export const footerLinks = () => `<div><h5>The benchmark</h5><ul><li><a href="#leaderboards">Leaderboards</a></li><li><a href="${appLink('/evals')}">Evaluation viewer</a></li><li><a href="${appLink('/tasks')}">Tasks and criteria</a></li><li><a href="${DATASET.href}">The dataset</a></li></ul></div>
