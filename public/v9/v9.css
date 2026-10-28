@@ -101,23 +101,30 @@ button { font: inherit; color: inherit; }
 .hero-caption span { display: block; color: #a8a8a8; }
 @media (max-width: 860px) { .hero-caption { display: none; } }
 
-/* the founders, a slim strip under the hero */
-.partners { padding: 26px 0 30px; border-bottom: 1px solid var(--line-2); }
+/* the founders, a slim strip under the hero. Logos only, spaced evenly, each sized by eye to carry the same weight;
+   the link is the logo itself, so the space between them is not clickable. */
+.partners { padding: 28px 0; border-bottom: 1px solid var(--line-2); }
 .partners-wrap { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 24px; align-items: center; }
 .partners-title { color: var(--ink-3); }
-.partner-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; align-items: center; }
-.partner-list a { display: flex; align-items: center; min-height: 40px; text-decoration: none; color: var(--ink); }
-.partner-list img { height: 28px; width: auto; }
-.partner-list .br { height: 30px; }
-.partner-list .magic { height: 24px; }
-.partner-list .hf { display: inline-flex; align-items: center; gap: 10px; }
-.partner-list .hf b { font: 700 17px/1 var(--sans); }
-.partner-list .eaic { display: inline-flex; align-items: center; gap: 10px; }
-.partner-list .eaic img { height: 26px; }
-:root[data-theme="dark"] .partner-list .eaic img { box-sizing: content-box; height: 20px; padding: 4px 7px; background: #f1f1f1; border-radius: 3px; }
-.partner-list .eaic span { font-size: 11px; line-height: 1.25; color: var(--ink-3); }
-@media (max-width: 960px) { .partners-wrap { grid-template-columns: 1fr; gap: 16px; } }
-@media (max-width: 760px) { .partner-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 20px; } }
+.partner-list { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 28px 40px; }
+.partner-list li { display: flex; }
+.partner-list a { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); transition: opacity .15s ease; }
+.partner-list a:hover { opacity: .65; }
+.partner-list a:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+.partner-list img { display: block; width: auto; }
+.partner-list .magic { height: 25px; }
+.partner-list .br { height: 34px; }
+.partner-list .eaic { height: 30px; }
+:root[data-theme="dark"] .partner-list .eaic { box-sizing: content-box; height: 24px; padding: 5px 8px; background: #f1f1f1; border-radius: 3px; }
+.partner-list .hf { display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; }
+.partner-list .hf img { height: 30px; }
+.partner-list .hf b { font: 700 19px/1 var(--sans); letter-spacing: -.01em; }
+@media (max-width: 960px) { .partners-wrap { grid-template-columns: 1fr; gap: 18px; } }
+@media (max-width: 760px) {
+  .partner-list { display: grid; grid-template-columns: repeat(2, max-content); justify-content: space-between; gap: 26px 24px; }
+  .partner-list .magic { height: 19px; } .partner-list .br { height: 28px; } .partner-list .eaic { height: 25px; }
+  .partner-list .hf img { height: 25px; } .partner-list .hf b { font-size: 16px; }
+}
 
 /* the offer: a notice that follows the reader, like a cookie notice, until it is dismissed or the form is in view */
 .callout { position: fixed; z-index: 60; right: 24px; bottom: 24px; display: grid; gap: 12px; justify-items: start; width: min(320px, calc(100% - 32px)); padding: 18px 20px 20px; background: #161616; color: #d6d6d6; border: 1px solid #333; border-top: 4px solid var(--accent); box-shadow: 0 18px 50px rgba(0, 0, 0, .35); transition: transform .35s ease, opacity .35s ease; }
