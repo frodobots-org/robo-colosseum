@@ -57,11 +57,11 @@ function playWhenVisible(video) {
   new IntersectionObserver(es => es.forEach(e => { e.isIntersecting ? video.play().catch(() => {}) : video.pause() })).observe(video)
 }
 
-// The hero film (BITROBOT-39.1, 28 Oct 2026); its caption names the robot and the place of each shot, from the cue list
+// The hero film (BITROBOT-39.2, 28 Oct 2026); its caption names the robot and the place of each shot, from the cue list
 // that ships with it (no dates, user request). The 27 Oct film it replaced stays in v8/video for /v8/.
 const HERO = `${ROOT}v9/video/`
 const film = $('#film'), caption = $('#caption')
-// Phones get the 720p cut (3.8 MB instead of 6.6).
+// Phones get the 720p cut (3.9 MB instead of 5.8).
 film.poster = `${HERO}hero.jpg`; film.src = `${HERO}${matchMedia('(max-width: 760px)').matches ? 'hero-720' : 'hero'}.mp4`
 let cues = [], current = -1
 fetch(`${HERO}hero.json`).then(r => r.ok ? r.json() : []).then(list => { cues = list }).catch(() => {})
