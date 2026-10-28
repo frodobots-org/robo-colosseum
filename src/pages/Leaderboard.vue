@@ -6,7 +6,7 @@
         <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Head-to-head' : 'Standard tasks' }}</span></h1>
         <p class="lede">{{ track === 'open' ? 'Policies rated from blind comparisons on this robot, in scenes they have never seen. Each robot has its own leaderboard; ratings are never pooled across robots.' : 'Every model learns the same task from the same demonstrations, then makes up to 25 attempts. Full success and progress are reported separately.' }}</p>
       </div>
-      <span class="live-tag"><i></i>Refreshed daily</span>
+      <span class="live-tag"><i></i>Refreshed hourly</span>
     </section>
 
     <BoardControls><RouterLink class="text-link" :to="link('/evals')">Review the evaluations <Icon name="external" /></RouterLink></BoardControls>
@@ -137,11 +137,9 @@ let requestController
 const LOW = 20
 const initialOf = name => String(name || '').replace(/^[^a-z0-9]*/i, '').charAt(0).toUpperCase() || '?'
 
-// Policy labels: the name without its revision, made unique when two revisions of one policy are rated.
+// Display names omit revisions; IDs and evaluation links keep the full identity.
 function labelled(items, key) {
-  const seen = new Map()
-  for (const it of items) { const n = policyName(it[key]); seen.set(n, (seen.get(n) || 0) + 1) }
-  return items.map(it => { const n = policyName(it[key]); const rev = String(it.policy || '').split('@')[1]; return { ...it, label: seen.get(n) > 1 && rev ? `${n} @${rev.slice(0, 7)}` : n } })
+  return items.map(it => ({ ...it, label: policyName(it[key]) }))
 }
 
 const scoped = computed(() => apiRows.value.filter(r => r.robotId === robot.value.id && r.track === track.value))
