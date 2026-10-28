@@ -81,7 +81,7 @@ mosaic.poster = `${VIDEO}wild.jpg`; mosaic.src = `${VIDEO}${matchMedia('(max-wid
 playWhenVisible(mosaic)
 
 // The 10,000-hour offer follows the reader like a cookie notice: it appears once they scroll past the top of the hero,
-// steps aside while the form itself is on screen, and stays closed for the rest of the visit once dismissed.
+// steps aside while the closing section is on screen, and stays closed for the rest of the visit once dismissed.
 const callout = $('#offer')
 let dismissed = false, formInView = false
 try { dismissed = sessionStorage.getItem('rc-offer') === 'closed' } catch {}

@@ -6,7 +6,7 @@
         <h1>Get your policy evaluated on real robots.</h1>
         <p class="lede">You bring the model. We provide the robots, operators, scenes and scoring, and publish every run with its recordings. 10,000 hours of evaluation are free for new policies and models.</p>
       </div>
-      <a class="cta" :href="APPLY">Apply for free evaluation</a>
+      <a class="cta" :href="APPLY" target="_blank" rel="noopener">Apply for free evaluation</a>
     </section>
 
     <section class="summary" aria-label="What you get">
