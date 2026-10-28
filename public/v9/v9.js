@@ -203,8 +203,10 @@ function fleet() {
   }).join('')
 }
 
-// The leaderboard preview: one robot and one kind of score at a time, the top five.
-const board = { robot: 'franka', track: 'open', chosen: false }
+// The leaderboard preview: one robot and one kind of score at a time, the top five; a button under the list reveals
+// every policy (and the choice holds while the reader switches robots).
+const board = { robot: 'franka', track: 'open', chosen: false, all: false }
+const CHEVRON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'
 const MIN = { open: 20, fine: 10 }
 function rankings() {
   const has = { open: id => rankedOpen(id).length > 0, fine: id => fineRows(id).length > 0 }
@@ -217,7 +219,8 @@ function rankings() {
   $('#robot-tabs').innerHTML = ROBOTS.map(r => tab('robot', r.id, r.name, r.id === board.robot, empty(r.id, 'open') && empty(r.id, 'fine'))).join('')
   $('#track-tabs').innerHTML = tab('track', 'open', 'Head-to-head', board.track === 'open', empty(board.robot, 'open'))
     + tab('track', 'fine', 'Standard tasks', board.track === 'fine', empty(board.robot, 'fine'))
-  const rows = $('#rows'), note = $('#board-note')
+  const rows = $('#rows'), note = $('#board-note'), more = $('#rows-more')
+  more.hidden = true
   const robot = ROBOTS.find(r => r.id === board.robot)
   $('#board-link').href = appLink('/leaderboard', { robot: board.robot, track: board.track === 'open' ? 'open' : 'fine-tuning' })
   if (!loaded(board.robot, board.track)) { rows.innerHTML = Array.from({ length: 5 }, () => '<li class="row loading"><span class="skel" style="min-width:60%">&nbsp;</span></li>').join(''); note.textContent = ''; return }
@@ -227,7 +230,7 @@ function rankings() {
   const evidence = board.track === 'open'
     ? Object.fromEntries(rankedOpen(board.robot).map(r => [r.policy, Number(r.evals) || 0]))
     : Object.fromEntries(model.rows.map(r => [r.policy, Number(r.em.split('/')[1]) || 0]))
-  rows.innerHTML = model.rows.slice(0, 5).map(r => {
+  rows.innerHTML = (board.all ? model.rows : model.rows.slice(0, 5)).map(r => {
     const low = (evidence[r.policy] ?? 0) < MIN[board.track]
     const bar = board.track === 'open'
       ? `<i class="ci" style="left:${r.lo}%;width:${r.span}%"></i><i class="pt" style="left:${r.at}%"></i>`
@@ -239,16 +242,23 @@ function rankings() {
       <span class="bar" aria-hidden="true">${bar}</span>
       <span class="val">${value}</span></li>`
   }).join('')
-  const more = model.rows.length > 5 ? ` Top 5 of ${model.rows.length} shown.` : ''
+  const total = model.rows.length, extra = total > 5
+  if (extra) {
+    more.hidden = false
+    more.setAttribute('aria-expanded', String(board.all))
+    more.innerHTML = `<span>${board.all ? 'Show top 5' : `Show all ${total} policies`}</span>${CHEVRON}`
+  }
+  const shown = !extra ? '' : board.all ? ` All ${total} shown.` : ` Top 5 of ${total} shown.`
   note.textContent = board.track === 'open'
-    ? `Ratings on ${robot.name} from blind comparisons; ± is one standard error. Faded rows have fewer than 20 comparisons so far.${more}`
-    : `Full successes on ${robot.name}'s standard tasks; the band is a 95% interval. Faded rows have fewer than 10 trials so far.${more}`
+    ? `Ratings on ${robot.name} from blind comparisons; ± is one standard error. Faded rows have fewer than 20 comparisons so far.${shown}`
+    : `Full successes on ${robot.name}'s standard tasks; the band is a 95% interval. Faded rows have fewer than 10 trials so far.${shown}`
 }
 document.querySelector('.board-controls').addEventListener('click', e => {
   const b = e.target.closest('button[role="tab"]'); if (!b || b.disabled) return
   if (b.dataset.robot) { board.robot = b.dataset.robot; board.chosen = true } else board.track = b.dataset.track
   rankings()
 })
+$('#rows-more').addEventListener('click', () => { board.all = !board.all; rankings() })
 
 // Open data: the repositories themselves, grouped by robot.
 function openData() {
