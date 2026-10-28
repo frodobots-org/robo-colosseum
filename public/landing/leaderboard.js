@@ -63,7 +63,7 @@ function openModel(robot) {
   return {
     title, subtitle: second ? `Rating: ${fmt(Math.round(first.score))} (${first.label}) → ${fmt(Math.round(last.score))} (${last.label})` : `Rating: ${fmt(Math.round(first.score))}`,
     yLabel: 'Rating (higher is better)', xLabel: 'Blind A/B comparisons (log)',
-    note: `RoboColosseum open track · ${robot.name} · ${fmt(comparisons)} blind comparisons. Whiskers: ±1 standard error. Bold: current leader${rows.some(r => r.evals < LOW_EVIDENCE) ? `; n = comparisons where fewer than ${LOW_EVIDENCE}` : ''}.`,
+    note: `RoboColosseum Open track · ${robot.name} · ${fmt(comparisons)} blind comparisons. Whiskers: ±1 standard error. Bold: current leader${rows.some(r => r.evals < LOW_EVIDENCE) ? `; n = comparisons where fewer than ${LOW_EVIDENCE}` : ''}.`,
     x: { log: true, d0: Math.max(1, Math.min(...counts) / 1.6), d1: Math.max(...counts) * 1.6 },
     y: { d0: lo - pad, d1: hi + pad },
     points, head: ['#', 'Model', 'Lab', 'Rating', '±1 SE', 'W / T / L', 'Comparisons'],
@@ -72,7 +72,7 @@ function openModel(robot) {
 
 function fineModel(robot) {
   const rows = fineRows(robot.id)
-  if (!rows.length) return { empty: `No published fine-tuning results for ${robot.name} yet.` }
+  if (!rows.length) return { empty: `No published Fine-tune track results for ${robot.name} yet.` }
   const byPolicy = new Map()
   for (const row of rows) {
     const key = row.policyId || row.policy
@@ -93,12 +93,12 @@ function fineModel(robot) {
     cells: [String(i + 1), p.label, labFor(p.policyId)?.name || '—', `${Math.round(p.rate)}%`, `${Math.round(p.lo)}–${Math.round(p.hi)}%`, `${Math.round(p.avgProgress)}%`, fmt(p.trials)],
   }))
   const first = policies[0], last = policies[policies.length - 1]
-  const title = total < 25 ? `Only ${total} fine-tuning trial${total === 1 ? '' : 's'} scored on ${robot.name} so far`
+  const title = total < 25 ? `Only ${total} Fine-tune track trial${total === 1 ? '' : 's'} scored on ${robot.name} so far`
     : `${first.label} fully completes ${Math.round(first.rate)}% of its ${robot.name} trials`
   return {
     title, subtitle: policies.length > 1 ? `Full success: ${Math.round(first.rate)}% (${first.label}) → ${Math.round(last.rate)}% (${last.label}), ${fmt(total)} trials` : `Full success: ${Math.round(first.rate)}% over ${fmt(total)} trial${total === 1 ? '' : 's'}`,
     yLabel: 'Full success rate', xLabel: 'Average task progress',
-    note: `RoboColosseum fine-tuning track · ${robot.name} · ${tasks} task${tasks === 1 ? '' : 's'}, up to 25 trials per model each. Whiskers: Wilson 95% interval. Dashed line: success equals progress.`,
+    note: `RoboColosseum Fine-tune track · ${robot.name} · ${tasks} task${tasks === 1 ? '' : 's'}, up to 25 trials per model each. Whiskers: Wilson 95% interval. Dashed line: success equals progress.`,
     x: { d0: 0, d1: 100, percent: true }, y: { d0: 0, d1: 100, percent: true }, diagonal: true,
     points, head: ['#', 'Model', 'Lab', 'Full success', '95% CI', 'Progress', 'Trials'],
   }

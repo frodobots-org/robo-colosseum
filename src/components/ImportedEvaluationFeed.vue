@@ -113,7 +113,7 @@ onBeforeUnmount(() => { datasetRequest?.abort(); replayRequest?.abort(); playbac
     <p v-else-if="!dataset" class="state" role="status"><span class="skel" style="min-width:24ch">&nbsp;</span></p>
     <article v-else-if="selected" class="trial-card" aria-live="polite">
       <header class="tc-head">
-        <span class="tc-meta"><b>{{ embodiments.find(e => e.id === robotId)?.name || robotId }}</b> · standard task · imported dataset</span>
+        <span class="tc-meta"><b>{{ embodiments.find(e => e.id === robotId)?.name || robotId }}</b> · Fine-tune track · imported dataset</span>
         <span class="tc-meta right"><time>{{ selected.source_result?.saved_at || 'Recording time unavailable' }}</time></span>
       </header>
       <div class="tc-who"><span class="lab-tile" :class="{ contain: lab.fit === 'contain' }" :style="{ background: lab.bg || '' }"><img v-if="lab.logo" :src="lab.logo" :alt="lab.name" @error="e => e.target.remove()"><template v-else>{{ lab.mono }}</template></span><div><h2>{{ modelLabel }}</h2><small>{{ lab.name }} · {{ episodes.length }} episodes</small></div></div>

@@ -10,8 +10,8 @@
     </section>
 
     <section class="summary" aria-label="What you get">
-      <article class="sum-card text"><span class="sum-label"><Icon name="ab" />Head-to-head</span><div class="sum-main"><b>Blind comparisons</b></div><small>against every rated policy on the robot</small></article>
-      <article class="sum-card text"><span class="sum-label"><Icon name="trials" />Standard tasks</span><div class="sum-main"><b>Repeated trials</b></div><small>up to 25 per task, success and progress</small></article>
+      <article class="sum-card text"><span class="sum-label"><Icon name="ab" />Open track</span><div class="sum-main"><b>Blind comparisons</b></div><small>against every rated policy on the robot</small></article>
+      <article class="sum-card text"><span class="sum-label"><Icon name="trials" />Fine-tune track</span><div class="sum-main"><b>Repeated trials</b></div><small>up to 25 per task, success and progress</small></article>
       <article class="sum-card text"><span class="sum-label"><Icon name="grid" />Robots</span><div class="sum-main"><b>Franka, SO-ARM101, YAM, G1</b></div><small>Earth Rover Mini+ joining</small></article>
       <article class="sum-card text"><span class="sum-label"><Icon name="play" />Evidence</span><div class="sum-main"><b>Every run recorded</b></div><small>pick, note and video in the viewer</small></article>
     </section>
@@ -28,7 +28,7 @@
       </section>
       <section class="panel-card">
         <h2>What we ask for</h2>
-        <div class="kv"><div><span>Model</span><b>Hugging Face repo, revision, subfolder</b></div><div><span>Robot</span><b>Franka, SO-ARM101, Bimanual YAM or Unitree G1</b></div><div><span>Kind of score</span><b>Head-to-head, standard tasks, or both</b></div><div><span>Inference</span><b>On our machine next to the robot, or your server</b></div><div><span>Contact</span><b>A lab and a person to reach</b></div><div><span>Licence</span><b>Permission to publish the recordings</b></div></div>
+        <div class="kv"><div><span>Model</span><b>Hugging Face repo, revision, subfolder</b></div><div><span>Robot</span><b>Franka, SO-ARM101, Bimanual YAM or Unitree G1</b></div><div><span>Track</span><b>Open track, Fine-tune track, or both</b></div><div><span>Inference</span><b>On our machine next to the robot, or your server</b></div><div><span>Contact</span><b>A lab and a person to reach</b></div><div><span>Licence</span><b>Permission to publish the recordings</b></div></div>
         <div class="actions">
           <a class="button secondary" href="https://github.com/frodobots-org/colosseum-policy-server" target="_blank" rel="noreferrer">Policy SDK on GitHub <Icon name="external" /></a>
         </div>

@@ -130,7 +130,7 @@ export function explorer(state) {
   const robots = ROBOTS.map(r => ({ id: r.id, name: r.name, active: r.id === robot.id }))
   const tracks = [
     { id: 'open', label: 'A/B', name: 'Open track', active: state.track === 'open' },
-    { id: 'fine', label: '✓/4', name: 'Fine-tuning', active: state.track === 'fine' },
+    { id: 'fine', label: '✓/4', name: 'Fine-tune track', active: state.track === 'fine' },
   ]
   const open = labelRows(rankedOpen(robot.id), 'policy')
   const fine = fineRows(robot.id)
@@ -159,7 +159,7 @@ export function explorer(state) {
     }
   }
 
-  if (!fine.length) return { ...base, mode: 'nofine', headline: `No published fine-tuning tasks for ${robot.name} yet.` }
+  if (!fine.length) return { ...base, mode: 'nofine', headline: `No published Fine-tune track tasks for ${robot.name} yet.` }
   const taskMap = new Map()
   for (const row of fine) {
     const info = taskInfo(row, robot.id)

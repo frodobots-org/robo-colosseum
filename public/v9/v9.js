@@ -10,7 +10,7 @@ import { labFor } from '../landing/leaderboard.js'
 import { SETUPS, setupDialog } from '../v7/setups.js'
 import { ROOT, chrome } from './chrome.js'
 import { viewer } from '../v8/viewer.js'
-import { HUB, TRAINING, HOURS, EVAL_SETS, EVAL_EXAMPLE } from '../v8/datasets.js'
+import { HUB, liveSets, hours, EVAL_SETS, EVAL_EXAMPLE } from '../v8/datasets.js'
 
 const $ = (s, el = document) => el.querySelector(s)
 // The films and the repository pictures are v8's files.
@@ -41,11 +41,11 @@ const PARTNERS = [
   { name: 'Hugging Face', href: 'https://huggingface.co/', logo: `<span class="hf"><img src="${ASSETS}huggingface-logo.svg" alt=""><b>Hugging Face</b></span>` },
 ]
 
-// Static wiring: chrome, partners, places, the setup dialog, the open-data repositories.
+// Static wiring: chrome, partners, places, the setup dialog.
 chrome()
 $('#viewer-link').href = appLink('/evals')
 $('#partners').innerHTML = PARTNERS.map(p => `<li><a href="${p.href}" aria-label="${esc(p.name)}">${p.logo}</a></li>`).join('')
-$('#sites').innerHTML = [['Open track', 'Evaluations run in', PLACES.open], ['Fine-tuning track', 'Datasets recorded in', PLACES.fine]]
+$('#sites').innerHTML = [['Open track', 'Evaluations run in', PLACES.open], ['Fine-tune track', 'Datasets recorded in', PLACES.fine]]
   .map(([track, verb, places]) => `<div><dt>${track}</dt><dd><span>${verb}</span><ul>${places.map(p => `<li>${esc(p)}</li>`).join('')}</ul></dd></div>`).join('')
 const openSetup = setupDialog($('#setup'))
 $('#fleet').addEventListener('click', e => { const b = e.target.closest('[data-setup]'); if (b) openSetup(b.dataset.setup) })
@@ -95,10 +95,12 @@ const get = (path, retry = true) => fetch(API + path, { headers: { Accept: 'appl
   .catch(err => retry ? get(path, false) : Promise.reject(err))
 const KEY = (id, track) => `${id}/${track === 'fine' ? 'fine-tuning' : track}`
 let stats = null, statsFailed = false
+// The tasks on the published Fine-tune track board: only their datasets are listed under Open data.
+let liveTasks = null
 function load(onChange) {
   const boards = {}
   const ready = Promise.all(['open', 'fine-tuning'].map(track => get(`/leaderboard?track=${track}`)
-    .then(data => { boards[track] = data.board || []; ROBOTS.forEach(r => { store.boards[KEY(r.id, track)] = boards[track].filter(row => row.robotId === r.id && row.track === track) }) })
+    .then(data => { boards[track] = data.board || []; if (track === 'fine-tuning') liveTasks = new Set(boards[track].map(r => r.taskId)); ROBOTS.forEach(r => { store.boards[KEY(r.id, track)] = boards[track].filter(row => row.robotId === r.id && row.track === track) }) })
     .catch(() => ROBOTS.forEach(r => store.failed.add(KEY(r.id, track))))))
     .then(() => { store.ready = true; onChange() })
   get('/stats').then(data => data.stats)
@@ -156,10 +158,10 @@ function scale() {
   }
   const h2h = 2 * s.comparisons
   $('#total').innerHTML = `<p class="total-n">${fmt(s.runs)}</p><p class="total-label">Recorded runs</p>
-    <div class="split" role="img" aria-label="${fmt(h2h)} runs from ${fmt(s.comparisons)} head-to-head comparisons and ${fmt(s.trials)} standard-task trials">
+    <div class="split" role="img" aria-label="${fmt(h2h)} runs from ${fmt(s.comparisons)} Open track comparisons and ${fmt(s.trials)} Fine-tune track trials">
       <span class="seg a" style="flex:${h2h}"></span><span class="seg b" style="flex:${s.trials}"></span></div>
-    <dl class="split-key"><div><dt><i class="sw a"></i>${fmt(h2h)}</dt><dd>runs in ${fmt(s.comparisons)} head-to-head comparisons, two models on the same instruction</dd></div>
-      <div><dt><i class="sw b"></i>${fmt(s.trials)}</dt><dd>standard-task trials, 25 attempts per model and task</dd></div></dl>`
+    <dl class="split-key"><div><dt><i class="sw a"></i>${fmt(h2h)}</dt><dd>runs in ${fmt(s.comparisons)} Open track comparisons, two models on the same instruction</dd></div>
+      <div><dt><i class="sw b"></i>${fmt(s.trials)}</dt><dd>Fine-tune track trials, 25 attempts per model and task</dd></div></dl>`
   // Scenes as a unit chart: one square per scene, grouped by robot type.
   const per = ROBOT_ORDER.map(id => ({ id, name: NAMES[id] || id, n: s.robots?.[id]?.scenes || 0 })).filter(r => r.n)
   $('#b-scenes').innerHTML = `<figcaption><b>${fmt(s.scenes)}</b><span>Scenes</span></figcaption>
@@ -217,8 +219,8 @@ function rankings() {
   }
   const tab = (key, value, label, on, disabled) => `<button type="button" role="tab" data-${key}="${value}" aria-selected="${on}"${disabled ? ' disabled' : ''}>${esc(label)}</button>`
   $('#robot-tabs').innerHTML = ROBOTS.map(r => tab('robot', r.id, r.name, r.id === board.robot, empty(r.id, 'open') && empty(r.id, 'fine'))).join('')
-  $('#track-tabs').innerHTML = tab('track', 'open', 'Head-to-head', board.track === 'open', empty(board.robot, 'open'))
-    + tab('track', 'fine', 'Standard tasks', board.track === 'fine', empty(board.robot, 'fine'))
+  $('#track-tabs').innerHTML = tab('track', 'open', 'Open track', board.track === 'open', empty(board.robot, 'open'))
+    + tab('track', 'fine', 'Fine-tune track', board.track === 'fine', empty(board.robot, 'fine'))
   const rows = $('#rows'), note = $('#board-note'), more = $('#rows-more')
   more.hidden = true
   const robot = ROBOTS.find(r => r.id === board.robot)
@@ -251,7 +253,7 @@ function rankings() {
   const shown = !extra ? '' : board.all ? ` All ${total} shown.` : ` Top 5 of ${total} shown.`
   note.textContent = board.track === 'open'
     ? `Ratings on ${robot.name} from blind comparisons; ± is one standard error. Faded rows have fewer than 20 comparisons so far.${shown}`
-    : `Full successes on ${robot.name}'s standard tasks; the band is a 95% interval. Faded rows have fewer than 10 trials so far.${shown}`
+    : `Full successes on ${robot.name}'s Fine-tune track tasks; the band is a 95% interval. Faded rows have fewer than 10 trials so far.${shown}`
 }
 document.querySelector('.board-controls').addEventListener('click', e => {
   const b = e.target.closest('button[role="tab"]'); if (!b || b.disabled) return
@@ -260,22 +262,26 @@ document.querySelector('.board-controls').addEventListener('click', e => {
 })
 $('#rows-more').addEventListener('click', () => { board.all = !board.all; rankings() })
 
-// Open data: the repositories themselves, grouped by robot.
+// Open data: the Fine-tune track datasets of the tasks on the leaderboard, grouped by robot (redrawn once the board arrives).
+let shownData = ''
 function openData() {
-  const sets = TRAINING.flatMap(g => g.sets), demos = sets.reduce((s, [, eps]) => s + eps, 0)
-  $('#data-figures').innerHTML = [[sets.length, 'training sets'], [demos, 'demonstrations'], [HOURS, 'hours of demonstrations'], [EVAL_SETS, 'evaluation sets so far']]
+  const groups = liveSets(liveTasks), sets = groups.flatMap(g => g.sets), demos = sets.reduce((s, [, eps]) => s + eps, 0)
+  const key = sets.map(([name]) => name).join()
+  if (key === shownData) return
+  shownData = key
+  $('#data-figures').innerHTML = [[sets.length, 'Fine-tune track datasets'], [demos, 'demonstrations'], [hours(groups), 'hours of demonstrations'], [EVAL_SETS, 'evaluation sets so far']]
     .map(([v, label]) => `<div><dt>${n(v)}</dt><dd>${esc(label)}</dd></div>`).join('')
-  $('#repos').innerHTML = TRAINING.flatMap(g => g.sets.map(([name, eps]) => `<li><a class="repo" href="${HUB}${name}">
+  $('#repos').innerHTML = groups.flatMap(g => g.sets.map(([name, eps]) => `<li><a class="repo" href="${HUB}${name}">
     <img src="${ROOT}v8/data/${name}.jpg" alt="" loading="lazy" width="480" height="270">
     <span class="repo-name">${esc(name)}</span><span class="repo-meta">${esc(g.robot)} · ${fmt(eps)} episodes · ${g.cameras} cameras</span></a></li>`)).join('')
-  $('#repos').insertAdjacentHTML('afterend', `<p class="repos-note">Each training set is the 100 or so teleoperated demonstrations every model learns a standard task from. Evaluation runs are published per model and task, for example <a href="${HUB}${EVAL_EXAMPLE}"><code>${EVAL_EXAMPLE}</code></a>. All load with the LeRobot library.</p>`)
 }
+$('#repos').insertAdjacentHTML('afterend', `<p class="repos-note">Each Fine-tune track dataset holds the 100 or so teleoperated demonstrations every model is fine-tuned on for one task. Evaluation runs are published per model and task, for example <a href="${HUB}${EVAL_EXAMPLE}"><code>${EVAL_EXAMPLE}</code></a>. All load with the LeRobot library.</p>`)
 
 openData()
 const preview = viewer($('#viewer'))
 preview.loading()
 function render() {
-  freshness(); scale(); places(); fleet(); rankings()
+  freshness(); scale(); places(); fleet(); rankings(); openData()
   if (stats) preview.show(stats.matchups)
   else if (statsFailed) preview.show([])
 }

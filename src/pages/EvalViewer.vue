@@ -3,8 +3,8 @@
     <section class="page-head">
       <div>
         <p class="eyebrow">Evaluations</p>
-        <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Head-to-head' : 'Standard tasks' }}</span></h1>
-        <p class="lede">{{ track === 'open' ? 'Every finalized blind comparison on this robot: both runs, the instruction the evaluator wrote, their pick and their note.' : 'Every scored trial on this robot\'s standard tasks, with the recording of each attempt.' }}</p>
+        <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Open track' : 'Fine-tune track' }}</span></h1>
+        <p class="lede">{{ track === 'open' ? 'Every finalized blind comparison on this robot: both runs, the instruction the evaluator wrote, their pick and their note.' : 'Every scored trial on this robot\'s Fine-tune track tasks, with the recording of each attempt.' }}</p>
       </div>
       <span class="live-tag"><i></i>Live from the API</span>
     </section>

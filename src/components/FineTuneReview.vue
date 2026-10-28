@@ -19,9 +19,9 @@
       <p v-if="error" class="state"><b>{{ error }}</b></p>
       <p v-else-if="datasetError" class="board-foot" role="alert">{{ datasetError }}</p>
       <div v-if="loading" class="state"><span class="skel" style="min-width:30ch">&nbsp;</span></div>
-      <div v-else-if="!error && !filtered.length" class="state"><h3>{{ query || outcomeFilter ? 'No trials match' : 'No scored trials on this robot yet' }}</h3><p>Completed standard-task trials and published datasets appear here as they finish.</p><button v-if="query || outcomeFilter" class="button secondary" type="button" @click="query = ''; outcomeFilter = ''">Clear filters</button></div>
+      <div v-else-if="!error && !filtered.length" class="state"><h3>{{ query || outcomeFilter ? 'No trials match' : 'No scored trials on this robot yet' }}</h3><p>Completed Fine-tune track trials and published datasets appear here as they finish.</p><button v-if="query || outcomeFilter" class="button secondary" type="button" @click="query = ''; outcomeFilter = ''">Clear filters</button></div>
       <div v-else-if="!error" class="ev-layout">
-        <ol class="feed" aria-label="Standard-task trials">
+        <ol class="feed" aria-label="Fine-tune track trials">
           <li v-for="trial in filtered" :key="trial.entryId">
             <button type="button" :class="['feed-item', { on: selectedId === trial.entryId }]" :aria-pressed="selectedId === trial.entryId" @click="selectEntry(trial)">
               <span class="feed-top"><time :datetime="trial.created" :title="trial.kind === 'dataset' ? 'Import date' : 'Evaluation date'">{{ ago(trial.created) }}</time><span v-if="trial.kind === 'dataset'" class="verdict">{{ trial.summary.episodes }} episode{{ trial.summary.episodes === 1 ? '' : 's' }}</span><span v-else :class="['verdict', outcome(trial)]">{{ outcomeLabel(trial) }}</span></span>
@@ -34,7 +34,7 @@
           <ImportedEvaluationFeed v-if="selectedEntry?.kind === 'dataset'" :key="selectedEntry.datasetId" :dataset-id="selectedEntry.datasetId" :model-name="registeredModelName(selectedEntry)" :robot-id="robotId" />
           <article v-else-if="selected" class="trial-card" aria-live="polite">
             <header class="tc-head">
-              <span class="tc-meta"><b>{{ robotName }}</b> · standard task{{ selected.inference_mode === 'imported' ? ' · imported' : '' }}</span>
+              <span class="tc-meta"><b>{{ robotName }}</b> · Fine-tune track{{ selected.inference_mode === 'imported' ? ' · imported' : '' }}</span>
               <span class="tc-meta right"><span v-if="selected.test" class="verdict test">Test</span><time :datetime="selected.created">{{ dateLabel(selected.created) }}</time></span>
             </header>
             <div class="tc-who"><span class="lab-tile" :class="{ contain: lab(selected).fit === 'contain' }" :style="{ background: lab(selected).bg || '' }"><img v-if="lab(selected).logo" :src="lab(selected).logo" :alt="lab(selected).name" @error="e => e.target.remove()"><template v-else>{{ lab(selected).mono }}</template></span><div><h2>{{ policyName(selected.policy_id) }}</h2><small>{{ lab(selected).name }}</small></div></div>
