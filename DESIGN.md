@@ -95,6 +95,7 @@ The v5 copy got bad feedback ("copy is bad or misleading... messy... doesn't giv
 
 ## Leaderboards (22 Oct 2026)
 
+- **28 Oct 2026:** public leaderboard labels show model names without checkpoint/version suffixes such as `rig-v1` or commit hashes. Keep the full identities in data and evaluation links. Open Track shows the backend's active deployment/checkpoint selection; older EE LLM results remain in evaluation history.
 - Modelled on Artificial Analysis (summary cards naming the leaders with lab logos, dense table with logo cells, filters, key definitions) and Arena (dark rows with numbered rank chips, logo tiles, score bars inside the rows, category tabs with icons).
 - Page order: header (body · track) → body tabs with the robot glyphs → track switch with icons → four summary cards (leader with lab tile, comparisons or trials, policies, lead over #2 or median progress) → the ranking → the Robocurve figure → key definitions.
 - Ranking rows: rank chip (#1 amber, #2–3 raised), lab tile + policy + lab + Hugging Face link, a bar per metric (open: rating with ±1 SE whisker on a shared axis; fine-tuning: full success fill with the Wilson 95% band, progress fill), W·T·L stacked record, counts in mono, a play icon to the evaluations. Fewer than 20 comparisons (or 10 trials) is faded and marked low evidence; pending policies are hidden behind a toggle.

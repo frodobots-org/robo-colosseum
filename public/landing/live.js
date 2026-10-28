@@ -93,15 +93,9 @@ export function policyLabel(policy) {
   const family = FAMILIES.find(([prefix]) => id === prefix || id.startsWith(prefix + '-'))
   return family ? family[1] : id.replace(/-(so101|yam|droid|franka|g1)$/, '')
 }
-// Two revisions of one family on the same board get a short revision tag.
+// Public labels omit checkpoint versions; row identities and links keep them.
 export function labelRows(rows, key) {
-  const counts = {}
-  rows.forEach(row => { const label = policyLabel(row[key]); counts[label] = (counts[label] || 0) + 1 })
-  return rows.map(row => {
-    const label = policyLabel(row[key])
-    const revision = String(row[key] || '').split('@')[1]
-    return { ...row, label: counts[label] > 1 && revision ? `${label} · ${revision.slice(0, 7)}` : label }
-  })
+  return rows.map(row => ({ ...row, label: policyLabel(row[key]) }))
 }
 
 const humanize = value => String(value || '').replace(/[_-]+/g, ' ').trim().replace(/^./, c => c.toUpperCase())
