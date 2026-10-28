@@ -1,21 +1,21 @@
-/* RoboColosseum app (leaderboard, evaluations, tasks, submit, join) in the brand of the landing page (public/v8, Figma
-   "RC Brand"): silver paper with a fine grain, near-black type, the brand orange for the one call to action and for a
-   picked run. Zalando Sans carries every word; Kode Mono, in capitals, carries labels and the record. Sharp rectangles
+/* RoboColosseum app (leaderboard, evaluations, tasks, submit, join) in the brand of the landing page (public/v9, Figma
+   "RC Brand", 28 Oct 2026): flat #f1f1f1 paper with white panels, near-black type, the orange of the mark for the one
+   call to action and for a picked run. Zalando Sans carries every word; Kode Mono, in capitals, carries labels and the record. Sharp rectangles
    and hairlines; lab marks are the only circles. Light by default, the brand's dark theme on the switch (shared with the
    landing page through localStorage "rc-theme"). Tokens first; base.css and boards.css read the same names. */
 :root {
   --sans: "Zalando Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Kode Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --paper: #cbcbcb; --paper-2: #d4d4d4; --panel: #d4d4d4; --raised: #dedede; --field: rgba(28, 28, 28, .08);
+  --paper: #f1f1f1; --paper-2: #fff; --panel: #fff; --raised: #f6f6f6; --field: rgba(28, 28, 28, .08);
   --ink: #1c1c1c; --ink-2: #363636; --muted: #555; --ink-4: #7a7a7a;
   --line: rgba(28, 28, 28, .16); --line-2: rgba(28, 28, 28, .38);
-  --accent: #ea5b02; --accent-ink: #1c1c1c; --accent-tint: rgba(234, 91, 2, .14); --accent-line: var(--ink);
+  --accent: #ff6200; --accent-ink: #1c1c1c; --accent-tint: rgba(255, 98, 0, .14); --accent-line: var(--ink);
   /* Data marks are ink, like the landing page's leaderboard; the two kinds of score are told apart by their labels. */
   --open: var(--ink); --fine: var(--ink); --fine-tint: var(--field); --fine-line: var(--ink-4);
   --good: #285f30; --good-tint: rgba(40, 95, 48, .14); --bad: #9e1f19; --bad-tint: rgba(158, 31, 25, .12); --warn: #7a4f00; --warn-tint: rgba(122, 79, 0, .14);
   --lime: var(--accent); --purple: var(--field); --dots: none;
-  --stage: #e4e4e4;
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
+  --stage: #f7f7f7;
+  --grain: none;
   --maxw: 1240px; --gutter: clamp(16px, 4vw, 48px);
   color-scheme: light; color: var(--ink); background: var(--paper); font-family: var(--sans);
 }
@@ -26,6 +26,7 @@
   --accent: #ff6200; --accent-ink: #1c1c1c; --accent-tint: rgba(255, 98, 0, .16);
   --good: #7cc488; --good-tint: rgba(124, 196, 136, .14); --bad: #f08d7e; --bad-tint: rgba(240, 141, 126, .14); --warn: #e3ac55; --warn-tint: rgba(227, 172, 85, .14);
   --stage: #cbcbcb;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E");
   color-scheme: dark;
 }
 body { background: var(--paper) var(--grain); color: var(--ink); font: 400 16px/1.55 var(--sans); }

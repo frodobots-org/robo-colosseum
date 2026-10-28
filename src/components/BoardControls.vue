@@ -17,7 +17,7 @@ import Icon from './Icon.vue'
 import { embodiments, useArena } from '../arena.js'
 defineProps({ openLabel: { type: String, default: 'Blind comparisons' }, fineLabel: { type: String, default: 'Repeated trials' } })
 const { robot, track, select } = useArena()
-// The same photos as the landing page's robot cards.
+// The same cut-out photos as the landing page's robot cards, so white robots stay white on the light grey stage.
 const base = import.meta.env.BASE_URL
-const photo = id => id === 'earth_rover_mini_plus' ? `${base}v3/bodies/earth-rover-mini-plus.webp` : `${base}v7/robots/${id}.webp`
+const photo = id => id === 'earth_rover_mini_plus' ? `${base}v3/bodies/earth-rover-mini-plus.webp` : `${base}v9/robots/${id}.webp`
 </script>
