@@ -15,7 +15,8 @@ import { HUB, TRAINING, HOURS, EVAL_SETS, EVAL_EXAMPLE } from '../v8/datasets.js
 const $ = (s, el = document) => el.querySelector(s)
 // The films and the repository pictures are v8's files.
 const VIDEO = `${ROOT}v8/video/`
-const PICS = `${ROOT}v7/robots/`
+// The robots cut out of their white backdrops, so white arms stay visible on the grey stage.
+const PICS = `${ROOT}v9/robots/`
 
 // The robot types we run. Fleet sizes are never shown: the page says "hundreds of robots" (user, 26 Oct 2026).
 const FLEET = [
