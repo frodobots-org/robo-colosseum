@@ -20,7 +20,7 @@
       <nav aria-label="Footer">
         <div><h3>The benchmark</h3><ul><li><RouterLink :to="link('/leaderboard')">Leaderboard</RouterLink></li><li><RouterLink :to="link('/evals')">Evaluations</RouterLink></li><li><RouterLink :to="link('/tasks')">Tasks and protocol</RouterLink></li><li><a href="https://huggingface.co/RoboColosseum">Open data</a></li><li><a :href="`${home}v7/blog/`">Blog</a></li></ul></div>
         <div><h3>Take part</h3><ul><li><a :href="apply" target="_blank" rel="noopener">Apply for free evaluation</a></li><li><RouterLink :to="link('/join')">Join as an evaluator</RouterLink></li></ul></div>
-        <div><h3>Follow</h3><ul><li><a href="https://x.com/RoboColosseum">X</a></li><li><a href="https://github.com/frodobots-org/robo-colosseum">GitHub</a></li><li><a href="https://huggingface.co/RoboColosseum">Hugging Face</a></li></ul></div>
+        <div><h3>Follow</h3><ul><li><a href="https://x.com/RoboColosseum">X</a></li><li><a href="https://github.com/RoboColosseum">GitHub</a></li><li><a href="https://huggingface.co/RoboColosseum">Hugging Face</a></li></ul></div>
       </nav>
     </footer>
   </div>
