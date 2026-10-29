@@ -372,6 +372,12 @@ button.robot:hover .see { text-decoration-color: var(--accent); text-decoration-
 .foot ul { display: grid; gap: 8px; margin-top: 12px; }
 .foot a { color: var(--ink-2); text-decoration: none; }
 .foot a:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); }
+/* Follow: the X and GitHub marks in the text colour, Hugging Face in its own colours (partner logos are never recoloured). */
+.foot .social li { display: flex; }
+.foot .social a { display: inline-flex; align-items: center; gap: 9px; }
+.foot .social svg, .foot .social img { width: 17px; height: 17px; flex: none; }
+.foot .social svg { padding: .5px; fill: currentColor; }
+.foot .social img { object-fit: contain; }
 @media (max-width: 760px) { .foot { grid-template-columns: 1fr; } .foot nav { grid-template-columns: repeat(2, minmax(0, 1fr)); } .foot-brand img { height: 52px; } }
 
 /* a robot's setup: the labelled photo on white and the parts list */

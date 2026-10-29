@@ -69,6 +69,12 @@ main { padding: clamp(36px, 5vw, 64px) var(--gutter) clamp(64px, 8vw, 96px); }
 .foot ul { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
 .foot a { color: var(--ink-2); text-decoration: none; }
 .foot a:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); }
+/* Follow: the X and GitHub marks in the text colour, Hugging Face in its own colours (partner logos are never recoloured). */
+.foot .social li { display: flex; }
+.foot .social a { display: inline-flex; align-items: center; gap: 9px; }
+.foot .social svg, .foot .social img { width: 17px; height: 17px; flex: none; }
+.foot .social svg { padding: .5px; fill: currentColor; }
+.foot .social img { object-fit: contain; }
 @media (max-width: 1020px) {
   .menu { display: inline-flex; margin-left: auto; }
   .nav { display: none; position: absolute; left: 0; right: 0; top: 100%; flex-direction: column; gap: 0; padding: 8px max(var(--gutter), calc((100% - var(--maxw)) / 2)) 16px; background: var(--paper) var(--grain); border-bottom: 1px solid var(--line-2); box-shadow: 0 12px 24px rgba(0, 0, 0, .12); }
