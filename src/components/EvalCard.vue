@@ -1,7 +1,7 @@
 <template>
   <article class="ev-card">
     <header class="ev-card-head">
-      <span class="ev-meta"><b>{{ robotName || evaluation.robotId }}</b>{{ evaluation.scene ? ` · ${evaluation.scene}` : '' }}{{ evaluation.institution ? ` · ${evaluation.institution}` : '' }}</span>
+      <span class="ev-meta"><b>{{ robotName || evaluation.robotId }}</b></span>
       <span class="ev-meta right"><span v-if="evaluation.test" class="verdict test">Test</span><time :datetime="evaluation.evalTime || evaluation.date">{{ dateLabel(evaluation.evalTime || evaluation.date) }}</time></span>
     </header>
     <blockquote class="ev-instruction">“{{ evaluation.instruction || evaluation.task }}”</blockquote>
@@ -19,10 +19,9 @@
       </div>
     </div>
     <div class="kv">
-      <div><span>Evaluator</span><b>{{ evaluation.evaluator || '—' }}</b></div>
-      <div><span>Site</span><b>{{ evaluation.institution || '—' }}</b></div>
+      <div><span>Evaluator</span><b>{{ evaluation.evaluator?.trim() || evaluation.institution?.trim() || '—' }}</b></div>
+      <div><span>Scene</span><b>{{ evaluation.scene || '—' }}</b></div>
       <div><span>Difficulty</span><b>{{ evaluation.test ? 'Not scored (test)' : difficulty }}</b></div>
-      <div><span>Evaluator's confidence</span><b class="cap">{{ evaluation.confidence || '—' }}</b></div>
     </div>
     <div class="ev-note"><span>Evaluator's note</span><p>{{ evaluation.feedback || evaluation.notes || 'No note recorded.' }}</p></div>
   </article>
@@ -60,7 +59,6 @@ const difficulty = computed(() => { const s = Number(props.evaluation.difficulty
 .stamp b { font: 600 36px/1 var(--sans); letter-spacing: -.04em; color: var(--ink); }
 .stamp b.tie { color: var(--ink-2); font-size: 22px; }
 .stamp small { font: 700 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); }
-.kv b.cap { text-transform: capitalize; }
 .ev-note { display: grid; gap: 4px; padding-top: 12px; border-top: 1px solid var(--line); }
 .ev-note span { font: 700 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--muted); }
 .ev-note p { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--ink); max-width: 80ch; }
