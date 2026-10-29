@@ -4,7 +4,7 @@
       <div>
         <p class="eyebrow">Evaluations</p>
         <h1>{{ robot.name }}<span class="h1-sub"> · {{ track === 'open' ? 'Open track' : 'Fine-tune track' }}</span></h1>
-        <p class="lede">{{ track === 'open' ? 'Every finalized blind comparison on this robot: both runs, the instruction the evaluator wrote, their pick and their note.' : 'Every scored trial on this robot\'s Fine-tune track tasks, with the recording of each attempt.' }}</p>
+        <p class="lede">{{ track === 'open' ? 'Finalized blind comparisons with recordings for both runs: the instruction, the evaluator’s pick and their note.' : 'Every scored trial on this robot\'s Fine-tune track tasks, with the recording of each attempt.' }}</p>
       </div>
       <span class="live-tag"><i></i>Live from the API</span>
     </section>
@@ -27,13 +27,13 @@
             <button v-for="opt in verdictOptions" :key="opt.id" type="button" :class="{ on: verdictFilter === opt.id }" @click="verdictFilter = opt.id">{{ opt.label }}</button>
             <button v-if="policyFilter" type="button" class="on" @click="clearPolicy">{{ policyFilter }} ×</button>
           </div>
-          <span class="count">{{ filtered.length }} of {{ scoped.length }} comparisons</span>
+          <span class="count">{{ filtered.length }} comparisons with A/B recordings</span>
           <button class="button secondary" type="button" @click="loadEvaluations"><Icon name="pulse" /> Refresh</button>
         </div>
 
         <div v-if="loading" class="state"><span class="skel" style="min-width:30ch">&nbsp;</span></div>
         <div v-else-if="unavailable" class="state"><h3>Evaluations are temporarily unavailable</h3><p>The API did not answer. Try again in a moment.</p><button class="button secondary" type="button" @click="loadEvaluations">Try again</button></div>
-        <div v-else-if="!filtered.length" class="state"><h3>{{ hasFilters ? 'No comparisons match' : 'No finalized comparisons on this robot yet' }}</h3><p>Comparisons appear here as soon as an evaluator finalizes a pick.</p><button v-if="hasFilters" class="button secondary" type="button" @click="clearFilters">Clear filters</button></div>
+        <div v-else-if="!filtered.length" class="state"><h3>{{ hasFilters ? 'No comparisons match' : 'No comparisons with A/B recordings yet' }}</h3><p>Comparisons appear here after a pick is finalized and both runs have a recording.</p><button v-if="hasFilters" class="button secondary" type="button" @click="clearFilters">Clear filters</button></div>
 
         <div v-else class="ev-layout">
           <ol class="feed" aria-label="Evaluations">
@@ -66,6 +66,7 @@ import Icon from '../components/Icon.vue'
 import { policyName } from '../display.js'
 import { useArena } from '../arena.js'
 import { getEvaluations } from '../api.js'
+import { hasBothRecordings } from '../evaluationVideos.js'
 import { fmt, pct } from '../labs.js'
 
 const route = useRoute()
@@ -84,7 +85,7 @@ const scoped = computed(() => evaluations.value.filter(e => e.finalized && !e.te
   .sort((a, b) => String(b.evalTime || b.date || '').localeCompare(String(a.evalTime || a.date || ''))))
 const filtered = computed(() => {
   const q = query.value.trim().toLowerCase(), pf = policyFilter.value.toLowerCase()
-  return scoped.value.filter(e => (verdictFilter.value === 'all' || verdictOf(e) === verdictFilter.value)
+  return scoped.value.filter(e => hasBothRecordings(e.videos) && (verdictFilter.value === 'all' || verdictOf(e) === verdictFilter.value)
     && (!pf || policyName(e.policyA).toLowerCase() === pf || policyName(e.policyB).toLowerCase() === pf)
     && (!q || `${e.instruction || ''} ${e.task || ''} ${e.scene || ''} ${e.evaluator || ''} ${e.policyA || ''} ${e.policyB || ''} ${e.institution || ''}`.toLowerCase().includes(q)))
 })

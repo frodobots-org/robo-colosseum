@@ -141,3 +141,5 @@ The v5 copy got bad feedback ("copy is bad or misleading... messy... doesn't giv
 - Tasks: the open track explains how an instruction is written on the spot; the fine-tuning suite lists the draft Franka cards in a grid (id, category icon, site, milestones, demos) with a detail panel (predicate quoted on an amber rule, ordered milestones as numbered steps). Other bodies show an empty state until their cards exist.
 - Submit and Join: header, four "what you get / what you do" cards, two panels (numbered steps, key/value requirements, buttons) and the embedded form once a real Google Form id replaces the `REPLACE_WITH_…` placeholder; until then a note points to GitHub.
 - Numbers: `fmt` and `pct` from `src/labs.js`; time-ago in mono; never a bare percentage in a sentence.
+
+- Open-track evaluation feed: filter the list response to comparisons with at least one nonempty video source on each side. The backend blanks unverified sources; fetch signed playback URLs only when a comparison is selected. Summary statistics, Fine-tune and leaderboards remain unchanged.
