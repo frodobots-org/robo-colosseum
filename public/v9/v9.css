@@ -18,7 +18,8 @@
 }
 :root[data-theme="dark"] {
   --paper: #1c1c1c; --paper-2: #222; --panel: #2a2a2a; --field: rgba(203, 203, 203, .1);
-  --ink: #cbcbcb; --ink-2: #b0b0b0; --ink-3: #8f8f8f; --ink-4: #6b6b6b;
+  /* type in near-white #f1f1f1 (the light paper), steps down stay readable on #1c1c1c (29 Oct 2026: silver was hard to read) */
+  --ink: #f1f1f1; --ink-2: #d4d4d4; --ink-3: #ababab; --ink-4: #858585;
   --line: rgba(203, 203, 203, .14); --line-2: rgba(203, 203, 203, .34);
   --accent: #ff6200; --on-accent: #1c1c1c;
   --stage: #cbcbcb; --shade: rgba(0, 0, 0, .78);
@@ -115,6 +116,12 @@ button { font: inherit; color: inherit; }
 .partner-list .magic { height: 25px; }
 .partner-list .br { height: 34px; }
 .partner-list .eaic { height: 30px; }
+/* Light theme: outside brands (founders, labs, Hugging Face) are shown in grey so the page keeps one palette
+   (user request, 29 Oct 2026); a founder's logo takes its own colours back on hover. The dark theme keeps the colours. */
+:root:not([data-theme="dark"]) :is(.partner-list img, .mk img, .cta-hf img, .foot .social img) { filter: grayscale(1); }
+:root:not([data-theme="dark"]) .partner-list img { transition: filter .15s ease; }
+:root:not([data-theme="dark"]) .partner-list a:hover { opacity: 1; }
+:root:not([data-theme="dark"]) .partner-list a:hover img { filter: none; }
 :root[data-theme="dark"] .partner-list .eaic { box-sizing: content-box; height: 24px; padding: 5px 8px; background: #f1f1f1; border-radius: 3px; }
 .partner-list .hf { display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; }
 .partner-list .hf img { height: 30px; }
@@ -372,7 +379,7 @@ button.robot:hover .see { text-decoration-color: var(--accent); text-decoration-
 .foot ul { display: grid; gap: 8px; margin-top: 12px; }
 .foot a { color: var(--ink-2); text-decoration: none; }
 .foot a:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); }
-/* Follow: the X and GitHub marks in the text colour, Hugging Face in its own colours (partner logos are never recoloured). */
+/* Follow: the X and GitHub marks in the text colour, Hugging Face in its own colours (grey in the light theme, see the founders strip). */
 .foot .social li { display: flex; }
 .foot .social a { display: inline-flex; align-items: center; gap: 9px; }
 .foot .social svg, .foot .social img { width: 17px; height: 17px; flex: none; }

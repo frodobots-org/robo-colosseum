@@ -21,7 +21,8 @@
 }
 :root[data-theme="dark"] {
   --paper: #1c1c1c; --paper-2: #222; --panel: #232323; --raised: #2c2c2c; --field: rgba(203, 203, 203, .1);
-  --ink: #cbcbcb; --ink-2: #b0b0b0; --muted: #8f8f8f; --ink-4: #6b6b6b;
+  /* type in near-white #f1f1f1, like the landing page (29 Oct 2026: silver was hard to read) */
+  --ink: #f1f1f1; --ink-2: #d4d4d4; --muted: #ababab; --ink-4: #858585;
   --line: rgba(203, 203, 203, .14); --line-2: rgba(203, 203, 203, .34);
   --accent: #ff6200; --accent-ink: #1c1c1c; --accent-tint: rgba(255, 98, 0, .16);
   --good: #7cc488; --good-tint: rgba(124, 196, 136, .14); --bad: #f08d7e; --bad-tint: rgba(240, 141, 126, .14); --warn: #e3ac55; --warn-tint: rgba(227, 172, 85, .14);
@@ -69,12 +70,14 @@ main { padding: clamp(36px, 5vw, 64px) var(--gutter) clamp(64px, 8vw, 96px); }
 .foot ul { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
 .foot a { color: var(--ink-2); text-decoration: none; }
 .foot a:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); }
-/* Follow: the X and GitHub marks in the text colour, Hugging Face in its own colours (partner logos are never recoloured). */
+/* Follow: the X and GitHub marks in the text colour, Hugging Face in its own colours (grey in the light theme, below). */
 .foot .social li { display: flex; }
 .foot .social a { display: inline-flex; align-items: center; gap: 9px; }
 .foot .social svg, .foot .social img { width: 17px; height: 17px; flex: none; }
 .foot .social svg { padding: .5px; fill: currentColor; }
 .foot .social img { object-fit: contain; }
+/* Light theme: outside brands (lab marks in rows, cards and the figure, Hugging Face) in grey, like the landing page. */
+:root:not([data-theme="dark"]) :is(.lab-tile img, .lb-pt image, .foot .social img) { filter: grayscale(1); }
 @media (max-width: 1020px) {
   .menu { display: inline-flex; margin-left: auto; }
   .nav { display: none; position: absolute; left: 0; right: 0; top: 100%; flex-direction: column; gap: 0; padding: 8px max(var(--gutter), calc((100% - var(--maxw)) / 2)) 16px; background: var(--paper) var(--grain); border-bottom: 1px solid var(--line-2); box-shadow: 0 12px 24px rgba(0, 0, 0, .12); }
