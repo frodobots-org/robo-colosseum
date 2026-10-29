@@ -3,7 +3,7 @@
 Vue frontend for robot policy evaluation results and leaderboards.
 
 - Netlify website: https://robocolosseum.netlify.app/
-- Custom domain: https://robocolosseum.ai/ (DNS cutover pending)
+- Custom domain: https://robocolosseum.ai/
 - Previous website: https://frodobots-org.github.io/robo-colosseum/
 - Backend API: https://robocolosseum-api.onrender.com/api
 - Backend repository: https://github.com/frodobots-org/colosseum-router
@@ -55,11 +55,13 @@ directory is local configuration and must not be committed.
 
 ### Custom domain
 
-`robocolosseum.ai` is registered with GoDaddy. Keep DNS there and point the web
-records to Netlify: apex `A` record `@` to `75.2.60.5`, and `CNAME` record `www`
-to `robocolosseum.netlify.app`. Replace conflicting web records, preserving mail,
-verification, and other unrelated records. Complete DNS verification and HTTPS
-provisioning in Netlify before treating the domain as live.
+`robocolosseum.ai` is registered with GoDaddy. On 14 October 2026, its apex `A`
+record `@` was connected to `75.2.60.5` (600-second TTL), and its `CNAME` record
+`www` to `robocolosseum.netlify.app` (1-hour TTL). GoDaddy nameservers and other
+records remain unchanged. HTTPS is active with an automatically renewed Let's
+Encrypt certificate covering both names. `www.robocolosseum.ai` redirects to
+the primary domain, `robocolosseum.ai`. Site-wide password protection remains
+enabled; the app and live leaderboard data were verified on the custom domain.
 
 See [Netlify's external DNS instructions](https://docs.netlify.com/manage/domains/configure-domains/configure-external-dns/).
 
