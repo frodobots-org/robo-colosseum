@@ -195,10 +195,22 @@ function places() {
   $('#places').innerHTML = `From one robot at work to thousands of recorded runs. ${n(stats.scenes)} scenes on record so far: ${list(per.map(r => `${n(r.count)} for ${esc(r.name)}`))}.`
 }
 
+// The count a reader can check: the policies on the robot's largest leaderboard. Adding up both tracks counts a lab twice
+// when it entered a different model on each (LingBot on SO-ARM101: LingBot-MolmoAct2 on the Open track, LingBot VLA v2 6B
+// on the Fine-tune track), which is what the published per-robot figure does, so that figure is only the fallback.
+// undefined while the boards load, null if one failed.
+function rankedHere(id) {
+  if (!loaded(id, 'open') || !loaded(id, 'fine-tuning')) return undefined
+  if (store.failed.has(KEY(id, 'open')) || store.failed.has(KEY(id, 'fine-tuning'))) return null
+  const n = rows => new Set(rows.map(r => r.policyId || r.policy)).size
+  return Math.max(n(rankedOpen(id)), n(fineRows(id)))
+}
+
 function fleet() {
   $('#fleet').innerHTML = FLEET.map(f => {
-    const policies = stats?.robots?.[f.api]?.policies
-    const live = f.joining ? 'Joining' : policies ? `${fmt(policies)} policies ranked` : stats ? 'Results coming soon' : statsFailed ? '' : '<span class="skel">00 policies ranked</span>'
+    const here = rankedHere(f.api), policies = here === null ? stats?.robots?.[f.api]?.policies : here
+    const skel = '<span class="skel">00 policies ranked</span>'
+    const live = f.joining ? 'Joining' : policies ? `${fmt(policies)} policies ranked` : here === undefined ? skel : stats ? 'Results coming soon' : statsFailed ? '' : skel
     const body = `<span class="stage"><img src="${f.img}" alt="" loading="lazy"></span>
       <h3>${esc(f.name)}</h3><p class="kind">${esc(f.kind)}</p>${live ? `<p class="live${f.joining ? ' joining' : ''}">${live}</p>` : ''}`
     return SETUPS[f.id]
