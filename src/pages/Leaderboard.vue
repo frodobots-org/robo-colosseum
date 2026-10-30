@@ -47,7 +47,7 @@
           <span role="columnheader">#</span>
           <span role="columnheader">Policy</span>
           <template v-if="track === 'open'">
-            <button role="columnheader" type="button" :class="['sortable', { on: sortKey === 'score' }]" @click="sortBy('score')">Rating <small>±1 SE</small><Icon :name="sortIcon('score')" /></button>
+            <button role="columnheader" type="button" :class="['sortable', { on: sortKey === 'score' }]" @click="sortBy('score')">{{ isDcr ? 'DCR rating' : 'Rating' }} <small>{{ isDcr ? '±1 SD' : '±1 SE' }}</small><Icon :name="sortIcon('score')" /></button>
             <button role="columnheader" type="button" :class="['sortable', { on: sortKey === 'winrate' }]" @click="sortBy('winrate')">Record <small>W · T · L</small><Icon :name="sortIcon('winrate')" /></button>
             <button role="columnheader" type="button" :class="['sortable num', { on: sortKey === 'evals' }]" @click="sortBy('evals')">Comparisons<Icon :name="sortIcon('evals')" /></button>
           </template>
@@ -98,19 +98,21 @@
       </div>
 
       <div class="board-foot">
-        <span v-if="track === 'open'">Rating is fitted from blind pairwise preferences on this robot; ±1 standard error. Fewer than 20 comparisons is marked low evidence. Pending policies are registered but not yet compared.</span>
+        <span v-if="track === 'open' && isDcr">DCR rates full-task success after calibrating Router-estimated task difficulty, separately for each robot. Bars show ±1 posterior standard deviation (SD). At least 20 eligible comparisons per policy are required; models without enough eligible results remain unranked. W/T/L records are shown separately and do not determine DCR ranks.</span>
+        <span v-else-if="track === 'open'">Rating is fitted from blind pairwise preferences on this robot; ±1 standard error. Fewer than 20 comparisons is marked low evidence. Pending policies are registered but not yet compared.</span>
         <span v-else>Full success is the share of trials that completed the task, with a Wilson 95% interval. Progress is the mean partial score. "All tasks" pools a checkpoint's trials across its tasks; a task tab ranks within that task.</span>
       </div>
     </section>
 
     <section v-if="!loading && !apiUnavailable && apiRows.length" class="figure-panel">
-      <div><h2>{{ track === 'open' ? 'Rating against evidence' : 'Success against progress' }}</h2><p class="panel-note">{{ track === 'open' ? 'Every rated policy as a lab mark: rating on the vertical, comparisons on the horizontal (log). Whiskers are ±1 SE.' : 'Each checkpoint as a lab mark: full success against mean progress, with Wilson 95% intervals. The diagonal is success = progress.' }}</p></div>
+      <div><h2>{{ track === 'open' ? 'Rating against evidence' : 'Success against progress' }}</h2><p class="panel-note">{{ track === 'open' ? `Every rated policy as a lab mark: rating on the vertical, comparisons on the horizontal (log). Whiskers are ${isDcr ? '±1 SD' : '±1 SE'}.` : 'Each checkpoint as a lab mark: full success against mean progress, with Wilson 95% intervals. The diagonal is success = progress.' }}</p></div>
       <div ref="figureEl" class="figure"></div>
     </section>
 
     <section class="definitions">
       <h2>Key definitions</h2>
-      <details><summary>Rating and standard error<Icon name="down" /></summary><p>Ratings are fitted per robot from blind A/B preferences, so a rating only compares policies on the same robot. The ±1 standard error shows how much the fit could move with more comparisons; two policies whose intervals overlap are not reliably ordered.</p></details>
+      <details v-if="isDcr"><summary>DCR rating and standard deviation<Icon name="down" /></summary><p>DCR ratings estimate full-task success ability after accounting for task difficulty, separately for each robot. The ±1 SD interval shows posterior uncertainty in that rating.</p></details>
+      <details v-else><summary>Rating and standard error<Icon name="down" /></summary><p>Ratings are fitted per robot from blind A/B preferences, so a rating only compares policies on the same robot. The ±1 standard error shows how much the fit could move with more comparisons; two policies whose intervals overlap are not reliably ordered.</p></details>
       <details><summary>Record and comparisons<Icon name="down" /></summary><p>Each comparison is one evaluator-written instruction run by two policies in the same scene, judged blind. The record counts wins, ties and losses; comparisons is their total. Below 20 comparisons a rating is shown faded and marked low evidence.</p></details>
       <details><summary>Full success, progress and the 95% interval<Icon name="down" /></summary><p>In the Fine-tune track a checkpoint is adapted to one task from the shared demonstrations and run up to 25 times on it. Full success is the share of trials that completed the task; progress is the mean partial score (the share of the task's milestones reached), as a percentage. The interval on full success is a Wilson 95% interval for the number of trials.</p></details>
       <details><summary>Pending and hidden entries<Icon name="down" /></summary><p>A registered policy without finalized comparisons is pending and unranked. Rows the organizers hide for a robot or track are not counted here; their evaluations remain in the viewer.</p></details>
@@ -144,26 +146,31 @@ function labelled(items, key) {
 
 const scoped = computed(() => apiRows.value.filter(r => r.robotId === robot.value.id && r.track === track.value))
 
+const isDcr = computed(() => scoped.value.some(r => r.ratingMethod === 'dcr'))
+const lower = r => r.score - (r.std || 0)
+const upper = r => r.score + (r.std || 0)
+
 const openRows = computed(() => {
   // Rated policies with enough evidence come first; low-evidence ratings follow, still numbered, so a policy with
   // two comparisons cannot top the board on a wide error bar.
   const rated = labelled(scoped.value.filter(r => r.status !== 'pending' && Number(r.evals) > 0 && Number.isFinite(r.score)), 'policy')
-    .sort((a, b) => (b.evals >= LOW) - (a.evals >= LOW) || b.score - a.score)
-  const pending = labelled(scoped.value.filter(r => r.status === 'pending' || !(Number(r.evals) > 0)), 'policy')
+    .sort((a, b) => (isDcr.value ? 0 : (b.evals >= LOW) - (a.evals >= LOW)) || b.score - a.score)
+  const pending = labelled(scoped.value.filter(r => r.status === 'pending' || !(Number(r.evals) > 0) || !Number.isFinite(r.score)), 'policy')
   if (!rated.length && !pending.length) return []
-  const lo = Math.min(...rated.map(r => r.score - (r.std || 0))), hi = Math.max(...rated.map(r => r.score + (r.std || 0)))
+  const lo = Math.min(...rated.map(lower)), hi = Math.max(...rated.map(upper))
   const pad = Math.max(30, (hi - lo) * 0.12), d0 = lo - pad, d1 = hi + pad
   const pos = v => Math.min(100, Math.max(0, (v - d0) / (d1 - d0) * 100))
   let rank = 0, last = null
   const rows = rated.map((r, i) => {
     const v = Math.round(r.score); if (v !== last) rank = i + 1; last = v
+    if (r.ratingMethod === 'dcr') rank = r.rank
     const lab = labFor(r.policy)
     return { id: r.id || r.policy, rank, label: r.label, policyId: r.policyId || policyName(r.policy), lab, initial: initialOf(r.label), modelUrl: r.modelUrl,
       sub: `${lab ? lab.name : 'Independent'}${r.trend ? (r.trend > 0 ? ` · up ${r.trend}` : ` · down ${-r.trend}`) : ''}`,
-      score: v, se: Math.round(r.std || 0), at: pos(r.score), lo: pos(r.score - (r.std || 0)), span: pos(r.score + (r.std || 0)) - pos(r.score - (r.std || 0)),
+      dcr: r.ratingMethod === 'dcr', ciLow: r.ratingCiLow, ciHigh: r.ratingCiHigh, score: v, se: Math.round(r.std || 0), at: pos(r.score), lo: pos(lower(r)), span: pos(upper(r)) - pos(lower(r)),
       wins: r.wins, ties: r.ties, losses: r.losses, evals: r.evals, winrate: r.evals ? (r.wins + r.ties / 2) / r.evals * 100 : 0, faint: r.evals < LOW, pending: false }
   })
-  const rest = pending.map(r => { const lab = labFor(r.policy); return { id: r.id || r.policy, rank: null, label: r.label, policyId: r.policyId || policyName(r.policy), lab, initial: initialOf(r.label), modelUrl: r.modelUrl, sub: `${lab ? lab.name : 'Independent'} · registered`, score: null, se: 0, wins: 0, ties: 0, losses: 0, evals: 0, winrate: 0, faint: false, pending: true } })
+  const rest = pending.map(r => { const lab = labFor(r.policy); return { id: r.id || r.policy, rank: null, label: r.label, policyId: r.policyId || policyName(r.policy), lab, initial: initialOf(r.label), modelUrl: r.modelUrl, sub: `${lab ? lab.name : 'Independent'} · ${r.ratingStatus === 'insufficient_data' ? 'not enough eligible results' : 'registered'}`, score: null, se: 0, wins: r.wins || 0, ties: r.ties || 0, losses: r.losses || 0, evals: r.evals || 0, winrate: r.evals ? (r.wins + r.ties / 2) / r.evals * 100 : 0, faint: false, pending: true } })
   return [...rows, ...rest]
 })
 
@@ -224,10 +231,10 @@ const summary = computed(() => {
     const second = rows.filter(r => !r.faint && r !== lead)[0] || rows.filter(r => r !== lead)[0]
     const gap = second ? lead.score - second.score : 0
     return [
-      { icon: 'trophy', label: 'Leader', value: lead.label, sub: `${fmt(lead.score)} ±${fmt(lead.se)} · ${lead.lab?.name || 'Independent'}`, kind: 'lead', ...tile(lead) },
+      { icon: 'trophy', label: 'Leader', value: lead.label, sub: `${fmt(lead.score)} · ±${fmt(lead.se)} · ${lead.lab?.name || 'Independent'}`, kind: 'lead', ...tile(lead) },
       { icon: 'ab', label: 'Blind comparisons', value: fmt(comparisons), sub: `on ${robot.value.name}, judged by people`, kind: 'n' },
       { icon: 'grid', label: 'Policies rated', value: String(rows.length), sub: `${baseRows.value.length - rows.length} pending`, kind: 'k' },
-      { icon: second ? (gap > lead.se + second.se ? 'trend-up' : 'info') : 'info', label: 'Lead over #2', value: second ? `${gap > 0 ? '+' : ''}${fmt(gap)}` : '—', sub: second ? (gap > lead.se + second.se ? `clear of the error bars (${second.label})` : `inside the error bars (${second.label})`) : 'only one rated policy', kind: 'gap' },
+      { icon: second ? ((gap > lead.se + second.se) ? 'trend-up' : 'info') : 'info', label: 'Lead over #2', value: second ? `${gap > 0 ? '+' : ''}${fmt(gap)}` : '—', sub: second ? ((gap > lead.se + second.se) ? `clear of the error bars (${second.label})` : `inside the error bars (${second.label})`) : 'only one rated policy', kind: 'gap' },
     ]
   }
   const trials = rows.reduce((n, r) => n + r.trials, 0)

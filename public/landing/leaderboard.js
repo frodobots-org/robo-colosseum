@@ -1,5 +1,5 @@
 // Leaderboard figure: every model on a robot as a labeled logo marker, drawn from the live boards.
-import { ASSETS, ROBOTS, rankedOpen, fineRows, labelRows, wilson, fmt, esc } from './live.js'
+import { ASSETS, ROBOTS, ratingLow, ratingHigh, ratingInterval, rankedOpen, fineRows, labelRows, wilson, fmt, esc } from './live.js'
 
 // Lab marks are the labs' own Hugging Face organization avatars.
 const LABS = {
@@ -47,26 +47,26 @@ function openModel(robot) {
   const comparisons = Math.round(rows.reduce((n, r) => n + r.evals, 0) / 2)
   const points = rows.map((r, i) => ({
     key: r.policy, label: r.evals < LOW_EVIDENCE ? `${r.label} · n=${r.evals}` : r.label, name: r.label, lab: labFor(r.policy),
-    x: r.evals, y: r.score, lo: r.score - (r.std || 0), hi: r.score + (r.std || 0), lead: i === 0, faint: r.evals < LOW_EVIDENCE,
-    tip: [`${fmt(Math.round(r.score))} ± ${Math.round(r.std || 0)}`, 'rating', `${fmt(r.wins)} W · ${fmt(r.ties)} T · ${fmt(r.losses)} L · ${fmt(r.evals)} comparisons`],
-    cells: [String(i + 1), r.label, labFor(r.policy)?.name || '—', fmt(Math.round(r.score)), `± ${Math.round(r.std || 0)}`, `${fmt(r.wins)} / ${fmt(r.ties)} / ${fmt(r.losses)}`, fmt(r.evals)],
+    x: r.evals, y: r.score, lo: ratingLow(r), hi: ratingHigh(r), lead: i === 0, faint: r.evals < LOW_EVIDENCE,
+    tip: [`${fmt(Math.round(r.score))} · ${ratingInterval(r)}`, 'rating', `${fmt(r.wins)} W · ${fmt(r.ties)} T · ${fmt(r.losses)} L · ${fmt(r.evals)} comparisons`],
+    cells: [String(i + 1), r.label, labFor(r.policy)?.name || '—', fmt(Math.round(r.score)), ratingInterval(r), `${fmt(r.wins)} / ${fmt(r.ties)} / ${fmt(r.losses)}`, fmt(r.evals)],
   }))
   const [first, second] = rows, last = rows[rows.length - 1]
   const gap = second ? Math.round(first.score - second.score) : 0
   const title = !second ? `${first.label} is the only rated model on ${robot.name}`
     : first.evals < LOW_EVIDENCE ? `${first.label} tops ${robot.name} on just ${first.evals} comparisons`
-    : gap > (first.std || 0) + (second.std || 0) ? `${first.label} leads ${robot.name} by ${fmt(gap)} rating points`
+    : ratingLow(first) > ratingHigh(second) ? `${first.label} leads ${robot.name} by ${fmt(gap)} rating points`
     : `${first.label} edges ${second.label} on ${robot.name}, within the error bars`
-  const scores = rows.map(r => r.score), lo = Math.min(...scores), hi = Math.max(...scores)
+  const lo = Math.min(...rows.map(ratingLow)), hi = Math.max(...rows.map(ratingHigh))
   const pad = Math.max(60, (hi - lo) * 0.14)
   const counts = rows.map(r => r.evals)
   return {
     title, subtitle: second ? `Rating: ${fmt(Math.round(first.score))} (${first.label}) → ${fmt(Math.round(last.score))} (${last.label})` : `Rating: ${fmt(Math.round(first.score))}`,
     yLabel: 'Rating (higher is better)', xLabel: 'Blind A/B comparisons (log)',
-    note: `RoboColosseum Open track · ${robot.name} · ${fmt(comparisons)} blind comparisons. Whiskers: ±1 standard error. Bold: current leader${rows.some(r => r.evals < LOW_EVIDENCE) ? `; n = comparisons where fewer than ${LOW_EVIDENCE}` : ''}.`,
+    note: `RoboColosseum Open track · ${robot.name} · ${fmt(comparisons)} blind comparisons. Whiskers: ${first.ratingMethod === 'dcr' ? '±1 posterior standard deviation' : '±1 standard error'}. Bold: current leader${rows.some(r => r.evals < LOW_EVIDENCE) ? `; n = comparisons where fewer than ${LOW_EVIDENCE}` : ''}.`,
     x: { log: true, d0: Math.max(1, Math.min(...counts) / 1.6), d1: Math.max(...counts) * 1.6 },
     y: { d0: lo - pad, d1: hi + pad },
-    points, head: ['#', 'Model', 'Lab', 'Rating', '±1 SE', 'W / T / L', 'Comparisons'],
+    points, head: ['#', 'Model', 'Lab', 'Rating', first.ratingMethod === 'dcr' ? '±1 SD' : '±1 SE', 'W / T / L', 'Comparisons'],
   }
 }
 

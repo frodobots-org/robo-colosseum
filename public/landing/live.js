@@ -80,6 +80,10 @@ export function totals() {
   }
 }
 
+export const ratingLow = r => r.score - (r.std || 0)
+export const ratingHigh = r => r.score + (r.std || 0)
+export const ratingInterval = r => `± ${Math.round(r.std || 0)} (1 ${r.ratingMethod === 'dcr' ? 'SD' : 'SE'})`
+
 export const fmt = value => value === null || value === undefined ? '—' : Number(value).toLocaleString('en-US')
 export const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 
@@ -147,15 +151,15 @@ export function explorer(state) {
     const d0 = lo - pad, d1 = hi + pad, pos = v => Math.min(100, Math.max(0, (v - d0) / (d1 - d0) * 100))
     const comparisons = Math.round(open.reduce((n, r) => n + r.evals, 0) / 2)
     const openRows = open.map((r, i) => ({
-      rank: String(i + 1).padStart(2, '0'), name: r.label, score: Math.round(r.score), std: Math.round(r.std || 0),
+      rank: String(i + 1).padStart(2, '0'), name: r.label, score: Math.round(r.score), std: Math.round(r.std || 0), interval: ratingInterval(r),
       evals: r.evals, wins: r.wins, ties: r.ties, losses: r.losses,
-      at: pos(r.score) + '%', from: pos(r.score - (r.std || 0)) + '%', span: (pos(r.score + (r.std || 0)) - pos(r.score - (r.std || 0))) + '%',
+      at: pos(r.score) + '%', from: pos(ratingLow(r)) + '%', span: (pos(ratingHigh(r)) - pos(ratingLow(r))) + '%',
     }))
     const top = openRows[0]
     return {
       ...base, mode: 'open', openRows, comparisons,
-      headline: `${top.name} ranks first on ${robot.name}: rating ${fmt(top.score)} ± ${top.std} from ${fmt(top.evals)} comparisons.`,
-      sub: `${fmt(comparisons)} blind comparisons on ${robot.name} · fitted ratings with ±1 standard error, within this body only.`,
+      headline: `${top.name} ranks first on ${robot.name}: rating ${fmt(top.score)} · ${top.interval} from ${fmt(top.evals)} comparisons.`,
+      sub: `${fmt(comparisons)} blind comparisons on ${robot.name} · ${open[0].ratingMethod === 'dcr' ? 'DCR ratings with ±1 posterior standard deviation' : 'fitted ratings with ±1 standard error'}, within this body only.`,
     }
   }
 
