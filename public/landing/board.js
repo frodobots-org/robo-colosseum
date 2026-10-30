@@ -31,6 +31,7 @@ export function openRows(robotId) {
     ticks: niceTicks(d0, d1).map(v => ({ at: pos(v), label: fmt(v) })), n: `${fmt(Math.round(rows.reduce((s, r) => s + r.evals, 0) / 2))} comparisons`,
     rows: rows.map((r, i) => {
       const v = Math.round(r.score); if (v !== last) rank = i + 1; last = v
+      if (r.ratingMethod === 'dcr') rank = r.rank
       const lab = labFor(r.policy)
       return { id: r.policy, rank, label: r.label, sub: `${lab ? lab.name : 'Independent'} · ${fmt(r.evals)} comparisons`, policy: r.policy,
         at: pos(r.score), lo: pos(r.score - (r.std || 0)), span: pos(r.score + (r.std || 0)) - pos(r.score - (r.std || 0)),
@@ -88,7 +89,9 @@ function sceneMinis(robotId, policy) {
 }
 
 export const DESC = {
-  open: robot => `Ratings on ${robot.name} are fitted from blind pairs and drawn with ±1 standard error. Policies are only ever compared with others on this same body.`,
+  open: robot => rankedOpen(robot.id).some(r => r.ratingMethod === 'dcr')
+    ? `DCR ratings on ${robot.name} account for task difficulty; bars show ±1 SD. Policies are only compared within this body.`
+    : `Ratings on ${robot.name} are fitted from blind pairs and drawn with ±1 standard error. Policies are only ever compared with others on this same body.`,
   fine: robot => `Each checkpoint is adapted to one ${robot.name} task and runs up to 25 scored trials. Bars show the share with full success; the band is a Wilson 95% interval.`,
 }
 

@@ -265,7 +265,9 @@ function rankings() {
   }
   const shown = !extra ? '' : board.all ? ` All ${total} shown.` : ` Top 5 of ${total} shown.`
   note.textContent = board.track === 'open'
-    ? `Ratings on ${robot.name} from blind comparisons; ± is one standard error. Faded rows have fewer than 20 comparisons so far.${shown}`
+    ? (rankedOpen(board.robot).some(r => r.ratingMethod === 'dcr')
+      ? `DCR ratings on ${robot.name} account for task difficulty; ± is one standard deviation (SD).${shown}`
+      : `Ratings on ${robot.name} from blind comparisons; ± is one standard error. Faded rows have fewer than 20 comparisons so far.${shown}`)
     : `Full successes on ${robot.name}'s Fine-tune track tasks; the band is a 95% interval. Faded rows have fewer than 10 trials so far.${shown}`
 }
 document.querySelector('.board-controls').addEventListener('click', e => {
