@@ -13,7 +13,7 @@ import './styles/boards.css'
 const routes = [
   // The landing page is the overview. Netlify serves it at the site root before the app loads; elsewhere (GitHub Pages,
   // the dev server) the app sends the root to it.
-  { path: '/', component: { render: () => null }, beforeEnter: () => { window.location.replace(`${import.meta.env.BASE_URL}v9/`); return false } },
+  { path: '/', component: { render: () => null }, beforeEnter: () => { window.location.replace(`${import.meta.env.BASE_URL}landing/`); return false } },
   { path: '/leaderboard', component: Leaderboard },
   { path: '/tasks', component: Tasks },
   { path: '/evals', component: EvalViewer },

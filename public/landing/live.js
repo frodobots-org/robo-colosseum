@@ -1,4 +1,4 @@
-// Live data for the Pink and Orange landing pages.
+// Live data for the landing page, the blog and the app's leaderboard figure.
 // Reads the same production API as the main app; nothing here is a snapshot.
 const onPages = location.hostname.endsWith('github.io')
 export const API = onPages ? 'https://191.222.219.43/api' : '/api'
@@ -134,7 +134,7 @@ export function explorer(state) {
   ]
   const open = labelRows(rankedOpen(robot.id), 'policy')
   const fine = fineRows(robot.id)
-  const base = { robot, robots, tracks, taskChips: [], rows: [], openRows: [], headline: '', sub: '', hasUnknown: false, portrait: ASSETS + robot.img + '.webp' }
+  const base = { robot, robots, tracks, taskChips: [], rows: [], openRows: [], headline: '', sub: '', hasUnknown: false }
   const boardsFailed = TRACKS.some(track => store.failed.has(`${robot.id}/${track}`))
   if (!store.ready) return { ...base, mode: 'loading', headline: 'Loading the benchmark…' }
   if (boardsFailed && !open.length && !fine.length) return { ...base, mode: 'error', headline: `${robot.name} results are temporarily unavailable.`, sub: 'The production API did not respond. Reload to try again.' }

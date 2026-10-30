@@ -1,5 +1,5 @@
-/* RoboColosseum app (leaderboard, evaluations, tasks, submit, join) in the brand of the landing page (public/v9, Figma
-   "RC Brand", 28 Oct 2026): flat #f1f1f1 paper with white panels, near-black type, the orange of the mark for the one
+/* RoboColosseum app (leaderboard, evaluations, tasks, submit, join) in the brand of the landing page (public/landing,
+   Figma "RC Brand", Oct 2026): flat #f1f1f1 paper with white panels, near-black type, the orange of the mark for the one
    call to action and for a picked run. Zalando Sans carries every word; Kode Mono, in capitals, carries labels and the record. Sharp rectangles
    and hairlines; lab marks are the only circles. Light by default, the brand's dark theme on the switch (shared with the
    landing page through localStorage "rc-theme"). Tokens first; base.css and boards.css read the same names. */

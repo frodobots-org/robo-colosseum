@@ -1,0 +1,61 @@
+/* The blog, on the landing page's stylesheet (tokens, top bar, footer, the one button, the 10,000-hour close): an index
+   of posts and one reading layout, with the contents beside the text on wide screens and figures wider than the text. */
+.nav a[aria-current] { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+.kicker { font: 700 12.5px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--ink-3); }
+.kicker::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 9px; background: var(--accent); vertical-align: 1px; }
+.kicker a { color: var(--ink-2); text-decoration: none; }
+.kicker a:hover { color: var(--ink); text-decoration: underline; }
+.arr { width: 16px; height: 16px; flex: none; transition: transform .15s; }
+
+/* index */
+.blog-head { padding-block: clamp(56px, 8vw, 104px) clamp(32px, 4vw, 48px); }
+.blog-head h1 { font: 600 clamp(44px, 6vw, 84px)/1 var(--sans); letter-spacing: -.045em; }
+.blog-head p { margin-top: 16px; max-width: 52ch; font-size: clamp(17px, 1.4vw, 19px); line-height: 1.5; color: var(--ink-2); }
+.posts { display: grid; gap: 24px; padding-bottom: clamp(72px, 9vw, 120px); }
+.post-card { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); border: 1px solid var(--line-2); background: var(--paper-2) var(--grain); color: inherit; text-decoration: none; transition: border-color .15s; }
+.post-card:hover { border-color: var(--ink); }
+.post-card .cover { position: relative; overflow: hidden; aspect-ratio: 16 / 10; background: #111; }
+.post-card .cover img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+.post-card:hover .cover img { transform: scale(1.03); }
+.post-card .text { display: grid; align-content: space-between; gap: 32px; padding: clamp(24px, 3.2vw, 44px); }
+.post-card h2 { margin-top: 18px; font: 600 clamp(28px, 2.9vw, 42px)/1.06 var(--sans); letter-spacing: -.035em; text-wrap: balance; }
+.post-card p { margin-top: 16px; font-size: 17.5px; line-height: 1.5; color: var(--ink-2); }
+.read { display: inline-flex; align-items: center; gap: 10px; font: 650 15.5px/1 var(--sans); }
+.post-card:hover .read .arr { transform: translateX(3px); }
+@media (prefers-reduced-motion: reduce) { .post-card .cover img, .arr { transition: none; } }
+@media (max-width: 860px) { .post-card { grid-template-columns: 1fr; } }
+
+/* a post: the head, then the contents and the text */
+.article-head { padding: clamp(48px, 7vw, 96px) 0 clamp(40px, 5vw, 64px); border-bottom: 1px solid var(--line-2); }
+.article-head h1 { margin-top: 22px; max-width: 25ch; font: 600 clamp(36px, 5.2vw, 72px)/1.02 var(--sans); letter-spacing: -.045em; text-wrap: balance; }
+.standfirst { margin-top: 24px; max-width: 46ch; font-size: clamp(19px, 1.8vw, 23px); line-height: 1.45; color: var(--ink-2); }
+.article-head .meta { margin-top: 28px; font: 700 12.5px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--ink-3); }
+.article { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: clamp(40px, 6vw, 96px); padding-top: clamp(48px, 6vw, 80px); padding-bottom: clamp(72px, 9vw, 120px); }
+.toc { position: sticky; top: 96px; align-self: start; }
+.toc ol { margin-top: 16px; border-left: 1px solid var(--line-2); }
+.toc a { display: block; margin-left: -1px; padding: 7px 0 7px 14px; border-left: 2px solid transparent; font-size: 14.5px; line-height: 1.35; color: var(--ink-3); text-decoration: none; }
+.toc a:hover { color: var(--ink); }
+.toc a[aria-current] { color: var(--ink); border-left-color: var(--accent); }
+@media (max-width: 1020px) { .article { grid-template-columns: minmax(0, 1fr); } .toc { display: none; } }
+
+.prose > * { max-width: 680px; }
+.prose > figure { max-width: none; }
+.prose h2 { margin-top: clamp(56px, 7vw, 88px); font: 600 clamp(26px, 2.6vw, 36px)/1.12 var(--sans); letter-spacing: -.035em; text-wrap: balance; scroll-margin-top: 96px; }
+.prose h2:first-child { margin-top: 0; }
+.prose p, .prose li { font-size: 18px; line-height: 1.7; color: var(--ink-2); }
+.prose p { margin-top: 20px; }
+.prose h2 + p { margin-top: 18px; }
+.prose b { color: var(--ink); font-weight: 650; }
+.prose ul { display: grid; gap: 14px; margin-top: 20px; }
+.prose li { position: relative; padding-left: 24px; }
+.prose li::before { content: ""; position: absolute; left: 2px; top: .68em; width: 7px; height: 7px; background: var(--accent); }
+.prose figure { margin-top: 36px; }
+.prose h2 + figure { margin-top: 28px; }
+/* the diagrams are drawn on white, so they sit on white in both themes */
+.sheet { padding: clamp(8px, 1.6vw, 18px); background: #fff; border: 1px solid var(--line-2); }
+.sheet img { width: 100%; height: auto; }
+.prose figcaption { max-width: 680px; margin-top: 12px; font-size: 15px; line-height: 1.5; color: var(--ink-3); }
+.prose figcaption b { margin-right: 8px; font: 700 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .02em; color: var(--ink-2); }
+.equation { margin-top: 28px; padding: 20px clamp(14px, 3vw, 24px) 26px; background: var(--paper-2); border: 1px solid var(--line-2); overflow-x: auto; }
+.equation math { margin-top: 18px; font-size: clamp(16px, 4.4vw, 25px); font-family: "STIX Two Math", "Cambria Math", "Latin Modern Math", serif; }
+.film video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #121212; border: 1px solid var(--ink); }
