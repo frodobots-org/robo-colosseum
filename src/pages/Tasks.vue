@@ -65,11 +65,11 @@ import { fmt, pct, taskName } from '../labs.js'
 const { robot, track, link } = useArena()
 
 // The tasks that exist are the ones on the published Fine-tune track leaderboard; their datasets come from the landing's
-// list (public/v8/datasets.js), matched by the router's task id.
+// list (public/landing/datasets.js), matched by the router's task id.
 const rows = ref([]), loading = ref(true), datasets = ref({}), selectedId = ref('')
 onMounted(async () => {
   const base = import.meta.env.BASE_URL
-  const [board, data] = await Promise.all([getLeaderboard({ track: 'fine-tuning' }), import(/* @vite-ignore */ `${base}v8/datasets.js`).catch(() => null)])
+  const [board, data] = await Promise.all([getLeaderboard({ track: 'fine-tuning' }), import(/* @vite-ignore */ `${base}landing/datasets.js`).catch(() => null)])
   rows.value = (board.board || []).filter(r => r.track === 'fine-tuning')
   if (data) datasets.value = Object.fromEntries(data.TRAINING.flatMap(g => g.sets.map(([name, episodes, , task]) => [task, { name, episodes, href: `${data.HUB}${name}` }])))
   loading.value = false

@@ -19,5 +19,5 @@ defineProps({ openLabel: { type: String, default: 'Blind comparisons' }, fineLab
 const { robot, track, select } = useArena()
 // The same cut-out photos as the landing page's robot cards, so white robots stay white on the peach stage.
 const base = import.meta.env.BASE_URL
-const photo = id => id === 'earth_rover_mini_plus' ? `${base}v3/bodies/earth-rover-mini-plus.webp` : `${base}v9/robots/${id}.webp`
+const photo = id => `${base}landing/robots/${id === 'earth_rover_mini_plus' ? 'earth-rover-mini-plus' : id}.webp`
 </script>
